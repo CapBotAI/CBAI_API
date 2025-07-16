@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using App.Commons;
 using App.Entities.Enums;
 
 namespace App.Entities.Entities.App;
 
-public partial class Review
+public partial class Review : CommonDataModel
 {
     public int Id { get; set; }
 
@@ -21,10 +22,6 @@ public partial class Review
     public ReviewStatus Status { get; set; } = ReviewStatus.Draft;
 
     public DateTime? SubmittedAt { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime UpdatedAt { get; set; }
 
     public virtual ReviewerAssignment Assignment { get; set; } = null!;
     public virtual ICollection<ReviewCriteriaScore> ReviewCriteriaScores { get; set; } = new List<ReviewCriteriaScore>();

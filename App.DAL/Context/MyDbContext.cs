@@ -166,12 +166,8 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasMaxLength(50).IsRequired();
-            entity.Property(e => e.IsActive).HasDefaultValue(true);
-            entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasIndex(e => e.Name).IsUnique();
-            entity.HasIndex(e => e.IsActive);
         });
 
         // PhaseType Configuration
@@ -193,7 +189,6 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(d => d.Semester)
                 .WithMany(p => p.Phases)
@@ -232,7 +227,6 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.IsLegacy).HasDefaultValue(false);
             entity.Property(e => e.IsApproved).HasDefaultValue(true);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(d => d.Supervisor)
                 .WithMany(p => p.Topics)
@@ -267,7 +261,6 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.DocumentUrl).HasMaxLength(500);
             entity.Property(e => e.Status).HasDefaultValue(App.Entities.Enums.TopicStatus.Draft);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(d => d.Topic)
                 .WithMany(p => p.TopicVersions)
@@ -401,7 +394,6 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.Recommendation).HasDefaultValue(App.Entities.Enums.ReviewRecommendations.MinorRevision);
             entity.Property(e => e.Status).HasDefaultValue(App.Entities.Enums.ReviewStatus.Draft);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
-            entity.Property(e => e.UpdatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(d => d.Assignment)
                 .WithMany(p => p.Reviews)

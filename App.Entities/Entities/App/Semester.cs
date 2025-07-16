@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using App.Commons;
 
 namespace App.Entities.Entities.App;
 
-public partial class Semester
+public partial class Semester : CommonDataModel
 {
     public int Id { get; set; }
 
@@ -12,12 +13,6 @@ public partial class Semester
     public DateOnly StartDate { get; set; }
 
     public DateOnly EndDate { get; set; }
-
-    public bool IsActive { get; set; } = false;
-
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime UpdatedAt { get; set; }
 
     public virtual ICollection<Phase> Phases { get; set; } = new List<Phase>();
     public virtual ICollection<Topic> Topics { get; set; } = new List<Topic>();

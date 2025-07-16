@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using App.Commons;
 
 namespace App.Entities.Entities.App;
 
-public partial class Phase
+public partial class Phase : CommonDataModel
 {
     public int Id { get; set; }
 
@@ -18,12 +19,6 @@ public partial class Phase
     public DateTime EndDate { get; set; }
 
     public DateTime? SubmissionDeadline { get; set; }
-
-    public bool IsActive { get; set; } = false;
-
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime UpdatedAt { get; set; }
 
     public virtual Semester Semester { get; set; } = null!;
     public virtual PhaseType PhaseType { get; set; } = null!;

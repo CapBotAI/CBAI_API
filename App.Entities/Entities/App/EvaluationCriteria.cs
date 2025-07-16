@@ -1,9 +1,10 @@
 using System;
 using System.Collections.Generic;
+using App.Commons;
 
 namespace App.Entities.Entities.App;
 
-public partial class EvaluationCriteria
+public partial class EvaluationCriteria : CommonDataModel
 {
     public int Id { get; set; }
 
@@ -14,10 +15,6 @@ public partial class EvaluationCriteria
     public int MaxScore { get; set; } = 10;
 
     public decimal Weight { get; set; } = 1.00m;
-
-    public bool IsActive { get; set; } = true;
-
-    public DateTime CreatedAt { get; set; }
 
     public virtual ICollection<ReviewCriteriaScore> ReviewCriteriaScores { get; set; } = new List<ReviewCriteriaScore>();
 }

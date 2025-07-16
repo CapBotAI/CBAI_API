@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using App.Commons;
 using App.Entities.Entities.Core;
 using App.Entities.Enums;
 
 namespace App.Entities.Entities.App;
 
-public partial class TopicVersion
+public partial class TopicVersion : CommonDataModel
 {
     public int Id { get; set; }
 
@@ -32,10 +33,6 @@ public partial class TopicVersion
     public DateTime? SubmittedAt { get; set; }
 
     public int? SubmittedBy { get; set; }
-
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime UpdatedAt { get; set; }
 
     public virtual Topic Topic { get; set; } = null!;
     public virtual User? SubmittedByUser { get; set; }

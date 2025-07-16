@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
+using App.Commons;
 using App.Entities.Entities.Core;
 
 namespace App.Entities.Entities.App;
 
-public partial class Topic
+public partial class Topic : CommonDataModel
 {
     public int Id { get; set; }
 
@@ -25,10 +26,6 @@ public partial class Topic
     public bool IsLegacy { get; set; } = false;
 
     public bool IsApproved { get; set; } = false;
-
-    public DateTime CreatedAt { get; set; }
-
-    public DateTime UpdatedAt { get; set; }
 
     public virtual User Supervisor { get; set; } = null!;
     public virtual TopicCategory? Category { get; set; }
