@@ -1,6 +1,7 @@
 using System;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using App.Commons.ResponseModel;
 using App.Commons.Utils;
 using FS.Commons;
 using Microsoft.AspNetCore.Http;
@@ -10,6 +11,144 @@ namespace App.Commons.BaseAPI;
 
 public class BaseAPIController : ControllerBase
 {
+
+    /// <summary>
+    /// Xử lý BaseResponseModel generic và trả về ActionResult với status code chính xác
+    /// </summary>
+    /// <typeparam name="T">Loại dữ liệu trong response</typeparam>
+    /// <param name="response">BaseResponseModel từ service</param>
+    /// <returns>ActionResult với status code tương ứng</returns>
+    protected ActionResult HandleServiceResponse<T>(BaseResponseModel<T> response) where T : class
+    {
+        if (response == null)
+        {
+            return Error(ConstantModel.ErrorMessage);
+        }
+
+        var httpStatusCode = MapToHttpStatusCode(response.StatusCode);
+        var fsResponse = new FSResponse
+        {
+            Data = response.Data,
+            StatusCode = (System.Net.HttpStatusCode)response.StatusCode,
+            Message = response.Message,
+            Success = response.IsSuccess
+        };
+
+        return new ObjectResult(fsResponse)
+        {
+            StatusCode = httpStatusCode
+        };
+    }
+
+    /// <summary>
+    /// Xử lý BaseResponseModel không generic và trả về ActionResult với status code chính xác
+    /// </summary>
+    /// <param name="response">BaseResponseModel từ service</param>
+    /// <returns>ActionResult với status code tương ứng</returns>
+    protected ActionResult HandleServiceResponse(BaseResponseModel response)
+    {
+        if (response == null)
+        {
+            return Error(ConstantModel.ErrorMessage);
+        }
+
+        var httpStatusCode = MapToHttpStatusCode(response.StatusCode);
+        var fsResponse = new FSResponse
+        {
+            Data = null,
+            StatusCode = (System.Net.HttpStatusCode)response.StatusCode,
+            Message = response.Message,
+            Success = response.IsSuccess
+        };
+
+        return new ObjectResult(fsResponse)
+        {
+            StatusCode = httpStatusCode
+        };
+    }
+
+    /// <summary>
+    /// Xử lý BaseResponseModel khi thành công
+    /// </summary>
+    /// <typeparam name="T">Loại dữ liệu trong response</typeparam>
+    /// <param name="response">BaseResponseModel từ service</param>
+    /// <returns>ActionResult với status code thành công</returns>
+    protected ActionResult HandleSuccessResponse<T>(BaseResponseModel<T> response) where T : class
+    {
+        if (response == null || !response.IsSuccess)
+        {
+            return Error(ConstantModel.ErrorMessage);
+        }
+
+        return HandleServiceResponse(response);
+    }
+
+    /// <summary>
+    /// Xử lý BaseResponseModel khi có lỗi
+    /// </summary>
+    /// <typeparam name="T">Loại dữ liệu trong response</typeparam>
+    /// <param name="response">BaseResponseModel từ service</param>
+    /// <returns>ActionResult với status code lỗi</returns>
+    protected ActionResult HandleErrorResponse<T>(BaseResponseModel<T> response) where T : class
+    {
+        if (response == null)
+        {
+            return Error(ConstantModel.ErrorMessage);
+        }
+
+        return HandleServiceResponse(response);
+    }
+
+    /// <summary>
+    /// Map status code từ int sang HTTP status code
+    /// </summary>
+    /// <param name="statusCode">Status code từ service</param>
+    /// <returns>HTTP status code tương ứng</returns>
+    private int MapToHttpStatusCode(int statusCode)
+    {
+        return statusCode switch
+        {
+            >= 200 and < 300 => statusCode, // 2xx Success
+            >= 300 and < 400 => statusCode, // 3xx Redirection
+            >= 400 and < 500 => statusCode, // 4xx Client Error
+            >= 500 and < 600 => statusCode, // 5xx Server Error
+            _ => StatusCodes.Status500InternalServerError // Default fallback
+        };
+    }
+
+    /// <summary>
+    /// Phương thức tiện lợi để xử lý response từ service một cách tự động
+    /// </summary>
+    /// <typeparam name="T">Loại dữ liệu trong response</typeparam>
+    /// <param name="response">BaseResponseModel từ service</param>
+    /// <returns>ActionResult phù hợp dựa trên IsSuccess</returns>
+    protected ActionResult ProcessServiceResponse<T>(BaseResponseModel<T> response) where T : class
+    {
+        if (response == null)
+        {
+            return Error(ConstantModel.ErrorMessage);
+        }
+
+        return response.IsSuccess ? HandleSuccessResponse(response) : HandleErrorResponse(response);
+    }
+
+    /// <summary>
+    /// Phương thức tiện lợi cho BaseResponseModel không generic
+    /// </summary>
+    /// <param name="response">BaseResponseModel từ service</param>
+    /// <returns>ActionResult phù hợp dựa trên IsSuccess</returns>
+    protected ActionResult ProcessServiceResponse(BaseResponseModel response)
+    {
+        if (response == null)
+        {
+            return Error(ConstantModel.ErrorMessage);
+        }
+
+        return response.IsSuccess ? HandleServiceResponse(response) : HandleServiceResponse(response);
+    }
+
+
+
     /// <summary>
     /// Errors the specified message.
     /// </summary>
@@ -18,10 +157,10 @@ public class BaseAPIController : ControllerBase
     /// <returns></returns>
     protected ActionResult Error(string message, object data = null)
     {
-        return new BadRequestObjectResult(new FSResponse
+        return new ObjectResult(new FSResponse
         {
             Data = data,
-            StatusCode = System.Net.HttpStatusCode.BadRequest,
+            StatusCode = System.Net.HttpStatusCode.InternalServerError,
             Message = message
         });
     }
@@ -94,8 +233,8 @@ public class BaseAPIController : ControllerBase
         return new BadRequestObjectResult(new FSResponse
         {
             Errors = errors,
-            StatusCode = System.Net.HttpStatusCode.BadRequest,
-            Message = ConstantModel.SaveDataFailed
+            StatusCode = System.Net.HttpStatusCode.UnprocessableEntity,
+            Message = ConstantModel.ModelInvalid
         });
     }
 

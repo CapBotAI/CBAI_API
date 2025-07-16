@@ -3,6 +3,8 @@ namespace App.Commons;
 public class ConstantModel
 {
     #region Common
+    public const string ErrorMessage = "Đã xảy ra lỗi trong quá trình thực hiện. Vui lòng thử lại trong ít phút.";
+    public const string ModelInvalid = "Dữ liệu đầu vào không hợp lệ.";
     public const string GetDataSuccess = "Get data succeeded.";
     public const string GetDataFailed = "Get data failed.";
     public const string GetUnAuthorized = "Bạn đã hết phiên đăng nhập. Vui lòng đăng nhập lại để tiếp tục.";

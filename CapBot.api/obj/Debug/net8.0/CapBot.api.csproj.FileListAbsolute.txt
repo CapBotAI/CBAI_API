@@ -7,6 +7,7 @@
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/CapBot.api.runtimeconfig.json
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/CapBot.api.dll
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/CapBot.api.pdb
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/CapBot.api.xml
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/AutoMapper.dll
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/Azure.Core.dll
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/Azure.Identity.dll
@@ -119,6 +120,7 @@
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/Serilog.Sinks.File.dll
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/Serilog.Sinks.Http.dll
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/SixLabors.ImageSharp.dll
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/Swashbuckle.AspNetCore.Annotations.dll
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/Swashbuckle.AspNetCore.Swagger.dll
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerGen.dll
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/Swashbuckle.AspNetCore.SwaggerUI.dll
@@ -326,6 +328,7 @@
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/obj/Debug/net8.0/CapBot.api.csproj.Up2Date
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/obj/Debug/net8.0/CapBot.api.dll
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/obj/Debug/net8.0/refint/CapBot.api.dll
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/obj/Debug/net8.0/CapBot.api.xml
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/obj/Debug/net8.0/CapBot.api.pdb
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/obj/Debug/net8.0/CapBot.api.genruntimeconfig.cache
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/obj/Debug/net8.0/ref/CapBot.api.dll

@@ -1,0 +1,33 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>CapBot.api</name>
+    </assembly>
+    <members>
+        <member name="M:CapBot.api.Controllers.AuthController.Register(App.Entities.DTOs.Auth.RegisterDTO)">
+             <summary>
+             Đăng ký tài khoản mới
+             </summary>
+             <param name="registerDTO">Thông tin đăng ký người dùng</param>
+             <returns>Kết quả đăng ký tài khoản</returns>
+             <remarks>
+             Tạo tài khoản mới với thông tin đăng ký bao gồm:
+             - Email (bắt buộc)
+             - Mật khẩu (bắt buộc, tối thiểu 6 ký tự)
+             - Tên đầy đủ
+             - Số điện thoại
+            
+             Sample request:
+            
+                 POST /api/register
+                 {
+                     "email": "user@example.com",
+                     "password": "SecurePass123",
+                     "fullName": "Nguyễn Văn A",
+                     "phoneNumber": "+84123456789"
+                 }
+            
+             </remarks>
+        </member>
+    </members>
+</doc>

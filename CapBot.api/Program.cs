@@ -12,8 +12,9 @@ using CapBot.api.OData;
 using CapBot.api.ServiceConfiguration;
 using Microsoft.AspNetCore.OData;
 using App.BLL.Interfaces;
-using App.Entities.Entities.Core;
 using Microsoft.AspNetCore.Identity;
+using App.Entities.Entities.Core;
+using Swashbuckle.AspNetCore.SwaggerUI;
 
 namespace CapBot.api;
 
@@ -37,7 +38,7 @@ public class Program
             .CreateLogger();
         builder.Host.UseSerilog();
 
-        // Add services to the container.
+        // Add services to the container - CHỈ CẤU HÌNH MỘT LẦN
         builder.Services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -47,39 +48,6 @@ public class Program
             options.Select().Filter().OrderBy().Expand().SetMaxTop(null).Count();
             options.AddRouteComponents("odata", EdmModelBuilder.GetEdmModel());
         });
-
-        // Add services to the container.
-        builder.Services.AddAuthorization();
-
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-        builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen(option =>
-            {
-                option.SwaggerDoc("v1", new OpenApiInfo { Title = "Cap Bot Capstone API", Version = "v1" });
-                option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
-                {
-                    In = ParameterLocation.Header,
-                    Description = "Please enter a valid token",
-                    Name = "Authorization",
-                    Type = SecuritySchemeType.Http,
-                    BearerFormat = "JWT",
-                    Scheme = "Bearer"
-                });
-                option.AddSecurityRequirement(new OpenApiSecurityRequirement
-                {
-                    {
-                        new OpenApiSecurityScheme
-                        {
-                            Reference = new OpenApiReference
-                            {
-                                Type = ReferenceType.SecurityScheme,
-                                Id = "Bearer"
-                            }
-                        },
-                        new string[] { }
-                    }
-                });
-            });
 
         //<=====Set up policy=====>
         builder.Services.AddCors(opts =>
@@ -93,6 +61,27 @@ public class Program
         builder.Services.AddDbContext<MyDbContext>(opts => opts.UseSqlServer(connectionString,
             options => { options.MigrationsAssembly("App.DAL"); }));
 
+        //<=====Add Identity Services=====>
+        builder.Services.AddIdentity<User, Role>(options =>
+        {
+            options.Password.RequireDigit = true;
+            options.Password.RequiredLength = 6;
+            options.Password.RequireNonAlphanumeric = false;
+            options.Password.RequireUppercase = false;
+            options.Password.RequireLowercase = false;
+            options.Password.RequiredUniqueChars = 0;
+            options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
+            options.Lockout.MaxFailedAccessAttempts = 5;
+            options.Lockout.AllowedForNewUsers = true;
+            options.User.RequireUniqueEmail = true;
+            options.User.AllowedUserNameCharacters =
+                "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
+            options.SignIn.RequireConfirmedEmail = false;
+            options.SignIn.RequireConfirmedPhoneNumber = false;
+        })
+        .AddEntityFrameworkStores<MyDbContext>()
+        .AddDefaultTokenProviders();
+
         //<=====Add Session=====>
         builder.Services.AddSession(options =>
         {
@@ -101,29 +90,6 @@ public class Program
             options.Cookie.IsEssential = true;
         });
         builder.Services.AddDistributedMemoryCache();
-
-        //<=====Add Identity Framework=====>
-        builder.Services.AddIdentity<User, Role>(options =>
-            {
-                options.Password.RequireDigit = true;
-                options.Password.RequiredLength = 6;
-                options.Password.RequireNonAlphanumeric = false;
-                options.Password.RequireUppercase = true;
-                options.Password.RequireLowercase = true;
-
-                options.Lockout.DefaultLockoutTimeSpan = TimeSpan.FromMinutes(30);
-                options.Lockout.MaxFailedAccessAttempts = 5;
-                options.Lockout.AllowedForNewUsers = true;
-
-                options.User.RequireUniqueEmail = true;
-                options.User.AllowedUserNameCharacters =
-                    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
-
-                options.SignIn.RequireConfirmedEmail = true;
-            })
-            .AddEntityFrameworkStores<MyDbContext>()
-            .AddDefaultTokenProviders();
-
 
         //<=====Add JWT Authentication=====>
         builder.Services.AddAuthentication(options =>
@@ -147,7 +113,6 @@ public class Program
                 ClockSkew = TimeSpan.Zero
             };
         });
-
 
         //<=====Add Authorization=====>
         builder.Services.AddAuthorization(options =>
@@ -178,16 +143,56 @@ public class Program
         //<=====Add SignalR=====>
         builder.Services.AddSignalR();
 
-
         //<=====Register Service=====>
         ServiceConfig.Register(builder.Services, builder.Configuration);
 
         builder.Services.AddHttpContextAccessor();
 
-        builder.Services.AddControllers();
-        // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+        // ===== CẤU HÌNH SWAGGER =====
         builder.Services.AddEndpointsApiExplorer();
-        builder.Services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen(c =>
+        {
+            c.SwaggerDoc("v1", new OpenApiInfo
+            {
+                Version = "v1",
+                Title = "Cap Bot Capstone API",
+                Description = "API Documentation for Cap Bot Capstone System",
+                Contact = new OpenApiContact
+                {
+                    Name = "Development Team",
+                    Email = "dev@capbot.com"
+                }
+            });
+
+            // Cấu hình Security
+            c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+            {
+                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
+                Name = "Authorization",
+                In = ParameterLocation.Header,
+                Type = SecuritySchemeType.Http,
+                Scheme = "bearer",
+                BearerFormat = "JWT"
+            });
+
+            c.AddSecurityRequirement(new OpenApiSecurityRequirement
+            {
+                {
+                    new OpenApiSecurityScheme
+                    {
+                        Reference = new OpenApiReference
+                        {
+                            Type = ReferenceType.SecurityScheme,
+                            Id = "Bearer"
+                        }
+                    },
+                    Array.Empty<string>()
+                }
+            });
+
+            // Bật annotations nếu có sử dụng
+            c.EnableAnnotations();
+        });
 
         var app = builder.Build();
 
@@ -209,11 +214,16 @@ public class Program
         // Configure the HTTP request pipeline.
         if (app.Environment.IsDevelopment())
         {
-            app.UseSwagger();
+            app.UseSwagger(c =>
+            {
+                c.SerializeAsV2 = false;
+            });
             app.UseSwaggerUI(c =>
             {
-                c.SwaggerEndpoint("/swagger/v1/swagger.json", "API v1");
-                c.RoutePrefix = "";
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Cap Bot Capstone API v1");
+                c.RoutePrefix = string.Empty;
+                c.DisplayRequestDuration();
+                c.DocExpansion(DocExpansion.None);
             });
         }
 
@@ -224,7 +234,10 @@ public class Program
         app.UseSession();
         app.UseAuthentication();
         app.UseAuthorization();
+        app.UseRateLimiter();
+
         app.MapControllers();
+
         app.Run();
     }
 }
