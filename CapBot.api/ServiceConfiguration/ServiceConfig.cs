@@ -30,5 +30,8 @@ public class ServiceConfig
         //Jwt Service
         services.AddScoped<IJwtService, JwtService>();
 
+        //Data Seeder Service
+        services.AddScoped<IDataSeederService, DataSeederService>();
+
     }
 }

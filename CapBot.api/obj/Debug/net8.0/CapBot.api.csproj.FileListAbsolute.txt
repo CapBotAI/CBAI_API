@@ -1,7 +1,5 @@
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/appsettings.Development.json
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/appsettings.json
-/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/Handbag API Test Cases.postman_collection.json
-/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/test.json
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/CapBot.api.staticwebassets.runtime.json
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/CapBot.api.staticwebassets.endpoints.json
 /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/bin/Debug/net8.0/CapBot.api
