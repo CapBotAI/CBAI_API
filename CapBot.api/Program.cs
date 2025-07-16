@@ -15,6 +15,7 @@ using App.BLL.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using App.Entities.Entities.Core;
 using Swashbuckle.AspNetCore.SwaggerUI;
+using Microsoft.AspNetCore.Mvc;
 
 namespace CapBot.api;
 
@@ -38,7 +39,7 @@ public class Program
             .CreateLogger();
         builder.Host.UseSerilog();
 
-        // Add services to the container - CHỈ CẤU HÌNH MỘT LẦN
+        // Add services to the container
         builder.Services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
@@ -47,6 +48,34 @@ public class Program
         {
             options.Select().Filter().OrderBy().Expand().SetMaxTop(null).Count();
             options.AddRouteComponents("odata", EdmModelBuilder.GetEdmModel());
+        });
+
+        // Hoặc configure ApiBehaviorOptions để custom response
+        builder.Services.Configure<ApiBehaviorOptions>(options =>
+        {
+            options.SuppressModelStateInvalidFilter = true; // Disable auto validation
+
+            // Hoặc custom response nếu muốn giữ auto validation
+            // options.InvalidModelStateResponseFactory = actionContext =>
+            // {
+            //     var errors = actionContext.ModelState
+            //         .Where(m => m.Value.Errors.Count > 0)
+            //         .ToDictionary(
+            //             kvp => kvp.Key.ToCamelCase(),
+            //             kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).First());
+            //
+            //     var response = new FSResponse
+            //     {
+            //         Errors = errors,
+            //         StatusCode = System.Net.HttpStatusCode.UnprocessableEntity,
+            //         Message = ConstantModel.ModelInvalid
+            //     };
+            //
+            //     return new ObjectResult(response)
+            //     {
+            //         StatusCode = StatusCodes.Status422UnprocessableEntity
+            //     };
+            // };
         });
 
         //<=====Set up policy=====>
@@ -64,7 +93,7 @@ public class Program
         //<=====Add Identity Services=====>
         builder.Services.AddIdentity<User, Role>(options =>
         {
-            options.Password.RequireDigit = true;
+            options.Password.RequireDigit = false;
             options.Password.RequiredLength = 6;
             options.Password.RequireNonAlphanumeric = false;
             options.Password.RequireUppercase = false;
@@ -164,31 +193,29 @@ public class Program
                 }
             });
 
-            // Cấu hình Security
             c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
             {
-                Description = "JWT Authorization header using the Bearer scheme. Example: \"Authorization: Bearer {token}\"",
-                Name = "Authorization",
                 In = ParameterLocation.Header,
+                Description = "Please enter a valid token",
+                Name = "Authorization",
                 Type = SecuritySchemeType.Http,
-                Scheme = "bearer",
-                BearerFormat = "JWT"
+                BearerFormat = "JWT",
+                Scheme = "Bearer"
             });
-
             c.AddSecurityRequirement(new OpenApiSecurityRequirement
-            {
                 {
-                    new OpenApiSecurityScheme
                     {
-                        Reference = new OpenApiReference
+                        new OpenApiSecurityScheme
                         {
-                            Type = ReferenceType.SecurityScheme,
-                            Id = "Bearer"
-                        }
-                    },
-                    Array.Empty<string>()
-                }
-            });
+                            Reference = new OpenApiReference
+                            {
+                                Type = ReferenceType.SecurityScheme,
+                                Id = "Bearer"
+                            }
+                        },
+                        new string[] { }
+                    }
+                });
 
             // Bật annotations nếu có sử dụng
             c.EnableAnnotations();

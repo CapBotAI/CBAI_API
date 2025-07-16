@@ -4,6 +4,7 @@ using App.Commons;
 using App.Commons.ResponseModel;
 using App.Entities.Entities.Core;
 using App.Entities.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace App.Entities.DTOs.Auth;
 
@@ -68,7 +69,8 @@ public class RegisterDTO
                 return new BaseResponseModel
                 {
                     IsSuccess = false,
-                    Message = "Role không hợp lệ."
+                    Message = "Role không hợp lệ.",
+                    StatusCode = StatusCodes.Status422UnprocessableEntity
                 };
             }
         }
@@ -78,7 +80,8 @@ public class RegisterDTO
             return new BaseResponseModel
             {
                 IsSuccess = false,
-                Message = "Mật khẩu xác nhận không khớp"
+                Message = "Mật khẩu xác nhận không khớp",
+                StatusCode = StatusCodes.Status422UnprocessableEntity
             };
         }
 
@@ -87,7 +90,8 @@ public class RegisterDTO
             return new BaseResponseModel
             {
                 IsSuccess = false,
-                Message = "Không thể đăng ký tài khoản admin"
+                Message = "Không thể đăng ký tài khoản admin",
+                StatusCode = StatusCodes.Status422UnprocessableEntity
             };
         }
 

@@ -25,9 +25,45 @@ public class AuthService : IAuthService
 
     }
 
-    public async Task<BaseResponseModel<LoginResponseDTOV2>> SignInAsyncV2(LoginDTO loginDTO)
+    public async Task<BaseResponseModel<LoginResponseDTO>> SignInAsync(LoginDTO loginDTO)
     {
-        throw new Exception("Not implement");
+        try
+        {
+            var user = await _identityRepository.GetByEmailOrUserNameAsync(loginDTO.EmailOrUsername);
+            if (user == null)
+            {
+                return new BaseResponseModel<LoginResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Message = "Email hoặc username không tồn tại trong hệ thống"
+                };
+            }
+
+            var checkPassword = await _identityRepository.CheckPasswordAsync(user, loginDTO.Password);
+            if (!checkPassword)
+            {
+                return new BaseResponseModel<LoginResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Message = "Mật khẩu không chính xác"
+                };
+            }
+
+            var token = await _jwtService.GenerateJwtToken(user);
+            return new BaseResponseModel<LoginResponseDTO>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Đăng nhập thành công",
+                Data = new LoginResponseDTO { TokenData = token }
+            };
+        }
+        catch (System.Exception)
+        {
+            throw;
+        }
     }
 
     public async Task<BaseResponseModel<RegisterResDTO>> SignUpAsync(RegisterDTO dto)

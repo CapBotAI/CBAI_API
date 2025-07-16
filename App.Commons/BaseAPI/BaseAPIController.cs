@@ -230,7 +230,7 @@ public class BaseAPIController : ControllerBase
             .ToDictionary(
                 kvp => kvp.Key.ToCamelCase(),
                 kvp => kvp.Value.Errors.Select(e => e.ErrorMessage).First()).ToList();
-        return new BadRequestObjectResult(new FSResponse
+        return new UnprocessableEntityObjectResult(new FSResponse
         {
             Errors = errors,
             StatusCode = System.Net.HttpStatusCode.UnprocessableEntity,
@@ -322,37 +322,6 @@ public class BaseAPIController : ControllerBase
             var isadmin = User.FindFirst(ConstantModel.IS_ADMIN)?.Value;
             bool.TryParse(isadmin, out bool isAdmin);
             return isAdmin;
-        }
-    }
-
-    protected bool IsManager
-    {
-        get
-        {
-            var isManager = User.FindFirst(ConstantModel.IS_MANAGER)?.Value;
-            bool.TryParse(isManager, out bool isManagerReal);
-            return isManagerReal;
-        }
-    }
-
-    protected bool IsStaff
-    {
-        get
-        {
-            var isStaff = User.FindFirst(ConstantModel.IS_STAFF)?.Value;
-            bool.TryParse(isStaff, out bool isStaffReal);
-            return isStaffReal;
-        }
-    }
-
-
-    protected bool IsAuthor
-    {
-        get
-        {
-            var isCustomer = User.FindFirst(ConstantModel.IS_AUTHOR)?.Value;
-            bool.TryParse(isCustomer, out bool isCustomerReal);
-            return isCustomerReal;
         }
     }
 

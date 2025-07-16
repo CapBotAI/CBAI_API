@@ -24,9 +24,9 @@ public class ConstantModel
     public const string CLAIM_EMAIL = "Email";
     public const string CLAIM_ID = "id";
     public const string IS_ADMIN = "is_admin";
-    public const string IS_MANAGER = "is_manager";
-    public const string IS_STAFF = "is_staff";
-    public const string IS_AUTHOR = "is_author";
+    public const string IS_MODERATOR = "is_moderator";
+    public const string IS_SUPERVISOR = "is_supervisor";
+    public const string IS_REVIEWER = "is_reviewer";
     public const string AVATAR = "avatar";
     public const string USERNAME = "username";
     public const string IS_REMEMBER = "is_remember";
@@ -49,7 +49,7 @@ public class ConstantModel
     #endregion
 
     #region JWT
-    public const string JWT_ISSUER = "NewsManagement";
-    public const string JWT_AUDIENCE = "NewsManagement-Users";
+    public const string JWT_ISSUER = "CapBot";
+    public const string JWT_AUDIENCE = "CapBot-Users";
     #endregion
 }

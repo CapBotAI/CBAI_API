@@ -19,7 +19,30 @@
             
              Sample request:
             
-                 POST /api/register
+                 POST /api/auth/register
+                 {
+                     "email": "user@example.com",
+                     "password": "SecurePass123",
+                     "fullName": "Nguyễn Văn A",
+                     "phoneNumber": "+84123456789"
+                 }
+            
+             </remarks>
+        </member>
+        <member name="M:CapBot.api.Controllers.AuthController.Login(App.Entities.DTOs.Auth.LoginDTO)">
+             <summary>
+             Đăng nhập
+             </summary>
+             <param name="loginDTO">Thông tin đăng nhập</param>
+             <returns>Kết quả đăng nhập</returns>
+             <remarks>
+             Đăng nhập với thông tin đăng nhập bao gồm:
+             - Email (bắt buộc)
+             - Mật khẩu (bắt buộc, tối thiểu 6 ký tự)
+            
+             Sample request:
+            
+                 POST /api/auth/login
                  {
                      "email": "user@example.com",
                      "password": "SecurePass123",

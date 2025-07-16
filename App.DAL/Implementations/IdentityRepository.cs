@@ -148,9 +148,9 @@ public class IdentityRepository : IIdentityRepository
         throw new NotImplementedException();
     }
 
-    public Task<bool> CheckPasswordAsync(User dto, string password)
+    public async Task<bool> CheckPasswordAsync(User user, string password)
     {
-        throw new NotImplementedException();
+        return await _userManager.CheckPasswordAsync(user, password);
     }
 
     public Task<bool> HasPasswordAsync(User dto)

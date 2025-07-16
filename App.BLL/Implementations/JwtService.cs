@@ -4,6 +4,7 @@ using System.Security.Cryptography;
 using System.Text;
 using App.BLL.Interfaces;
 using App.Commons;
+using App.DAL.Interfaces;
 using App.Entities.DTOs.Accounts;
 using App.Entities.DTOs.Auth;
 using App.Entities.Entities.Core;
@@ -18,38 +19,39 @@ public class JwtService : IJwtService
 {
     private readonly ILogger<JwtService> _logger;
     private readonly IConfiguration _configuration;
+    private readonly IIdentityRepository _identityRepository;
+
 
     public JwtService(
         ILogger<JwtService> logger,
-        IConfiguration configuration)
+        IConfiguration configuration,
+        IIdentityRepository identityRepository)
     {
         _logger = logger;
         _configuration = configuration;
+        _identityRepository = identityRepository;
+
     }
 
-    public async Task<JwtTokenDTO> GenerateTokenAsync(User user)
+
+    public async Task<JwtTokenDTO> GenerateJwtToken(User user)
     {
-        var tokenHandler = new JwtSecurityTokenHandler();
-        var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);
+        var claims = new List<Claim> {
+                new (ClaimTypes.Email, user.Email ?? string.Empty),
+                new (ClaimTypes.NameIdentifier, user.Id.ToString()),
+                new (ClaimTypes.Name, user.UserName ?? string.Empty),
+                new (ConstantModel.CLAIM_EMAIL, user.Email ?? string.Empty),
+                new (ConstantModel.POLICY_VERIFY_EMAIL, user.EmailConfirmed.ToString()),
+                new (ConstantModel.CLAIM_ID, user.Id.ToString()),
+            };
 
-        // var roleName = user.Role switch
-        // {
-        //     1 => nameof(SystemRoles.Administrator),
-        //     2 => nameof(SystemRoles.Moderator),
-        //     3 => nameof(SystemRoles.Supervisor),
-        //     4 => nameof(SystemRoles.Reviewer),
-        //     _ => "Other"
-        // };
-
-        var roleName = "";
-
-        var claims = new List<Claim>
+        var roles = await _identityRepository.GetRolesAsync(user.Id);
+        foreach (var role in roles)
         {
-            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
-            new(ClaimTypes.Email, user.Email ?? ""),
-            new("jti", Guid.NewGuid().ToString()),
-            new(ClaimTypes.Role, roleName)
-        };
+            claims.Add(new Claim(ClaimTypes.Role, role));
+        }
+
+        var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);
 
         var tokenDescriptor = new SecurityTokenDescriptor
         {
@@ -60,58 +62,18 @@ public class JwtService : IJwtService
             Audience = ConstantModel.JWT_AUDIENCE
         };
 
+        var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
         var accessToken = tokenHandler.WriteToken(token);
-
-        var userData = new UserViewDTO(user);
+        var refreshToken = "Tạm thời chưa implement";
 
         return new JwtTokenDTO
         {
             AccessToken = accessToken,
-            User = userData,
+            RefreshToken = refreshToken,
             ExpiryTime = tokenDescriptor.Expires.Value
         };
     }
-
-
-    // public async Task<JwtTokenDTO> GenerateJwtToken(ViroCureUser user, bool isRemember, bool isAdmin, bool isManager = false, bool isStaff = false, bool isAuthor = false)
-    // {
-    //     var claims = new List<Claim> {
-    //             new (ClaimTypes.Email, user.Email ?? string.Empty),
-    //             new (ClaimTypes.NameIdentifier, user.Id.ToString()),
-    //             new (ClaimTypes.Name, user.UserName ?? string.Empty),
-    //             new (ConstantModel.CLAIM_EMAIL, user.Email ?? string.Empty),
-    //             new (ConstantModel.POLICY_VERIFY_EMAIL, user.EmailConfirmed.ToString()),
-    //             new (ConstantModel.CLAIM_ID, user.Id.ToString()),
-    //             new (ConstantModel.IS_ADMIN, isAdmin.ToString()),
-    //             new (ConstantModel.IS_MANAGER, isManager.ToString()),
-    //             new (ConstantModel.IS_STAFF, isStaff.ToString()),
-    //             new (ConstantModel.IS_AUTHOR, isAuthor.ToString()),
-    //         };
-    //
-    //     var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);
-    //
-    //     var tokenDescriptor = new SecurityTokenDescriptor
-    //     {
-    //         Subject = new ClaimsIdentity(claims),
-    //         Expires = isRemember ? DateTime.Now.AddDays(28) : DateTime.Now.AddHours(24),
-    //         SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
-    //         Issuer = ConstantModel.JWT_ISSUER,
-    //         Audience = ConstantModel.JWT_AUDIENCE
-    //     };
-    //
-    //     var tokenHandler = new JwtSecurityTokenHandler();
-    //     var token = tokenHandler.CreateToken(tokenDescriptor);
-    //     var accessToken = tokenHandler.WriteToken(token);
-    //     var refreshToken = GenerateRefreshToken();
-    //
-    //     return new JwtTokenDTO
-    //     {
-    //         AccessToken = accessToken,
-    //         RefreshToken = refreshToken,
-    //         ExpiryTime = tokenDescriptor.Expires.Value
-    //     };
-    // }
 
 
     public async Task<bool> ValidateTokenAsync(string token)
