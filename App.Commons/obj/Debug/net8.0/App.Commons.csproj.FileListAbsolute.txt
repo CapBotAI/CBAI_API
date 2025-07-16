@@ -1,0 +1,13 @@
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/bin/Debug/net8.0/App.Commons.deps.json
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/bin/Debug/net8.0/App.Commons.dll
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/bin/Debug/net8.0/App.Commons.pdb
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/obj/Debug/net8.0/App.Commons.csproj.AssemblyReference.cache
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/obj/Debug/net8.0/App.Commons.GeneratedMSBuildEditorConfig.editorconfig
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/obj/Debug/net8.0/App.Commons.AssemblyInfoInputs.cache
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/obj/Debug/net8.0/App.Commons.AssemblyInfo.cs
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/obj/Debug/net8.0/App.Commons.csproj.CoreCompileInputs.cache
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/obj/Debug/net8.0/App.Commons.sourcelink.json
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/obj/Debug/net8.0/App.Commons.dll
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/obj/Debug/net8.0/refint/App.Commons.dll
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/obj/Debug/net8.0/App.Commons.pdb
+/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/App.Commons/obj/Debug/net8.0/ref/App.Commons.dll

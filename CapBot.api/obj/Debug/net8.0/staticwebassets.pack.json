@@ -1,0 +1,29 @@
+{
+  "Files": [
+    {
+      "Id": "/Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api/wwwroot/Email/ConfirmEmail/index.html",
+      "PackagePath": "staticwebassets/Email/ConfirmEmail/index.html"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.CapBot.api.Microsoft.AspNetCore.StaticWebAssetEndpoints.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssetEndpoints.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.CapBot.api.Microsoft.AspNetCore.StaticWebAssets.props",
+      "PackagePath": "build\\Microsoft.AspNetCore.StaticWebAssets.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.build.CapBot.api.props",
+      "PackagePath": "build\\CapBot.api.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildMultiTargeting.CapBot.api.props",
+      "PackagePath": "buildMultiTargeting\\CapBot.api.props"
+    },
+    {
+      "Id": "obj/Debug/net8.0/staticwebassets/msbuild.buildTransitive.CapBot.api.props",
+      "PackagePath": "buildTransitive\\CapBot.api.props"
+    }
+  ],
+  "ElementsToRemove": []
+}

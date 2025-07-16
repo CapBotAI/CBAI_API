@@ -14,7 +14,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("CapBot.api")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+42f60034e218a87a8220b032ba93219894908c0d")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+f7a4e63dc32aa78014bd12c1f3894cf5fba08b89")]
 [assembly: System.Reflection.AssemblyProductAttribute("CapBot.api")]
 [assembly: System.Reflection.AssemblyTitleAttribute("CapBot.api")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]
