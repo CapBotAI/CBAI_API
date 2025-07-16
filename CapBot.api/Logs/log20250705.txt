@@ -5993,3 +5993,6 @@ WHERE [Id] = @p21;
 2025-07-05 15:54:34.782 +07:00 [DBG] The connection queue processing loop for 0HNDRK680T84D completed.
 2025-07-05 15:54:34.782 +07:00 [DBG] Connection id "0HNDRK680T84D" sending FIN because: "The Socket transport's send loop completed gracefully."
 2025-07-05 15:54:34.784 +07:00 [DBG] Connection id "0HNDRK680T84D" stopped.
+2025-07-05 23:23:26.229 +07:00 [INF] Application is shutting down...
+2025-07-05 23:23:26.233 +07:00 [DBG] Hosting stopping
+2025-07-05 23:23:26.252 +07:00 [DBG] Hosting stopped

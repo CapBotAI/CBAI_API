@@ -17,6 +17,7 @@ public class ServiceConfig
 
         //register repo
         services.AddScoped(typeof(IRepoBase<>), typeof(RepoBase<>));
+        services.AddScoped<IIdentityRepository, IdentityRepository>();
 
         //register UOW
         services.AddScoped<IUnitOfWork, UnitOfWork>();
