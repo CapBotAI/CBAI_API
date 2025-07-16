@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\App.DAL\App.DAL.csproj" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <PackageReference Include="Bogus" Version="35.6.2" />
+      <PackageReference Include="CsvHelper" Version="33.0.1" />
+      <PackageReference Include="EPPlus" Version="7.6.0" />
+      <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.13" />
+      <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
+      <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.13" />
+      <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.Json" Version="8.0.13" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.13" />
+      <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.13" />
+      <PackageReference Include="payOS" Version="1.0.9" />
+      <PackageReference Include="SixLabors.ImageSharp" Version="3.1.7" />
+    </ItemGroup>
+
+</Project>
