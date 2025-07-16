@@ -6,7 +6,7 @@ using App.BLL.Interfaces;
 using App.Commons;
 using App.Entities.DTOs.Accounts;
 using App.Entities.DTOs.Auth;
-using App.Entities.Entities_2;
+using App.Entities.Entities.Core;
 using App.Entities.Enums;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -27,23 +27,25 @@ public class JwtService : IJwtService
         _configuration = configuration;
     }
 
-    public async Task<JwtTokenDTO> GenerateTokenAsync(SystemAccount user)
+    public async Task<JwtTokenDTO> GenerateTokenAsync(User user)
     {
         var tokenHandler = new JwtSecurityTokenHandler();
         var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);
 
-        var roleName = user.Role switch
-        {
-            1 => nameof(UserRoles.Administrator),
-            2 => nameof(UserRoles.Moderator),
-            3 => nameof(UserRoles.Developer),
-            4 => nameof(UserRoles.Member),
-            _ => "Other"
-        };
+        // var roleName = user.Role switch
+        // {
+        //     1 => nameof(SystemRoles.Administrator),
+        //     2 => nameof(SystemRoles.Moderator),
+        //     3 => nameof(SystemRoles.Supervisor),
+        //     4 => nameof(SystemRoles.Reviewer),
+        //     _ => "Other"
+        // };
+
+        var roleName = "";
 
         var claims = new List<Claim>
         {
-            new(ClaimTypes.NameIdentifier, user.AccountID.ToString()),
+            new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email ?? ""),
             new("jti", Guid.NewGuid().ToString()),
             new(ClaimTypes.Role, roleName)

@@ -1,5 +1,5 @@
 namespace App.Entities.Enums;
-public enum UserRoles
+public enum SystemRoles
 {
     Administrator = 1,
     Moderator = 2,

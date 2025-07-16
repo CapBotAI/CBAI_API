@@ -23,7 +23,6 @@ public class ServiceConfig
 
         //register service
         services.AddScoped<IAuthService, AuthService>();
-        services.AddScoped<IHandbagService, HandbagService>();
 
         //SignalR Service
         services.AddSignalR();

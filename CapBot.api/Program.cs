@@ -52,7 +52,7 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen(option =>
             {
-                option.SwaggerDoc("v1", new OpenApiInfo { Title = "Hand Bag Summer 2025 API", Version = "v1" });
+                option.SwaggerDoc("v1", new OpenApiInfo { Title = "Cap Bot Capstone API", Version = "v1" });
                 option.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
                 {
                     In = ParameterLocation.Header,
@@ -129,27 +129,6 @@ public class Program
         {
             options.AddPolicy("RequireAdminRole", policy =>
                 policy.RequireRole("Admin"));
-
-            options.AddPolicy("RequireManagerRole", policy =>
-                policy.RequireRole("Manager"));
-
-            options.AddPolicy("RequireStaffRole", policy =>
-                policy.RequireRole("Staff"));
-
-            options.AddPolicy("RequireCustomerRole", policy =>
-                policy.RequireRole("Customer"));
-
-            options.AddPolicy("RequireAdministratorRole", policy =>
-                policy.RequireRole("administrator"));
-
-            options.AddPolicy("RequireModeratorRole", policy =>
-                policy.RequireRole("moderator"));
-
-            options.AddPolicy("RequireFullAccess", policy =>
-                policy.RequireRole("administrator", "moderator"));
-
-            options.AddPolicy("RequireReadAccess", policy =>
-                policy.RequireRole("administrator", "moderator", "developer", "member"));
         });
 
         builder.Services.AddAntiforgery(options =>
