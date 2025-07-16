@@ -10,9 +10,9 @@ public partial class Semester : CommonDataModel
 
     public string Name { get; set; } = null!;
 
-    public DateOnly StartDate { get; set; }
+    public DateTime StartDate { get; set; }
 
-    public DateOnly EndDate { get; set; }
+    public DateTime EndDate { get; set; }
 
     public virtual ICollection<Phase> Phases { get; set; } = new List<Phase>();
     public virtual ICollection<Topic> Topics { get; set; } = new List<Topic>();
