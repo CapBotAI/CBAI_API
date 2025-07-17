@@ -81,4 +81,89 @@ public class SemesterService : ISemesterService
             throw;
         }
     }
+
+    public async Task<BaseResponseModel<UpdateSemesterResDTO>> UpdateSemester(UpdateSemesterDTO updateSemesterDTO, int userId)
+    {
+        try
+        {
+            var user = await _identityRepository.GetByIdAsync((long)userId);
+            if (user == null)
+            {
+                return new BaseResponseModel<UpdateSemesterResDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Người dùng không tồn tại"
+                };
+            }
+
+            var semesterRepo = _unitOfWork.GetRepo<App.Entities.Entities.App.Semester>();
+            var semester = await semesterRepo.GetSingleAsync(new QueryBuilder<Semester>()
+            .WithPredicate(x => x.Id == updateSemesterDTO.Id && x.IsActive && x.DeletedAt == null)
+            .WithTracking(false)
+            .Build());
+            if (semester == null)
+            {
+                return new BaseResponseModel<UpdateSemesterResDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Học kỳ không tồn tại"
+                };
+            }
+
+            semester.Name = updateSemesterDTO.Name;
+            semester.StartDate = updateSemesterDTO.StartDate;
+            semester.EndDate = updateSemesterDTO.EndDate;
+            semester.LastModifiedBy = user.UserName;
+            semester.LastModifiedAt = DateTime.Now;
+
+            await semesterRepo.UpdateAsync(semester);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return new BaseResponseModel<UpdateSemesterResDTO>
+            {
+                Data = new UpdateSemesterResDTO(semester),
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK
+            };
+        }
+        catch (System.Exception)
+        {
+            throw;
+        }
+    }
+
+    public async Task<BaseResponseModel<SemesterDetailDTO>> GetSemesterDetail(int semesterId)
+    {
+        try
+        {
+            var semesterRepo = _unitOfWork.GetRepo<App.Entities.Entities.App.Semester>();
+            var semester = await semesterRepo.GetSingleAsync(new QueryBuilder<Semester>()
+            .WithPredicate(x => x.Id == semesterId && x.IsActive && x.DeletedAt == null)
+            .WithTracking(false)
+            .Build());
+            if (semester == null)
+            {
+                return new BaseResponseModel<SemesterDetailDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Học kỳ không tồn tại"
+                };
+            }
+
+            return new BaseResponseModel<SemesterDetailDTO>
+            {
+                Data = new SemesterDetailDTO(semester),
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK
+            };
+        }
+        catch (System.Exception)
+        {
+            throw;
+        }
+    }
 }

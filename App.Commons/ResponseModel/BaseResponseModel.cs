@@ -9,5 +9,5 @@ public class BaseResponseModel
 
 public class BaseResponseModel<T> : BaseResponseModel where T : class
 {
-    public T Data { get; set; }
+    public T? Data { get; set; }
 }
