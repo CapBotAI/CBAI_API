@@ -1,0 +1,276 @@
+2025-07-15 22:13:31.283 +07:00 [DBG] An 'IServiceProvider' was created for internal use by Entity Framework.
+2025-07-15 22:13:31.564 +07:00 [DBG] No relationship from 'ReviewerAssignment' to 'User' has been configured by convention because there are multiple properties on one entity type - {'AssignedByUser', 'Reviewer'} that could be matched with the properties on the other entity type - {'ReviewerAssignments'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.590 +07:00 [DBG] No relationship from 'SubmissionWorkflowLog' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromStateLogs', 'ToStateLogs'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.605 +07:00 [DBG] No relationship from 'User' to 'ReviewerAssignment' has been configured by convention because there are multiple properties on one entity type - {'ReviewerAssignments'} that could be matched with the properties on the other entity type - {'AssignedByUser', 'Reviewer'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.606 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.606 +07:00 [DBG] No relationship from 'WorkflowState' to 'WorkflowTransition' has been configured by convention because there are multiple properties on one entity type - {'FromTransitions', 'ToTransitions'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.607 +07:00 [DBG] No relationship from 'WorkflowTransition' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromTransitions', 'ToTransitions'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.840 +07:00 [DBG] No relationship from 'ReviewerAssignment' to 'User' has been configured by convention because there are multiple properties on one entity type - {'AssignedByUser', 'Reviewer'} that could be matched with the properties on the other entity type - {'ReviewerAssignments'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.842 +07:00 [DBG] No relationship from 'User' to 'ReviewerAssignment' has been configured by convention because there are multiple properties on one entity type - {'ReviewerAssignments'} that could be matched with the properties on the other entity type - {'AssignedByUser', 'Reviewer'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.864 +07:00 [DBG] No relationship from 'WorkflowTransition' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromTransitions', 'ToTransitions'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.865 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.865 +07:00 [DBG] No relationship from 'WorkflowState' to 'WorkflowTransition' has been configured by convention because there are multiple properties on one entity type - {'FromTransitions', 'ToTransitions'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.866 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.872 +07:00 [DBG] No relationship from 'SubmissionWorkflowLog' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromStateLogs', 'ToStateLogs'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.872 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-15 22:13:31.902 +07:00 [DBG] The index {'LecturerId'} was not created on entity type 'LecturerSkill' as the properties are already covered by the index {'LecturerId', 'SkillTag'}.
+2025-07-15 22:13:31.902 +07:00 [DBG] The index {'SemesterId'} was not created on entity type 'Phase' as the properties are already covered by the index {'SemesterId', 'PhaseTypeId'}.
+2025-07-15 22:13:31.902 +07:00 [DBG] The index {'AssignmentId'} was not created on entity type 'Review' as the properties are already covered by the index {'AssignmentId', 'Status'}.
+2025-07-15 22:13:31.902 +07:00 [DBG] The index {'ReviewId'} was not created on entity type 'ReviewComment' as the properties are already covered by the index {'ReviewId', 'SectionName'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'ReviewId'} was not created on entity type 'ReviewCriteriaScore' as the properties are already covered by the index {'ReviewId', 'CriteriaId'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'ReviewerId'} was not created on entity type 'ReviewerAssignment' as the properties are already covered by the index {'ReviewerId', 'Status'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'SubmissionId'} was not created on entity type 'ReviewerAssignment' as the properties are already covered by the index {'SubmissionId', 'ReviewerId'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'ReviewerId'} was not created on entity type 'ReviewerPerformance' as the properties are already covered by the index {'ReviewerId', 'SemesterId'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'PhaseId'} was not created on entity type 'Submission' as the properties are already covered by the index {'PhaseId', 'Status'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'PhaseId'} was not created on entity type 'Submission' as the properties are already covered by the index {'PhaseId', 'Status', 'SubmittedAt'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'TopicVersionId'} was not created on entity type 'Submission' as the properties are already covered by the index {'TopicVersionId', 'PhaseId', 'SubmissionRound'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'SubmissionId'} was not created on entity type 'SubmissionWorkflowLog' as the properties are already covered by the index {'SubmissionId', 'CreatedAt'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'UserId'} was not created on entity type 'SystemNotification' as the properties are already covered by the index {'UserId', 'IsRead', 'CreatedAt'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'SemesterId'} was not created on entity type 'Topic' as the properties are already covered by the index {'SemesterId', 'IsApproved'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'SupervisorId'} was not created on entity type 'Topic' as the properties are already covered by the index {'SupervisorId', 'SemesterId'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'TopicVersion' as the properties are already covered by the index {'TopicId', 'Status'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'TopicVersion' as the properties are already covered by the index {'TopicId', 'VersionNumber'}.
+2025-07-15 22:13:31.903 +07:00 [DBG] The index {'UserId'} was not created on entity type 'UserRole' as the properties are already covered by the index {'UserId', 'RoleId'}.
+2025-07-15 22:13:31.904 +07:00 [DBG] The index {'UserId'} was not created on entity type 'UserToken' as the properties are already covered by the index {'UserId', 'LoginProvider', 'Name'}.
+2025-07-15 22:13:32.046 +07:00 [WRN] The 'ProficiencyLevels' property 'ProficiencyLevel' on entity type 'LecturerSkill' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ProficiencyLevels' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-15 22:13:32.047 +07:00 [WRN] The 'ReviewRecommendations' property 'Recommendation' on entity type 'Review' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ReviewRecommendations' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-15 22:13:32.047 +07:00 [WRN] The 'ReviewStatus' property 'Status' on entity type 'Review' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ReviewStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-15 22:13:32.047 +07:00 [WRN] The 'CommentTypes' property 'CommentType' on entity type 'ReviewComment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'CommentTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-15 22:13:32.047 +07:00 [WRN] The 'PriorityLevels' property 'Priority' on entity type 'ReviewComment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'PriorityLevels' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-15 22:13:32.047 +07:00 [WRN] The 'AssignmentTypes' property 'AssignmentType' on entity type 'ReviewerAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AssignmentTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-15 22:13:32.047 +07:00 [WRN] The 'AssignmentStatus' property 'Status' on entity type 'ReviewerAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AssignmentStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-15 22:13:32.946 +07:00 [WRN] The 'AiCheckStatus' property 'AiCheckStatus' on entity type 'Submission' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AiCheckStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-15 22:13:32.947 +07:00 [WRN] The 'SubmissionStatus' property 'Status' on entity type 'Submission' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'SubmissionStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-15 22:13:32.947 +07:00 [WRN] The 'NotificationTypes' property 'Type' on entity type 'SystemNotification' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'NotificationTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-15 22:13:32.947 +07:00 [WRN] The 'TopicStatus' property 'Status' on entity type 'TopicVersion' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'TopicStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-15 22:13:33.097 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-07-15 22:13:33.111 +07:00 [DBG] Creating DbConnection.
+2025-07-15 22:13:33.144 +07:00 [DBG] Created DbConnection. (30ms).
+2025-07-15 22:13:33.148 +07:00 [DBG] Migrating using database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:33.151 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:33.272 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:33.783 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:33.786 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:34.294 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:34.299 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:34.808 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:34.813 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:35.316 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:35.320 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:35.832 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:35.837 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:36.341 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:36.345 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:36.852 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:36.856 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:37.365 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:37.369 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:37.878 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:37.883 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:38.391 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:38.395 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:38.904 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:38.908 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:39.415 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:39.419 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:39.927 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:39.930 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:40.440 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:40.443 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:40.952 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:40.957 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:41.464 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:41.468 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:41.979 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:41.983 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:42.494 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:42.498 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:43.004 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:43.009 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:43.517 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:43.520 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:44.024 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:44.028 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:44.538 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:44.541 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:45.050 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:45.054 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:45.563 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:45.566 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:46.077 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:46.081 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:46.589 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:46.592 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:47.104 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:47.108 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:47.617 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:47.621 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:51.231 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:51.235 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:51.742 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:51.745 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:52.257 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:52.261 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:52.767 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:52.770 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:53.280 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:53.284 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:53.797 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:53.801 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:54.306 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:54.310 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:54.817 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:54.821 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:55.327 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:55.330 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:55.841 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:55.844 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:56.352 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:56.355 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:56.866 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:56.870 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:57.374 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:57.377 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:57.885 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:57.889 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:58.400 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:58.404 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:58.916 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:58.919 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:59.423 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:59.426 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:59.934 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:13:59.938 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:00.445 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:00.448 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:00.955 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:00.958 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:01.467 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:01.471 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:01.983 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:01.986 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:02.495 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:02.498 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:03.007 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:03.011 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:03.518 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:03.521 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:04.033 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:04.036 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:04.546 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:04.550 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:05.060 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:05.063 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:05.572 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:05.575 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:06.084 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:06.089 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:06.597 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:06.600 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:07.112 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:07.116 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:07.616 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:07.621 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:08.128 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:08.132 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:08.639 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:08.642 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:09.153 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:09.156 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:09.663 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:09.666 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:10.174 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:10.178 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:10.687 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:10.691 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:11.198 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:11.202 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:11.710 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:11.714 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:12.222 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:12.225 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:12.735 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:12.739 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:13.247 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:13.250 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:13.761 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:13.764 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:14.275 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:14.278 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:14.785 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:14.788 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:15.298 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:15.302 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:15.810 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:15.814 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:16.324 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:16.328 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:16.833 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:16.838 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:17.340 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:17.343 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:17.857 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:17.861 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:18.368 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:18.372 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:18.884 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:18.888 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:19.398 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:19.402 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:19.909 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:19.911 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:20.422 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:20.425 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:20.936 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:20.941 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:21.450 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:21.454 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:21.960 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:21.964 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:22.475 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:22.479 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:22.985 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:22.988 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:23.495 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:23.500 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:24.007 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:24.011 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:24.518 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:24.521 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:25.032 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:25.034 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:25.543 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:25.547 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:26.054 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:26.057 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:26.569 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:26.573 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:27.082 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:27.086 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:27.595 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:27.599 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:28.109 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:28.112 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:28.624 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:28.627 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:29.134 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:29.137 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:29.646 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:29.650 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:30.159 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:30.163 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:30.674 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:30.678 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:31.185 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:31.189 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:31.698 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:31.701 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:32.213 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:32.217 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:32.726 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:32.731 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:33.236 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:33.239 +07:00 [DBG] An error occurred using the connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:33.243 +07:00 [DBG] 'MyDbContext' disposed.
+2025-07-15 22:14:33.245 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-07-15 22:14:33.248 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).

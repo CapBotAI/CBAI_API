@@ -37,6 +37,9 @@ public class ServiceConfig
         //Topic Category Service
         services.AddScoped<ITopicCategoryService, TopicCategoryService>();
 
+        //Topic Service
+        services.AddScoped<ITopicService, TopicService>();
+
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 
