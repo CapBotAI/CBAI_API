@@ -34,6 +34,9 @@ public class ServiceConfig
         //Semester Service
         services.AddScoped<ISemesterService, SemesterService>();
 
+        //Topic Category Service
+        services.AddScoped<ITopicCategoryService, TopicCategoryService>();
+
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 
