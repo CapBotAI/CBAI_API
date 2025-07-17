@@ -26,7 +26,8 @@ public class CreateSemesterDTO : IEntity<App.Entities.Entities.App.Semester>, IV
         {
             Name = Name,
             StartDate = StartDate,
-            EndDate = EndDate
+            EndDate = EndDate,
+            IsActive = true,
         };
     }
 

@@ -23,25 +23,23 @@ namespace CapBot.api.Controllers
         }
 
         /// <summary>
-        /// Đăng ký tài khoản mới
+        /// Tạo học kỳ mới
         /// </summary>
-        /// <param name="registerDTO">Thông tin đăng ký người dùng</param>
-        /// <returns>Kết quả đăng ký tài khoản</returns>
+        /// <param name="createSemesterDTO">Thông tin tạo học kỳ</param>
+        /// <returns>Kết quả tạo học kỳ</returns>
         /// <remarks>
-        /// Tạo tài khoản mới với thông tin đăng ký bao gồm:
-        /// - Email (bắt buộc)
-        /// - Mật khẩu (bắt buộc, tối thiểu 6 ký tự)
-        /// - Tên đầy đủ
-        /// - Số điện thoại
+        /// Tạo học kỳ mới với thông tin đầy đủ
+        /// - Tên học kỳ (bắt buộc)
+        /// - Ngày bắt đầu (bắt buộc)
+        /// - Ngày kết thúc (bắt buộc)
         ///
         /// Sample request:
         ///
-        ///     POST /api/auth/register
+        ///     POST /api/semester/create
         ///     {
-        ///         "email": "user@example.com",
-        ///         "password": "SecurePass123",
-        ///         "fullName": "Nguyễn Văn A",
-        ///         "phoneNumber": "+84123456789"
+        ///         "name": "Học kỳ 1",
+        ///         "startDate": "2025-01-01",
+        ///         "endDate": "2025-05-31"
         ///     }
         ///
         /// </remarks>
@@ -72,13 +70,53 @@ namespace CapBot.api.Controllers
 
             try
             {
-                var result = await _semesterService.CreateSemester(createSemesterDTO);
+                var result = await _semesterService.CreateSemester(createSemesterDTO, UserId);
 
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while creating semester");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Lấy danh sách học kỳ
+        /// </summary>
+        /// <returns>Danh sách học kỳ</returns>
+        /// <remarks>
+        /// Lấy danh sách học kỳ
+        ///
+        /// Sample request:
+        ///
+        ///     GET /api/semester/all
+        ///
+        /// </remarks>
+        [Authorize(Roles = SystemRoleConstants.Administrator)]
+        [HttpGet("all")]
+        [SwaggerOperation(
+            Summary = "Lấy danh sách học kỳ",
+            Description = "Lấy danh sách học kỳ"
+        )]
+        [SwaggerResponse(200, "Lấy danh sách học kỳ thành công")]
+        [SwaggerResponse(401, "Lỗi xác thực")]
+        [SwaggerResponse(403, "Quyền truy cập bị từ chối")]
+        [SwaggerResponse(422, "Model không hợp lệ.")]
+        [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetAll()
+        {
+            try
+            {
+                var result = await _semesterService.GetAllSemester();
+
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting all semester");
                 return Error(ConstantModel.ErrorMessage);
             }
         }
