@@ -1,5 +1,7 @@
 using System;
 using App.BLL.Interfaces;
+using App.Commons.Extensions;
+using App.Commons.Paging;
 using App.Commons.ResponseModel;
 using App.DAL.Interfaces;
 using App.DAL.Queries.Implementations;
@@ -8,6 +10,7 @@ using App.Entities.DTOs.Topics;
 using App.Entities.Entities.App;
 using App.Entities.Enums;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace App.BLL.Implementations;
@@ -128,7 +131,7 @@ public class TopicService : ITopicService
         }
     }
 
-    public async Task<BaseResponseModel<List<TopicOverviewResDTO>>> GetAllTopics(int? semesterId = null, int? categoryId = null)
+    public async Task<BaseResponseModel<PagingDataModel<TopicOverviewResDTO, GetTopicsQueryDTO>>> GetAllTopics(GetTopicsQueryDTO query)
     {
         try
         {
@@ -141,21 +144,27 @@ public class TopicService : ITopicService
                 .WithInclude(x => x.TopicVersions)
                 .WithTracking(false);
 
-            if (semesterId.HasValue)
+            if (query.SemesterId.HasValue)
             {
-                queryBuilder = queryBuilder.WithPredicate(x => x.SemesterId == semesterId.Value);
+                queryBuilder = queryBuilder.WithPredicate(x => x.SemesterId == query.SemesterId.Value);
             }
 
-            if (categoryId.HasValue)
+            if (query.CategoryId.HasValue)
             {
-                queryBuilder = queryBuilder.WithPredicate(x => x.CategoryId == categoryId.Value);
+                queryBuilder = queryBuilder.WithPredicate(x => x.CategoryId == query.CategoryId.Value);
             }
 
-            var topics = await topicRepo.GetAllAsync(queryBuilder.Build());
+            var topicQuery = topicRepo.Get(queryBuilder.Build());
 
-            return new BaseResponseModel<List<TopicOverviewResDTO>>
+            query.TotalRecord = await topicQuery.CountAsync();
+
+            var topics = await topicQuery
+            .OrderByDescending(x => x.CreatedAt)
+            .ToPagedList(query.PageNumber, query.PageSize).ToListAsync();
+
+            return new BaseResponseModel<PagingDataModel<TopicOverviewResDTO, GetTopicsQueryDTO>>
             {
-                Data = topics.Select(x => new TopicOverviewResDTO(x)).ToList(),
+                Data = new PagingDataModel<TopicOverviewResDTO, GetTopicsQueryDTO>(topics.Select(x => new TopicOverviewResDTO(x)), query),
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK
             };
