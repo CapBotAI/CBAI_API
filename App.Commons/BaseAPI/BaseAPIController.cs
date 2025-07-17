@@ -161,9 +161,14 @@ public class BaseAPIController : ControllerBase
         {
             Data = data,
             StatusCode = System.Net.HttpStatusCode.InternalServerError,
-            Message = message
-        });
+            Message = message,
+            Success = false
+        })
+        {
+            StatusCode = StatusCodes.Status500InternalServerError
+        };
     }
+
 
     protected ActionResult GetNotFound(string message, object data = null)
     {

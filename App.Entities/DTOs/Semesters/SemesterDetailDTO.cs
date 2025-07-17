@@ -21,7 +21,7 @@ public class SemesterDetailDTO
         EndDate = semester.EndDate;
         CreatedAt = semester.CreatedAt;
         CreatedBy = semester.CreatedBy ?? string.Empty;
-        UpdatedAt = semester.LastModifiedAt;
+        UpdatedAt = semester.LastModifiedAt ?? DateTime.Now;
         UpdatedBy = semester.LastModifiedBy ?? string.Empty;
     }
 }

@@ -17,7 +17,7 @@ public class UpdateSemesterResDTO
         Name = semester.Name;
         StartDate = semester.StartDate;
         EndDate = semester.EndDate;
-        UpdatedAt = semester.LastModifiedAt;
+        UpdatedAt = semester.LastModifiedAt ?? DateTime.Now;
         UpdatedBy = semester.LastModifiedBy ?? string.Empty;
     }
 }
