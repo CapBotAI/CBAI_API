@@ -288,12 +288,12 @@ public class BaseAPIController : ControllerBase
     /// <summary>
     /// Get the loged in UserId;
     /// </summary>
-    protected long UserId
+    protected int UserId
     {
         get
         {
             var id = User.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            long.TryParse(id, out long userId);
+            int.TryParse(id, out int userId);
             return userId;
         }
     }

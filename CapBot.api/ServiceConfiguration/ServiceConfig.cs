@@ -31,6 +31,12 @@ public class ServiceConfig
         //Jwt Service
         services.AddScoped<IJwtService, JwtService>();
 
+        //Semester Service
+        services.AddScoped<ISemesterService, SemesterService>();
+
+        //Topic Category Service
+        services.AddScoped<ITopicCategoryService, TopicCategoryService>();
+
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 
