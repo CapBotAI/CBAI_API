@@ -1,6 +1,7 @@
 using App.BLL.Interfaces;
 using App.Commons;
 using App.Commons.BaseAPI;
+using App.Commons.Paging;
 using App.Entities.Constants;
 using App.Entities.DTOs.Topics;
 using Microsoft.AspNetCore.Authorization;
@@ -95,22 +96,21 @@ namespace CapBot.api.Controllers
         /// <summary>
         /// Lấy danh sách chủ đề
         /// </summary>
-        /// <param name="semesterId">Id học kỳ (tùy chọn)</param>
-        /// <param name="categoryId">Id danh mục (tùy chọn)</param>
+        /// <param name="query">Thông tin lọc</param>
         /// <returns>Danh sách chủ đề</returns>
         /// <remarks>
         /// Lấy danh sách chủ đề với bộ lọc tùy chọn
         ///
         /// Sample request:
         ///
-        ///     GET /api/topic/all
-        ///     GET /api/topic/all?semesterId=1
-        ///     GET /api/topic/all?categoryId=1
-        ///     GET /api/topic/all?semesterId=1&categoryId=1
+        ///     GET /api/topic/list
+        ///     GET /api/topic/list?semesterId=1
+        ///     GET /api/topic/list?categoryId=1
+        ///     GET /api/topic/list?semesterId=1&categoryId=1
         ///
         /// </remarks>
         [Authorize]
-        [HttpGet("all")]
+        [HttpGet("list")]
         [SwaggerOperation(
             Summary = "Lấy danh sách chủ đề",
             Description = "Lấy danh sách chủ đề với bộ lọc tùy chọn"
@@ -120,11 +120,11 @@ namespace CapBot.api.Controllers
         [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetAll([FromQuery] int? semesterId = null, [FromQuery] int? categoryId = null)
+        public async Task<IActionResult> GetAll([FromQuery] GetTopicsQueryDTO query)
         {
             try
             {
-                var result = await _topicService.GetAllTopics(semesterId, categoryId);
+                var result = await _topicService.GetAllTopics(query);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)
