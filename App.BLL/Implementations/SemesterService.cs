@@ -166,4 +166,42 @@ public class SemesterService : ISemesterService
             throw;
         }
     }
+
+    public async Task<BaseResponseModel> DeleteSemester(int semesterId)
+    {
+        try
+        {
+            var semesterRepo = _unitOfWork.GetRepo<App.Entities.Entities.App.Semester>();
+            var semester = await semesterRepo.GetSingleAsync(new QueryBuilder<Semester>()
+            .WithPredicate(x => x.Id == semesterId && x.IsActive && x.DeletedAt == null)
+            .WithTracking(false)
+            .Build());
+            if (semester == null)
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Học kỳ không tồn tại"
+                };
+            }
+
+            semester.IsActive = false;
+            semester.DeletedAt = DateTime.Now;
+
+            await semesterRepo.UpdateAsync(semester);
+
+            await _unitOfWork.SaveChangesAsync();
+
+            return new BaseResponseModel
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK
+            };
+        }
+        catch (System.Exception)
+        {
+            throw;
+        }
+    }
 }

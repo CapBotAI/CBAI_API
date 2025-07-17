@@ -12,4 +12,5 @@ public interface ISemesterService
     Task<BaseResponseModel<List<SemesterOverviewResDTO>>> GetAllSemester();
     Task<BaseResponseModel<UpdateSemesterResDTO>> UpdateSemester(UpdateSemesterDTO updateSemesterDTO, int userId);
     Task<BaseResponseModel<SemesterDetailDTO>> GetSemesterDetail(int semesterId);
+    Task<BaseResponseModel> DeleteSemester(int semesterId);
 }

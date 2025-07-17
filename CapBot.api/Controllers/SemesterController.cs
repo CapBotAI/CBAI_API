@@ -196,7 +196,7 @@ namespace CapBot.api.Controllers
         ///     GET /api/semester/detail/1
         ///
         /// </remarks>
-        [Authorize]
+        [Authorize(Roles = SystemRoleConstants.Administrator)]
         [HttpGet("detail/{semesterId}")]
         [SwaggerOperation(
             Summary = "Lấy chi tiết học kỳ",
@@ -220,6 +220,48 @@ namespace CapBot.api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while getting semester detail");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+
+        /// <summary>
+        /// Xóa học kỳ
+        /// </summary>
+        /// <param name="semesterId">Id của học kỳ</param>
+        /// <returns>Kết quả xóa học kỳ</returns>
+        /// <remarks>
+        /// Xóa học kỳ
+        ///
+        /// Sample request:
+        ///
+        ///     POST /api/semester/delete/1
+        ///
+        /// </remarks>
+        [Authorize(Roles = SystemRoleConstants.Administrator)]
+        [HttpDelete("delete/{semesterId}")]
+        [SwaggerOperation(
+            Summary = "Xóa học kỳ",
+            Description = "Xóa học kỳ"
+        )]
+        [SwaggerResponse(200, "Xóa học kỳ thành công")]
+        [SwaggerResponse(401, "Lỗi xác thực")]
+        [SwaggerResponse(403, "Quyền truy cập bị từ chối")]
+        [SwaggerResponse(422, "Model không hợp lệ.")]
+        [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        public async Task<IActionResult> Delete(int semesterId)
+        {
+            try
+            {
+                var result = await _semesterService.DeleteSemester(semesterId);
+
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while deleting semester");
                 return Error(ConstantModel.ErrorMessage);
             }
         }
