@@ -405,23 +405,40 @@ public class TopicService : ITopicService
         }
     }
 
-    public async Task<BaseResponseModel<List<TopicOverviewResDTO>>> GetMyTopics(int userId)
+    public async Task<BaseResponseModel<PagingDataModel<TopicOverviewResDTO, GetTopicsQueryDTO>>> GetMyTopics(int userId, GetTopicsQueryDTO query)
     {
         try
         {
             var topicRepo = _unitOfWork.GetRepo<Topic>();
-            var topics = await topicRepo.GetAllAsync(new QueryBuilder<Topic>()
+            var queryBuilder = new QueryBuilder<Topic>()
                 .WithPredicate(x => x.SupervisorId == userId && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.Supervisor)
-                .WithInclude(x => x.Category)
+                .WithInclude(x => x.Category!)
                 .WithInclude(x => x.Semester)
                 .WithInclude(x => x.TopicVersions)
-                .WithTracking(false)
-                .Build());
+                .WithTracking(false);
 
-            return new BaseResponseModel<List<TopicOverviewResDTO>>
+            if (query.SemesterId.HasValue)
             {
-                Data = topics.Select(x => new TopicOverviewResDTO(x)).ToList(),
+                queryBuilder = queryBuilder.WithPredicate(x => x.SemesterId == query.SemesterId.Value);
+            }
+
+            if (query.CategoryId.HasValue)
+            {
+                queryBuilder = queryBuilder.WithPredicate(x => x.CategoryId == query.CategoryId.Value);
+            }
+
+            var topicQuery = topicRepo.Get(queryBuilder.Build());
+
+            query.TotalRecord = await topicQuery.CountAsync();
+
+            var topics = await topicQuery
+            .OrderByDescending(x => x.CreatedAt)
+            .ToPagedList(query.PageNumber, query.PageSize).ToListAsync();
+
+            return new BaseResponseModel<PagingDataModel<TopicOverviewResDTO, GetTopicsQueryDTO>>
+            {
+                Data = new PagingDataModel<TopicOverviewResDTO, GetTopicsQueryDTO>(topics.Select(x => new TopicOverviewResDTO(x)), query),
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK
             };
