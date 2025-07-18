@@ -17543,3 +17543,8 @@ ORDER BY [t0].[CreatedAt] DESC, [t0].[Id], [u].[Id], [t1].[Id], [s].[Id]
 2025-07-11 23:23:27.987 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
 2025-07-11 23:23:27.988 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
 2025-07-11 23:23:27.988 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/topic/my-topics?PageNumber=1&PageSize=12 - 200 null application/json; charset=utf-8 114.3975ms
+2025-07-11 23:24:50.187 +07:00 [DBG] Connection id "0HNE0ISRLIPF5" received FIN.
+2025-07-11 23:24:50.193 +07:00 [DBG] Connection id "0HNE0ISRLIPF5" is closed. The last processed stream ID was 11.
+2025-07-11 23:24:50.194 +07:00 [DBG] Connection id "0HNE0ISRLIPF5" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-07-11 23:24:50.199 +07:00 [DBG] The connection queue processing loop for 0HNE0ISRLIPF5 completed.
+2025-07-11 23:24:50.204 +07:00 [DBG] Connection id "0HNE0ISRLIPF5" stopped.
