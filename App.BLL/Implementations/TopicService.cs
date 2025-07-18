@@ -297,7 +297,7 @@ public class TopicService : ITopicService
         }
     }
 
-    public async Task<BaseResponseModel> DeleteTopic(int topicId)
+    public async Task<BaseResponseModel> DeleteTopic(int topicId, int userId, bool isAdmin)
     {
         try
         {
@@ -314,6 +314,16 @@ public class TopicService : ITopicService
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
                     Message = "Chủ đề không tồn tại"
+                };
+            }
+
+            if (topic.SupervisorId != userId && !isAdmin)
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Message = "Bạn không có quyền xóa chủ đề này"
                 };
             }
 
@@ -335,7 +345,7 @@ public class TopicService : ITopicService
         }
     }
 
-    public async Task<BaseResponseModel> ApproveTopic(int topicId, int userId)
+    public async Task<BaseResponseModel> ApproveTopic(int topicId, int userId, bool isAdmin, bool isModerator)
     {
         try
         {
@@ -350,15 +360,15 @@ public class TopicService : ITopicService
                 };
             }
 
-            // if (!IsUserAdmin(user))
-            // {
-            //     return new BaseResponseModel
-            //     {
-            //         IsSuccess = false,
-            //         StatusCode = StatusCodes.Status403Forbidden,
-            //         Message = "Bạn không có quyền phê duyệt chủ đề"
-            //     };
-            // }
+            if (!isAdmin && !isModerator)
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Message = "Bạn không có quyền phê duyệt chủ đề"
+                };
+            }
 
             var topicRepo = _unitOfWork.GetRepo<Topic>();
             var topic = await topicRepo.GetSingleAsync(new QueryBuilder<Topic>()
