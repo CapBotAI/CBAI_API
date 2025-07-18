@@ -120,11 +120,11 @@ namespace CapBot.api.Controllers
         [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetAll([FromQuery] GetTopicsQueryDTO query)
+        public async Task<IActionResult> GetTopicsWithPaging([FromQuery] GetTopicsQueryDTO query)
         {
             try
             {
-                var result = await _topicService.GetAllTopics(query);
+                var result = await _topicService.GetTopicsWithPaging(query);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)
