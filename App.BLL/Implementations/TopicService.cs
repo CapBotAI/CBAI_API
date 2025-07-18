@@ -345,7 +345,7 @@ public class TopicService : ITopicService
         }
     }
 
-    public async Task<BaseResponseModel> ApproveTopic(int topicId, int userId, bool isAdmin, bool isModerator)
+    public async Task<BaseResponseModel> ApproveTopic(int topicId, int userId)
     {
         try
         {
@@ -360,15 +360,15 @@ public class TopicService : ITopicService
                 };
             }
 
-            if (!isAdmin && !isModerator)
-            {
-                return new BaseResponseModel
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status403Forbidden,
-                    Message = "Bạn không có quyền phê duyệt chủ đề"
-                };
-            }
+            // if (!IsUserAdmin(user))
+            // {
+            //     return new BaseResponseModel
+            //     {
+            //         IsSuccess = false,
+            //         StatusCode = StatusCodes.Status403Forbidden,
+            //         Message = "Bạn không có quyền phê duyệt chủ đề"
+            //     };
+            // }
 
             var topicRepo = _unitOfWork.GetRepo<Topic>();
             var topic = await topicRepo.GetSingleAsync(new QueryBuilder<Topic>()

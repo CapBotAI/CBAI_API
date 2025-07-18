@@ -51,10 +51,6 @@ public class JwtService : IJwtService
         {
             claims.Add(new Claim(ConstantModel.IS_ADMIN, "true"));
         }
-        if (roles.Contains(SystemRoleConstants.Moderator))
-        {
-            claims.Add(new Claim(ConstantModel.IS_MODERATOR, "true"));
-        }
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));

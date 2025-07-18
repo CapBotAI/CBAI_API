@@ -287,7 +287,7 @@ namespace CapBot.api.Controllers
         ///     POST /api/topic/approve/1
         ///
         /// </remarks>
-        [Authorize(Roles = SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
+        [Authorize(Roles = SystemRoleConstants.Administrator)]
         [HttpPost("approve/{topicId}")]
         [SwaggerOperation(
             Summary = "Phê duyệt chủ đề",
@@ -304,7 +304,7 @@ namespace CapBot.api.Controllers
         {
             try
             {
-                var result = await _topicService.ApproveTopic(topicId, UserId, IsAdmin, IsModerator);
+                var result = await _topicService.ApproveTopic(topicId, UserId);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)
