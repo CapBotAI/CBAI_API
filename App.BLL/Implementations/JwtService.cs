@@ -5,6 +5,7 @@ using System.Text;
 using App.BLL.Interfaces;
 using App.Commons;
 using App.DAL.Interfaces;
+using App.Entities.Constants;
 using App.Entities.DTOs.Accounts;
 using App.Entities.DTOs.Auth;
 using App.Entities.Entities.Core;
@@ -46,6 +47,10 @@ public class JwtService : IJwtService
             };
 
         var roles = await _identityRepository.GetRolesAsync(user.Id);
+        if (roles.Contains(SystemRoleConstants.Administrator))
+        {
+            claims.Add(new Claim(ConstantModel.IS_ADMIN, "true"));
+        }
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));

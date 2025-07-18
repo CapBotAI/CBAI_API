@@ -12,10 +12,8 @@ public class CreateTopicDTO : IValiationPipeline, IEntity<Topic>
     [StringLength(500, ErrorMessage = "Tiêu đề chủ đề không được vượt quá 500 ký tự")]
     public string Title { get; set; } = null!;
 
-    [StringLength(2000, ErrorMessage = "Mô tả không được vượt quá 2000 ký tự")]
     public string? Description { get; set; }
 
-    [StringLength(2000, ErrorMessage = "Mục tiêu không được vượt quá 2000 ký tự")]
     public string? Objectives { get; set; }
 
     [Required(ErrorMessage = "Danh mục chủ đề không được để trống")]
@@ -27,14 +25,10 @@ public class CreateTopicDTO : IValiationPipeline, IEntity<Topic>
     [Range(1, 5, ErrorMessage = "Số lượng sinh viên tối đa phải từ 1 đến 5")]
     public int MaxStudents { get; set; } = 1;
 
-    // TopicVersion fields for initial version
-    [StringLength(3000, ErrorMessage = "Phương pháp nghiên cứu không được vượt quá 3000 ký tự")]
     public string? Methodology { get; set; }
 
-    [StringLength(3000, ErrorMessage = "Kết quả mong đợi không được vượt quá 3000 ký tự")]
     public string? ExpectedOutcomes { get; set; }
 
-    [StringLength(2000, ErrorMessage = "Yêu cầu không được vượt quá 2000 ký tự")]
     public string? Requirements { get; set; }
 
     public string? DocumentUrl { get; set; }

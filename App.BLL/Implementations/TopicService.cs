@@ -212,14 +212,14 @@ public class TopicService : ITopicService
         }
     }
 
-    public async Task<BaseResponseModel<TopicDetailDTO>> UpdateTopic(UpdateTopicDTO updateTopicDTO, int userId)
+    public async Task<BaseResponseModel<UpdateTopicResDTO>> UpdateTopic(UpdateTopicDTO updateTopicDTO, int userId, bool isAdmin)
     {
         try
         {
             var user = await _identityRepository.GetByIdAsync((long)userId);
             if (user == null)
             {
-                return new BaseResponseModel<TopicDetailDTO>
+                return new BaseResponseModel<UpdateTopicResDTO>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
@@ -233,23 +233,23 @@ public class TopicService : ITopicService
                 .WithInclude(x => x.Supervisor)
                 .WithInclude(x => x.Category)
                 .WithInclude(x => x.Semester)
+                .WithInclude(x => x.TopicVersions)
                 .WithTracking(true)
                 .Build());
 
             if (topic == null)
             {
-                return new BaseResponseModel<TopicDetailDTO>
+                return new BaseResponseModel<UpdateTopicResDTO>
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusCode = StatusCodes.Status409Conflict,
                     Message = "Chủ đề không tồn tại"
                 };
             }
 
-            // Check permission - only supervisor or admin can update
-            if (topic.SupervisorId != userId && !IsUserAdmin(user))
+            if (topic.SupervisorId != userId && !isAdmin)
             {
-                return new BaseResponseModel<TopicDetailDTO>
+                return new BaseResponseModel<UpdateTopicResDTO>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status403Forbidden,
@@ -257,7 +257,6 @@ public class TopicService : ITopicService
                 };
             }
 
-            // Validate Category exists
             var categoryRepo = _unitOfWork.GetRepo<TopicCategory>();
             var category = await categoryRepo.GetSingleAsync(new QueryBuilder<TopicCategory>()
                 .WithPredicate(x => x.Id == updateTopicDTO.CategoryId && x.IsActive && x.DeletedAt == null)
@@ -266,10 +265,10 @@ public class TopicService : ITopicService
 
             if (category == null)
             {
-                return new BaseResponseModel<TopicDetailDTO>
+                return new BaseResponseModel<UpdateTopicResDTO>
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status404NotFound,
+                    StatusCode = StatusCodes.Status409Conflict,
                     Message = "Danh mục chủ đề không tồn tại"
                 };
             }
@@ -285,9 +284,9 @@ public class TopicService : ITopicService
             await topicRepo.UpdateAsync(topic);
             await _unitOfWork.SaveChangesAsync();
 
-            return new BaseResponseModel<TopicDetailDTO>
+            return new BaseResponseModel<UpdateTopicResDTO>
             {
-                Data = new TopicDetailDTO(topic),
+                Data = new UpdateTopicResDTO(topic),
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK
             };
@@ -351,15 +350,15 @@ public class TopicService : ITopicService
                 };
             }
 
-            if (!IsUserAdmin(user))
-            {
-                return new BaseResponseModel
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status403Forbidden,
-                    Message = "Bạn không có quyền phê duyệt chủ đề"
-                };
-            }
+            // if (!IsUserAdmin(user))
+            // {
+            //     return new BaseResponseModel
+            //     {
+            //         IsSuccess = false,
+            //         StatusCode = StatusCodes.Status403Forbidden,
+            //         Message = "Bạn không có quyền phê duyệt chủ đề"
+            //     };
+            // }
 
             var topicRepo = _unitOfWork.GetRepo<Topic>();
             var topic = await topicRepo.GetSingleAsync(new QueryBuilder<Topic>()
@@ -421,12 +420,5 @@ public class TopicService : ITopicService
         {
             throw;
         }
-    }
-
-    private bool IsUserAdmin(object user)
-    {
-        // Implement admin check logic based on your user roles structure
-        // This is a placeholder - adjust according to your UserRole implementation
-        return true; // Replace with actual implementation
     }
 }
