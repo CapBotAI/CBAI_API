@@ -247,7 +247,7 @@ namespace CapBot.api.Controllers
         ///     DELETE /api/topic/delete/1
         ///
         /// </remarks>
-        [Authorize(Roles = SystemRoleConstants.Administrator)]
+        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator)]
         [HttpDelete("delete/{topicId}")]
         [SwaggerOperation(
             Summary = "Xóa chủ đề",
@@ -264,7 +264,7 @@ namespace CapBot.api.Controllers
         {
             try
             {
-                var result = await _topicService.DeleteTopic(topicId);
+                var result = await _topicService.DeleteTopic(topicId, UserId, IsAdmin);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)
@@ -287,7 +287,7 @@ namespace CapBot.api.Controllers
         ///     POST /api/topic/approve/1
         ///
         /// </remarks>
-        [Authorize(Roles = SystemRoleConstants.Administrator)]
+        [Authorize(Roles = SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
         [HttpPost("approve/{topicId}")]
         [SwaggerOperation(
             Summary = "Phê duyệt chủ đề",
@@ -304,7 +304,7 @@ namespace CapBot.api.Controllers
         {
             try
             {
-                var result = await _topicService.ApproveTopic(topicId, UserId);
+                var result = await _topicService.ApproveTopic(topicId, UserId, IsAdmin, IsModerator);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)

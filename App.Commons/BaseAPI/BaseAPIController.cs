@@ -320,6 +320,9 @@ public class BaseAPIController : ControllerBase
     /// </summary>
     protected string? Jti => User.FindFirst(JwtRegisteredClaimNames.Jti)?.Value;
 
+    /// <summary>
+    /// Get the logged in user is admin
+    /// </summary>
     protected bool IsAdmin
     {
         get
@@ -327,6 +330,19 @@ public class BaseAPIController : ControllerBase
             var isadmin = User.FindFirst(ConstantModel.IS_ADMIN)?.Value;
             bool.TryParse(isadmin, out bool isAdmin);
             return isAdmin;
+        }
+    }
+
+    /// <summary>
+    /// Get the logged in user is moderator
+    /// </summary>
+    protected bool IsModerator
+    {
+        get
+        {
+            var is_Moderator = User.FindFirst(ConstantModel.IS_MODERATOR)?.Value;
+            bool.TryParse(is_Moderator, out bool isModerator);
+            return isModerator;
         }
     }
 
