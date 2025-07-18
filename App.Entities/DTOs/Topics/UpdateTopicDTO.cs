@@ -12,16 +12,13 @@ public class UpdateTopicDTO
     [StringLength(500, ErrorMessage = "Tiêu đề chủ đề không được vượt quá 500 ký tự")]
     public string Title { get; set; } = null!;
 
-    [StringLength(2000, ErrorMessage = "Mô tả không được vượt quá 2000 ký tự")]
     public string? Description { get; set; }
-
-    [StringLength(2000, ErrorMessage = "Mục tiêu không được vượt quá 2000 ký tự")]
     public string? Objectives { get; set; }
 
     [Required(ErrorMessage = "Danh mục chủ đề không được để trống")]
     public int CategoryId { get; set; }
 
-    [Range(1, 10, ErrorMessage = "Số lượng sinh viên tối đa phải từ 1 đến 10")]
+    [Range(1, 5, ErrorMessage = "Số lượng sinh viên tối đa phải từ 1 đến 5")]
     public int MaxStudents { get; set; }
 
     public BaseResponseModel Validate()

@@ -224,7 +224,7 @@ namespace CapBot.api.Controllers
 
             try
             {
-                var result = await _topicService.UpdateTopic(updateTopicDTO, UserId);
+                var result = await _topicService.UpdateTopic(updateTopicDTO, UserId, IsAdmin);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)

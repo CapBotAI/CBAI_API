@@ -1,8 +1,9 @@
+using System;
 using App.Entities.Entities.App;
 
 namespace App.Entities.DTOs.Topics;
 
-public class CreateTopicResDTO
+public class UpdateTopicResDTO
 {
     public int Id { get; set; }
     public string Title { get; set; } = null!;
@@ -12,13 +13,11 @@ public class CreateTopicResDTO
     public string SemesterName { get; set; } = null!;
     public int MaxStudents { get; set; }
     public bool IsApproved { get; set; }
-    public DateTime? CreatedAt { get; set; }
-    public string? CreatedBy { get; set; }
+    public DateTime? UpdatedAt { get; set; }
+    public string? UpdatedBy { get; set; }
     public int CurrentVersionNumber { get; set; }
 
-    public CreateTopicResDTO() { }
-
-    public CreateTopicResDTO(Topic topic)
+    public UpdateTopicResDTO(Topic topic)
     {
         Id = topic.Id;
         Title = topic.Title;
@@ -28,8 +27,8 @@ public class CreateTopicResDTO
         SemesterName = topic.Semester?.Name ?? "";
         MaxStudents = topic.MaxStudents;
         IsApproved = topic.IsApproved;
-        CreatedAt = topic.CreatedAt;
-        CreatedBy = topic.CreatedBy;
+        UpdatedAt = topic.LastModifiedAt ?? DateTime.Now;
+        UpdatedBy = topic.LastModifiedBy;
         CurrentVersionNumber = topic.TopicVersions?.Max(v => v.VersionNumber) ?? 1;
     }
 }
