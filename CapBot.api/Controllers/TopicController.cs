@@ -317,6 +317,7 @@ namespace CapBot.api.Controllers
         /// <summary>
         /// Lấy danh sách chủ đề của tôi
         /// </summary>
+        /// <param name="query">Thông tin lọc</param>
         /// <returns>Danh sách chủ đề của supervisor hiện tại</returns>
         /// <remarks>
         /// Lấy danh sách chủ đề mà supervisor hiện tại đã tạo
@@ -338,11 +339,11 @@ namespace CapBot.api.Controllers
         [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetMyTopics()
+        public async Task<IActionResult> GetMyTopics([FromQuery] GetTopicsQueryDTO query)
         {
             try
             {
-                var result = await _topicService.GetMyTopics(UserId);
+                var result = await _topicService.GetMyTopics(UserId, query);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)

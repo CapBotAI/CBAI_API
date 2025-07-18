@@ -12,5 +12,5 @@ public interface ITopicService
     Task<BaseResponseModel<UpdateTopicResDTO>> UpdateTopic(UpdateTopicDTO updateTopicDTO, int userId, bool isAdmin);
     Task<BaseResponseModel> DeleteTopic(int topicId, int userId, bool isAdmin);
     Task<BaseResponseModel> ApproveTopic(int topicId, int userId, bool isAdmin, bool isModerator);
-    Task<BaseResponseModel<List<TopicOverviewResDTO>>> GetMyTopics(int userId);
+    Task<BaseResponseModel<PagingDataModel<TopicOverviewResDTO, GetTopicsQueryDTO>>> GetMyTopics(int userId, GetTopicsQueryDTO query);
 }
