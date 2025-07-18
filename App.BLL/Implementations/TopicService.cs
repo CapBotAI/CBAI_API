@@ -131,7 +131,7 @@ public class TopicService : ITopicService
         }
     }
 
-    public async Task<BaseResponseModel<PagingDataModel<TopicOverviewResDTO, GetTopicsQueryDTO>>> GetAllTopics(GetTopicsQueryDTO query)
+    public async Task<BaseResponseModel<PagingDataModel<TopicOverviewResDTO, GetTopicsQueryDTO>>> GetTopicsWithPaging(GetTopicsQueryDTO query)
     {
         try
         {
