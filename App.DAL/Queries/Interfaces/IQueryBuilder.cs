@@ -9,4 +9,5 @@ public interface IQueryBuilder<T> where T : class
     IQueryBuilder<T> WithOrderBy(Func<IQueryable<T>, IOrderedQueryable<T>> orderBy);
     IQueryBuilder<T> WithInclude(params Expression<Func<T, object>>[] includeProperty);
     QueryOptions<T> Build();
+
 }

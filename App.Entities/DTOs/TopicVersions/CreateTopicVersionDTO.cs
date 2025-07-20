@@ -1,9 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using App.Commons.Interfaces;
 using App.Commons.ResponseModel;
+using App.Entities.Entities.App;
+using FS.Commons.Interfaces;
 
 namespace App.Entities.DTOs.TopicVersions;
 
-public class CreateTopicVersionDTO
+public class CreateTopicVersionDTO : IEntity<TopicVersion>, IValidationPipeline
 {
     [Required(ErrorMessage = "Id chủ đề không được để trống")]
     public int TopicId { get; set; }
@@ -11,23 +14,31 @@ public class CreateTopicVersionDTO
     [Required(ErrorMessage = "Tiêu đề không được để trống")]
     [StringLength(500, ErrorMessage = "Tiêu đề không được vượt quá 500 ký tự")]
     public string Title { get; set; } = null!;
-
-    [StringLength(2000, ErrorMessage = "Mô tả không được vượt quá 2000 ký tự")]
     public string? Description { get; set; }
 
-    [StringLength(2000, ErrorMessage = "Mục tiêu không được vượt quá 2000 ký tự")]
     public string? Objectives { get; set; }
 
-    [StringLength(3000, ErrorMessage = "Phương pháp nghiên cứu không được vượt quá 3000 ký tự")]
     public string? Methodology { get; set; }
-
-    [StringLength(3000, ErrorMessage = "Kết quả mong đợi không được vượt quá 3000 ký tự")]
     public string? ExpectedOutcomes { get; set; }
-
-    [StringLength(2000, ErrorMessage = "Yêu cầu không được vượt quá 2000 ký tự")]
     public string? Requirements { get; set; }
 
     public string? DocumentUrl { get; set; }
+
+    public TopicVersion GetEntity()
+    {
+        return new TopicVersion
+        {
+            TopicId = TopicId,
+            Title = Title.Trim(),
+            Description = Description?.Trim(),
+            Objectives = Objectives?.Trim(),
+            Methodology = Methodology?.Trim(),
+            ExpectedOutcomes = ExpectedOutcomes?.Trim(),
+            Requirements = Requirements?.Trim(),
+            DocumentUrl = DocumentUrl?.Trim(),
+        };
+    }
+
 
     public BaseResponseModel Validate()
     {

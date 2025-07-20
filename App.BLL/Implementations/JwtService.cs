@@ -37,31 +37,29 @@ public class JwtService : IJwtService
 
     public async Task<JwtTokenDTO> GenerateJwtToken(User user)
     {
-        var claims = new List<Claim> {
-                new (ClaimTypes.Email, user.Email ?? string.Empty),
-                new (ClaimTypes.NameIdentifier, user.Id.ToString()),
-                new (ClaimTypes.Name, user.UserName ?? string.Empty),
-                new (ConstantModel.CLAIM_EMAIL, user.Email ?? string.Empty),
-                new (ConstantModel.POLICY_VERIFY_EMAIL, user.EmailConfirmed.ToString()),
-                new (ConstantModel.CLAIM_ID, user.Id.ToString()),
-            };
+        var email = user.Email ?? string.Empty;
+        var userId = user.Id.ToString();
+        var userName = user.UserName ?? string.Empty;
+
+        var claims = new List<Claim>
+    {
+        new(ClaimTypes.Email, email),
+        new(ClaimTypes.NameIdentifier, userId),
+        new(ClaimTypes.Name, userName),
+        new(ConstantModel.CLAIM_EMAIL, email),
+        new(ConstantModel.POLICY_VERIFY_EMAIL, user.EmailConfirmed.ToString()),
+        new(ConstantModel.CLAIM_ID, userId),
+    };
 
         var roles = await _identityRepository.GetRolesAsync(user.Id);
-        if (roles.Contains(SystemRoleConstants.Administrator))
-        {
-            claims.Add(new Claim(ConstantModel.IS_ADMIN, "true"));
-        }
-        if (roles.Contains(SystemRoleConstants.Moderator))
-        {
-            claims.Add(new Claim(ConstantModel.IS_MODERATOR, "true"));
-        }
+        claims.AddRange(GetRoleClaims(roles));
+
         foreach (var role in roles)
         {
             claims.Add(new Claim(ClaimTypes.Role, role));
         }
 
         var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);
-
         var tokenDescriptor = new SecurityTokenDescriptor
         {
             Subject = new ClaimsIdentity(claims),
@@ -73,13 +71,11 @@ public class JwtService : IJwtService
 
         var tokenHandler = new JwtSecurityTokenHandler();
         var token = tokenHandler.CreateToken(tokenDescriptor);
-        var accessToken = tokenHandler.WriteToken(token);
-        var refreshToken = "Tạm thời chưa implement";
 
         return new JwtTokenDTO
         {
-            AccessToken = accessToken,
-            RefreshToken = refreshToken,
+            AccessToken = tokenHandler.WriteToken(token),
+            RefreshToken = "Tạm thời chưa implement",
             ExpiryTime = tokenDescriptor.Expires.Value
         };
     }
@@ -118,4 +114,27 @@ public class JwtService : IJwtService
         var jwt = tokenHandler.ReadJwtToken(token);
         return jwt.Claims.FirstOrDefault(x => x.Type == ClaimTypes.NameIdentifier)?.Value ?? "";
     }
+
+    #region Private Methods
+
+    private static IEnumerable<Claim> GetRoleClaims(IEnumerable<string> roles)
+    {
+        var claims = new List<Claim>();
+
+        if (roles.Contains(SystemRoleConstants.Administrator))
+            claims.Add(new Claim(ConstantModel.IS_ADMIN, "true"));
+
+        if (roles.Contains(SystemRoleConstants.Moderator))
+            claims.Add(new Claim(ConstantModel.IS_MODERATOR, "true"));
+
+        if (roles.Contains(SystemRoleConstants.Supervisor))
+            claims.Add(new Claim(ConstantModel.IS_SUPERVISOR, "true"));
+
+        if (roles.Contains(SystemRoleConstants.Reviewer))
+            claims.Add(new Claim(ConstantModel.IS_REVIEWER, "true"));
+
+        return claims;
+    }
+
+    #endregion
 }

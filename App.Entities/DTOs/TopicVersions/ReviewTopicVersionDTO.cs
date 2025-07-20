@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using App.Commons.Interfaces;
 using App.Commons.ResponseModel;
 using App.Entities.Enums;
 
 namespace App.Entities.DTOs.TopicVersions;
 
-public class ReviewTopicVersionDTO
+public class ReviewTopicVersionDTO : IValidationPipeline
 {
     [Required(ErrorMessage = "Id phiên bản không được để trống")]
     public int VersionId { get; set; }

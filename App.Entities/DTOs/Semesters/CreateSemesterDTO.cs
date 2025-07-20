@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace App.Entities.DTOs.Semester;
 
-public class CreateSemesterDTO : IEntity<App.Entities.Entities.App.Semester>, IValiationPipeline
+public class CreateSemesterDTO : IEntity<App.Entities.Entities.App.Semester>, IValidationPipeline
 {
     [Required(ErrorMessage = "Tên học kỳ là bắt buộc")]
     public string Name { get; set; } = null!;

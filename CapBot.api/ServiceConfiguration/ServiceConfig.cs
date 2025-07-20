@@ -40,6 +40,9 @@ public class ServiceConfig
         //Topic Service
         services.AddScoped<ITopicService, TopicService>();
 
+        //Topic Version Service
+        services.AddScoped<ITopicVersionService, TopicVersionService>();
+
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 

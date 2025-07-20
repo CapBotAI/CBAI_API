@@ -1,9 +1,12 @@
 using System.ComponentModel.DataAnnotations;
+using App.Commons.Interfaces;
 using App.Commons.ResponseModel;
+using App.Entities.Entities.App;
+using FS.Commons.Interfaces;
 
 namespace App.Entities.DTOs.TopicVersions;
 
-public class UpdateTopicVersionDTO
+public class UpdateTopicVersionDTO : IEntity<TopicVersion>, IValidationPipeline
 {
     [Required(ErrorMessage = "Id phiên bản không được để trống")]
     public int Id { get; set; }
@@ -28,6 +31,12 @@ public class UpdateTopicVersionDTO
     public string? Requirements { get; set; }
 
     public string? DocumentUrl { get; set; }
+
+    public TopicVersion GetEntity()
+    {
+        throw new NotImplementedException();
+    }
+
 
     public BaseResponseModel Validate()
     {
