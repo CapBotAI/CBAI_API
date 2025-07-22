@@ -1,5 +1,7 @@
 using System;
 using App.BLL.Interfaces;
+using App.Commons.Extensions;
+using App.Commons.Paging;
 using App.Commons.ResponseModel;
 using App.DAL.Interfaces;
 using App.DAL.Queries.Implementations;
@@ -9,6 +11,7 @@ using App.Entities.DTOs.TopicVersions;
 using App.Entities.Entities.App;
 using App.Entities.Enums;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
 namespace App.BLL.Implementations;
@@ -178,7 +181,7 @@ public class TopicVersionService : ITopicVersionService
         }
     }
 
-    public async Task<BaseResponseModel<List<TopicVersionDetailDTO>>> GetTopicVersionHistory(int topicId)
+    public async Task<BaseResponseModel<PagingDataModel<TopicVersionOverviewDTO, GetTopicVersionQueryDTO>>> GetTopicVersionHistory(GetTopicVersionQueryDTO query, int topicId)
     {
         try
         {
@@ -190,7 +193,7 @@ public class TopicVersionService : ITopicVersionService
 
             if (topic == null)
             {
-                return new BaseResponseModel<List<TopicVersionDetailDTO>>
+                return new BaseResponseModel<PagingDataModel<TopicVersionOverviewDTO, GetTopicVersionQueryDTO>>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
@@ -199,16 +202,27 @@ public class TopicVersionService : ITopicVersionService
             }
 
             var versionRepo = _unitOfWork.GetRepo<TopicVersion>();
-            var versions = await versionRepo.GetAllAsync(new QueryBuilder<TopicVersion>()
+            var queryBuilder = new QueryBuilder<TopicVersion>()
                 .WithPredicate(x => x.TopicId == topicId && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.SubmittedByUser)
                 .WithOrderBy(x => x.OrderByDescending(y => y.VersionNumber))
-                .WithTracking(false)
-                .Build());
+                .WithTracking(false);
 
-            return new BaseResponseModel<List<TopicVersionDetailDTO>>
+            if (!string.IsNullOrEmpty(query.Keyword))
             {
-                Data = versions.Select(x => new TopicVersionDetailDTO(x)).ToList(),
+                queryBuilder.WithPredicate(x => x.Title.Contains(query.Keyword));
+            }
+
+            var versionQuery = versionRepo.Get(queryBuilder.Build());
+
+            query.TotalRecord = await versionQuery.CountAsync();
+            var versions = await versionQuery
+            .OrderByDescending(x => x.CreatedAt)
+            .ToPagedList(query.PageNumber, query.PageSize).ToListAsync();
+
+            return new BaseResponseModel<PagingDataModel<TopicVersionOverviewDTO, GetTopicVersionQueryDTO>>
+            {
+                Data = new PagingDataModel<TopicVersionOverviewDTO, GetTopicVersionQueryDTO>(versions.Select(x => new TopicVersionOverviewDTO(x)).ToList(), query),
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK
             };

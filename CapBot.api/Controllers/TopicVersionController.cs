@@ -153,6 +153,7 @@ namespace CapBot.api.Controllers
         /// <summary>
         /// Lấy lịch sử các phiên bản của chủ đề
         /// </summary>
+        /// <param name="query">Thông tin lọc và phân trang</param>
         /// <param name="topicId">Id của chủ đề</param>
         /// <returns>Danh sách các phiên bản của chủ đề</returns>
         /// <remarks>
@@ -175,11 +176,11 @@ namespace CapBot.api.Controllers
         [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetHistory(int topicId)
+        public async Task<IActionResult> GetHistory([FromQuery] GetTopicVersionQueryDTO query, int topicId)
         {
             try
             {
-                var result = await _topicVersionService.GetTopicVersionHistory(topicId);
+                var result = await _topicVersionService.GetTopicVersionHistory(query, topicId);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)
