@@ -132,7 +132,6 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
-            // Check permission - only supervisor can update
             if (topicVersion.Topic.SupervisorId != userId)
             {
                 return new BaseResponseModel<TopicVersionDetailDTO>
@@ -143,7 +142,6 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
-            // Only draft versions can be updated
             if (topicVersion.Status != TopicStatus.Draft)
             {
                 return new BaseResponseModel<TopicVersionDetailDTO>

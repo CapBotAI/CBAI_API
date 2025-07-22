@@ -1086,3 +1086,909 @@ ORDER BY [t1].[Id], [t1].[Id0], [t1].[Id1], [t1].[Id2]
 2025-07-12 00:35:22.593 +07:00 [DBG] Connection id "0HNE0K4DTEVOJ" sending FIN because: "The Socket transport's send loop completed gracefully."
 2025-07-12 00:35:22.594 +07:00 [DBG] The connection queue processing loop for 0HNE0K4DTEVOJ completed.
 2025-07-12 00:35:22.594 +07:00 [DBG] Connection id "0HNE0K4DTEVOJ" stopped.
+2025-07-12 00:37:23.022 +07:00 [INF] Application is shutting down...
+2025-07-12 00:37:23.024 +07:00 [DBG] Hosting stopping
+2025-07-12 00:37:23.032 +07:00 [DBG] Hosting stopped
+2025-07-12 00:40:55.761 +07:00 [DBG] An 'IServiceProvider' was created for internal use by Entity Framework.
+2025-07-12 00:40:55.817 +07:00 [INF] User profile is available. Using '/Users/tamnguyen/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2025-07-12 00:40:55.921 +07:00 [DBG] No relationship from 'ReviewerAssignment' to 'User' has been configured by convention because there are multiple properties on one entity type - {'AssignedByUser', 'Reviewer'} that could be matched with the properties on the other entity type - {'ReviewerAssignments'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:55.930 +07:00 [DBG] No relationship from 'SubmissionWorkflowLog' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromStateLogs', 'ToStateLogs'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:55.934 +07:00 [DBG] No relationship from 'User' to 'ReviewerAssignment' has been configured by convention because there are multiple properties on one entity type - {'ReviewerAssignments'} that could be matched with the properties on the other entity type - {'AssignedByUser', 'Reviewer'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:55.936 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:55.936 +07:00 [DBG] No relationship from 'WorkflowState' to 'WorkflowTransition' has been configured by convention because there are multiple properties on one entity type - {'FromTransitions', 'ToTransitions'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:55.936 +07:00 [DBG] No relationship from 'WorkflowTransition' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromTransitions', 'ToTransitions'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:56.016 +07:00 [DBG] No relationship from 'ReviewerAssignment' to 'User' has been configured by convention because there are multiple properties on one entity type - {'AssignedByUser', 'Reviewer'} that could be matched with the properties on the other entity type - {'ReviewerAssignments'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:56.016 +07:00 [DBG] No relationship from 'User' to 'ReviewerAssignment' has been configured by convention because there are multiple properties on one entity type - {'ReviewerAssignments'} that could be matched with the properties on the other entity type - {'AssignedByUser', 'Reviewer'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:56.025 +07:00 [DBG] No relationship from 'WorkflowTransition' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromTransitions', 'ToTransitions'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:56.026 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:56.026 +07:00 [DBG] No relationship from 'WorkflowState' to 'WorkflowTransition' has been configured by convention because there are multiple properties on one entity type - {'FromTransitions', 'ToTransitions'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:56.026 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:56.028 +07:00 [DBG] No relationship from 'SubmissionWorkflowLog' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromStateLogs', 'ToStateLogs'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:56.028 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'LecturerId'} was not created on entity type 'LecturerSkill' as the properties are already covered by the index {'LecturerId', 'SkillTag'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'SemesterId'} was not created on entity type 'Phase' as the properties are already covered by the index {'SemesterId', 'PhaseTypeId'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'AssignmentId'} was not created on entity type 'Review' as the properties are already covered by the index {'AssignmentId', 'Status'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'ReviewId'} was not created on entity type 'ReviewComment' as the properties are already covered by the index {'ReviewId', 'SectionName'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'ReviewId'} was not created on entity type 'ReviewCriteriaScore' as the properties are already covered by the index {'ReviewId', 'CriteriaId'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'ReviewerId'} was not created on entity type 'ReviewerAssignment' as the properties are already covered by the index {'ReviewerId', 'Status'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'SubmissionId'} was not created on entity type 'ReviewerAssignment' as the properties are already covered by the index {'SubmissionId', 'ReviewerId'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'ReviewerId'} was not created on entity type 'ReviewerPerformance' as the properties are already covered by the index {'ReviewerId', 'SemesterId'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'PhaseId'} was not created on entity type 'Submission' as the properties are already covered by the index {'PhaseId', 'Status'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'PhaseId'} was not created on entity type 'Submission' as the properties are already covered by the index {'PhaseId', 'Status', 'SubmittedAt'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'TopicVersionId'} was not created on entity type 'Submission' as the properties are already covered by the index {'TopicVersionId', 'PhaseId', 'SubmissionRound'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'SubmissionId'} was not created on entity type 'SubmissionWorkflowLog' as the properties are already covered by the index {'SubmissionId', 'CreatedAt'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'UserId'} was not created on entity type 'SystemNotification' as the properties are already covered by the index {'UserId', 'IsRead', 'CreatedAt'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'SemesterId'} was not created on entity type 'Topic' as the properties are already covered by the index {'SemesterId', 'IsApproved'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'SupervisorId'} was not created on entity type 'Topic' as the properties are already covered by the index {'SupervisorId', 'SemesterId'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'TopicVersion' as the properties are already covered by the index {'TopicId', 'Status'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'TopicVersion' as the properties are already covered by the index {'TopicId', 'VersionNumber'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'UserId'} was not created on entity type 'UserRole' as the properties are already covered by the index {'UserId', 'RoleId'}.
+2025-07-12 00:40:56.040 +07:00 [DBG] The index {'UserId'} was not created on entity type 'UserToken' as the properties are already covered by the index {'UserId', 'LoginProvider', 'Name'}.
+2025-07-12 00:40:56.102 +07:00 [WRN] The 'ProficiencyLevels' property 'ProficiencyLevel' on entity type 'LecturerSkill' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ProficiencyLevels' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-12 00:40:56.102 +07:00 [WRN] The 'ReviewRecommendations' property 'Recommendation' on entity type 'Review' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ReviewRecommendations' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-12 00:40:56.102 +07:00 [WRN] The 'ReviewStatus' property 'Status' on entity type 'Review' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ReviewStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-12 00:40:56.102 +07:00 [WRN] The 'CommentTypes' property 'CommentType' on entity type 'ReviewComment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'CommentTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-12 00:40:56.102 +07:00 [WRN] The 'PriorityLevels' property 'Priority' on entity type 'ReviewComment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'PriorityLevels' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-12 00:40:56.102 +07:00 [WRN] The 'AssignmentTypes' property 'AssignmentType' on entity type 'ReviewerAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AssignmentTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-12 00:40:56.103 +07:00 [WRN] The 'AssignmentStatus' property 'Status' on entity type 'ReviewerAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AssignmentStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-12 00:40:56.103 +07:00 [WRN] The 'AiCheckStatus' property 'AiCheckStatus' on entity type 'Submission' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AiCheckStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-12 00:40:56.103 +07:00 [WRN] The 'SubmissionStatus' property 'Status' on entity type 'Submission' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'SubmissionStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-12 00:40:56.103 +07:00 [WRN] The 'NotificationTypes' property 'Type' on entity type 'SystemNotification' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'NotificationTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-12 00:40:56.103 +07:00 [WRN] The 'TopicStatus' property 'Status' on entity type 'TopicVersion' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'TopicStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-07-12 00:40:56.164 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-07-12 00:40:56.193 +07:00 [DBG] Compiling query expression: 
+'DbSet<Role>()
+    .FirstOrDefault(r => r.NormalizedName == __normalizedName_0)'
+2025-07-12 00:40:56.264 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<Role>(
+    asyncEnumerable: new SingleQueryingEnumerable<Role>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: Role.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Role.ConcurrencyStamp (string), 1], [Property: Role.IsAdmin (bool) Required, 2], [Property: Role.Name (string), 3], [Property: Role.NormalizedName (string), 4] }
+            SELECT TOP(1) r.Id, r.ConcurrencyStamp, r.IsAdmin, r.Name, r.NormalizedName
+            FROM roles AS r
+            WHERE r.NormalizedName == @__normalizedName_0), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, Role>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-07-12 00:40:56.279 +07:00 [DBG] Creating DbConnection.
+2025-07-12 00:40:56.286 +07:00 [DBG] Created DbConnection. (6ms).
+2025-07-12 00:40:56.288 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.391 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.393 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:40:56.395 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (1ms).
+2025-07-12 00:40:56.397 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (4ms).
+2025-07-12 00:40:56.400 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-07-12 00:40:56.434 +07:00 [INF] Executed DbCommand (33ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-07-12 00:40:56.450 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:40:56.457 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.460 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 24ms reading results.
+2025-07-12 00:40:56.460 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.462 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (1ms).
+2025-07-12 00:40:56.464 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.464 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.464 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:40:56.464 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.464 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.464 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-07-12 00:40:56.468 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-07-12 00:40:56.468 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:40:56.468 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.468 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:40:56.468 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.468 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:40:56.469 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.469 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.469 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:40:56.469 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.469 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.469 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-07-12 00:40:56.471 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-07-12 00:40:56.471 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:40:56.471 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.471 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:40:56.471 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.471 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:40:56.471 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.471 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.471 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:40:56.471 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.471 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.471 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-07-12 00:40:56.474 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-07-12 00:40:56.474 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:40:56.474 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.474 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:40:56.474 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.474 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:40:56.477 +07:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .SingleOrDefault(u => u.NormalizedEmail == __normalizedEmail_0)'
+2025-07-12 00:40:56.480 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<User>(
+    asyncEnumerable: new SingleQueryingEnumerable<User>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: User.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: User.AccessFailedCount (int) Required, 1], [Property: User.ConcurrencyStamp (string), 2], [Property: User.CreatedAt (DateTime) Required, 3], [Property: User.DeletedAt (DateTime?), 4], [Property: User.Email (string), 5], [Property: User.EmailConfirmed (bool) Required, 6], [Property: User.LastModifiedAt (DateTime) Required, 7], [Property: User.LastModifiedBy (string), 8], [Property: User.LockoutEnabled (bool) Required, 9], [Property: User.LockoutEnd (DateTimeOffset?), 10], [Property: User.NormalizedEmail (string), 11], [Property: User.NormalizedUserName (string), 12], [Property: User.PasswordHash (string), 13], [Property: User.PhoneNumber (string), 14], [Property: User.PhoneNumberConfirmed (bool) Required, 15], [Property: User.SecurityStamp (string), 16], [Property: User.TwoFactorEnabled (bool) Required, 17], [Property: User.UserName (string), 18] }
+            SELECT TOP(2) u.Id, u.AccessFailedCount, u.ConcurrencyStamp, u.CreatedAt, u.DeletedAt, u.Email, u.EmailConfirmed, u.LastModifiedAt, u.LastModifiedBy, u.LockoutEnabled, u.LockoutEnd, u.NormalizedEmail, u.NormalizedUserName, u.PasswordHash, u.PhoneNumber, u.PhoneNumberConfirmed, u.SecurityStamp, u.TwoFactorEnabled, u.UserName
+            FROM users AS u
+            WHERE u.NormalizedEmail == @__normalizedEmail_0), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, User>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-07-12 00:40:56.480 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.480 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.480 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:40:56.480 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.480 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.481 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-07-12 00:40:56.484 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-07-12 00:40:56.491 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:40:56.501 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.501 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 16ms reading results.
+2025-07-12 00:40:56.501 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.501 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:40:56.502 +07:00 [INF] Admin user 'fptslayer@gmail.com' already exists
+2025-07-12 00:40:56.503 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.503 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.503 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:40:56.503 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.503 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.503 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-07-12 00:40:56.506 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-07-12 00:40:56.506 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:40:56.507 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.507 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:40:56.507 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.507 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:40:56.507 +07:00 [INF] Sample moderator 'moderator@example.com' already exists
+2025-07-12 00:40:56.507 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.507 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.507 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:40:56.507 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.507 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.507 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-07-12 00:40:56.509 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-07-12 00:40:56.509 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:40:56.509 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.509 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:40:56.509 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.510 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:40:56.510 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.510 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.510 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:40:56.510 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.510 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:40:56.510 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-07-12 00:40:56.513 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-07-12 00:40:56.513 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:40:56.513 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.513 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:40:56.513 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.513 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:40:56.513 +07:00 [INF] Data seeding completed successfully
+2025-07-12 00:40:56.514 +07:00 [DBG] 'MyDbContext' disposed.
+2025-07-12 00:40:56.514 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:40:56.515 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-07-12 00:40:56.586 +07:00 [DBG] Registered model binder providers, in the following order: ["Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BinderTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ServicesModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BodyModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.HeaderModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FloatingPointTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.EnumTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.DateTimeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.SimpleTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.TryParseModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CancellationTokenModelBinderProvider"]
+2025-07-12 00:40:56.622 +07:00 [DBG] Hosting starting
+2025-07-12 00:40:56.624 +07:00 [DBG] Reading data from file '/Users/tamnguyen/.aspnet/DataProtection-Keys/key-45734ab9-a8cc-4c68-9ae5-36f9a5253115.xml'.
+2025-07-12 00:40:56.625 +07:00 [DBG] Reading data from file '/Users/tamnguyen/.aspnet/DataProtection-Keys/key-5ef59ac5-f01b-4400-a43d-e0e7d8af5c7b.xml'.
+2025-07-12 00:40:56.625 +07:00 [DBG] Reading data from file '/Users/tamnguyen/.aspnet/DataProtection-Keys/key-f4e99ca9-6656-4066-996f-feec683eb80e.xml'.
+2025-07-12 00:40:56.626 +07:00 [DBG] Reading data from file '/Users/tamnguyen/.aspnet/DataProtection-Keys/key-443ab2bd-ad7c-414b-bf76-a2dcf79d813d.xml'.
+2025-07-12 00:40:56.627 +07:00 [DBG] Found key {45734ab9-a8cc-4c68-9ae5-36f9a5253115}.
+2025-07-12 00:40:56.628 +07:00 [DBG] Found key {5ef59ac5-f01b-4400-a43d-e0e7d8af5c7b}.
+2025-07-12 00:40:56.628 +07:00 [DBG] Found key {f4e99ca9-6656-4066-996f-feec683eb80e}.
+2025-07-12 00:40:56.628 +07:00 [DBG] Found key {443ab2bd-ad7c-414b-bf76-a2dcf79d813d}.
+2025-07-12 00:40:56.631 +07:00 [DBG] Considering key {5ef59ac5-f01b-4400-a43d-e0e7d8af5c7b} with expiration date 2025-07-13 10:25:26Z as default key.
+2025-07-12 00:40:56.632 +07:00 [DBG] Forwarded activator type request from Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2025-07-12 00:40:56.632 +07:00 [DBG] Using managed symmetric algorithm 'System.Security.Cryptography.Aes'.
+2025-07-12 00:40:56.632 +07:00 [DBG] Using managed keyed hash algorithm 'System.Security.Cryptography.HMACSHA256'.
+2025-07-12 00:40:56.632 +07:00 [DBG] Using key {5ef59ac5-f01b-4400-a43d-e0e7d8af5c7b} as the default key.
+2025-07-12 00:40:56.633 +07:00 [DBG] Key ring with default key {5ef59ac5-f01b-4400-a43d-e0e7d8af5c7b} was loaded during application startup.
+2025-07-12 00:40:56.780 +07:00 [INF] Now listening on: https://localhost:7190
+2025-07-12 00:40:56.780 +07:00 [DBG] Loaded hosting startup assembly CapBot.api
+2025-07-12 00:40:56.780 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-07-12 00:40:56.780 +07:00 [INF] Hosting environment: Development
+2025-07-12 00:40:56.780 +07:00 [INF] Content root path: /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api
+2025-07-12 00:40:56.780 +07:00 [DBG] Hosting started
+2025-07-12 00:40:58.708 +07:00 [DBG] Connection id "0HNE0K8CA5S99" accepted.
+2025-07-12 00:40:58.711 +07:00 [DBG] Connection id "0HNE0K8CA5S99" started.
+2025-07-12 00:40:58.750 +07:00 [DBG] Connection 0HNE0K8CA5S99 established using the following protocol: "Tls12"
+2025-07-12 00:40:58.779 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/index.html - null null
+2025-07-12 00:40:58.779 +07:00 [DBG] Wildcard detected, all requests with hosts will be allowed.
+2025-07-12 00:40:58.838 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/index.html - 200 null text/html;charset=utf-8 59.3812ms
+2025-07-12 00:40:58.917 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/swagger/v1/swagger.json - null null
+2025-07-12 00:40:58.992 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 74.2659ms
+2025-07-12 00:41:05.065 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/topic/detail/1 - null null
+2025-07-12 00:41:05.069 +07:00 [DBG] The request path /api/topic/detail/1 does not match a supported file type
+2025-07-12 00:41:05.070 +07:00 [DBG] The request path /api/topic/detail/1 does not match a supported file type
+2025-07-12 00:41:05.089 +07:00 [DBG] 1 candidate(s) found for the request path '/api/topic/detail/1'
+2025-07-12 00:41:05.089 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.TopicController.GetDetail (CapBot.api)' with route pattern 'api/topic/detail/{topicId}' is valid for the request path '/api/topic/detail/1'
+2025-07-12 00:41:05.090 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.TopicController.GetDetail (CapBot.api)'
+2025-07-12 00:41:05.134 +07:00 [DBG] Successfully validated the token.
+2025-07-12 00:41:05.134 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-07-12 00:41:05.136 +07:00 [DBG] Authorization was successful.
+2025-07-12 00:41:05.139 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.TopicController.GetDetail (CapBot.api)'
+2025-07-12 00:41:05.145 +07:00 [INF] Route matched with {action = "GetDetail", controller = "Topic"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetDetail(Int32) on controller CapBot.api.Controllers.TopicController (CapBot.api).
+2025-07-12 00:41:05.146 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-07-12 00:41:05.146 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-07-12 00:41:05.146 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-07-12 00:41:05.147 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-07-12 00:41:05.147 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-07-12 00:41:05.147 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.TopicController (CapBot.api)
+2025-07-12 00:41:05.149 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.TopicController (CapBot.api)
+2025-07-12 00:41:05.151 +07:00 [DBG] Attempting to bind parameter 'topicId' of type 'System.Int32' ...
+2025-07-12 00:41:05.152 +07:00 [DBG] Attempting to bind parameter 'topicId' of type 'System.Int32' using the name 'topicId' in request data ...
+2025-07-12 00:41:05.152 +07:00 [DBG] Done attempting to bind parameter 'topicId' of type 'System.Int32'.
+2025-07-12 00:41:05.152 +07:00 [DBG] Done attempting to bind parameter 'topicId' of type 'System.Int32'.
+2025-07-12 00:41:05.152 +07:00 [DBG] Attempting to validate the bound parameter 'topicId' of type 'System.Int32' ...
+2025-07-12 00:41:05.153 +07:00 [DBG] Done attempting to validate the bound parameter 'topicId' of type 'System.Int32'.
+2025-07-12 00:41:05.173 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-07-12 00:41:05.177 +07:00 [DBG] Compiling query expression: 
+'DbSet<Topic>()
+    .AsNoTracking()
+    .Include(x => x.Supervisor)
+    .Include(x => x.Category)
+    .Include(x => x.Semester)
+    .Include(x => x.TopicVersions)
+    .Where(x => x.Id == __topicId_0 && x.IsActive && x.DeletedAt == null)
+    .FirstOrDefault()'
+2025-07-12 00:41:05.182 +07:00 [DBG] Including navigation: 'Topic.Supervisor'.
+2025-07-12 00:41:05.183 +07:00 [DBG] Including navigation: 'Topic.Category'.
+2025-07-12 00:41:05.183 +07:00 [DBG] Including navigation: 'Topic.Semester'.
+2025-07-12 00:41:05.183 +07:00 [DBG] Including navigation: 'Topic.TopicVersions'.
+2025-07-12 00:41:05.220 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<Topic>(
+    asyncEnumerable: new SingleQueryingEnumerable<Topic>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Client Projections:
+                0 -> Dictionary<IProperty, int> { [Property: Topic.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Topic.CategoryId (int?) FK Index, 1], [Property: Topic.CreatedAt (DateTime) Required ValueGenerated.OnAdd, 2], [Property: Topic.CreatedBy (string), 3], [Property: Topic.DeletedAt (DateTime?), 4], [Property: Topic.Description (string), 5], [Property: Topic.IsActive (bool) Required, 6], [Property: Topic.IsApproved (bool) Required Index Sentinel:True ValueGenerated.OnAdd, 7], [Property: Topic.IsLegacy (bool) Required Index ValueGenerated.OnAdd, 8], [Property: Topic.LastModifiedAt (DateTime?), 9], [Property: Topic.LastModifiedBy (string), 10], [Property: Topic.MaxStudents (int) Required ValueGenerated.OnAdd, 11], [Property: Topic.Objectives (string), 12], [Property: Topic.SemesterId (int) Required FK Index, 13], [Property: Topic.SupervisorId (int) Required FK Index, 14], [Property: Topic.Title (string) Required MaxLength(500), 15] }
+                1 -> Dictionary<IProperty, int> { [Property: User.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 16], [Property: User.AccessFailedCount (int) Required, 17], [Property: User.ConcurrencyStamp (string), 18], [Property: User.CreatedAt (DateTime) Required, 19], [Property: User.DeletedAt (DateTime?), 20], [Property: User.Email (string), 21], [Property: User.EmailConfirmed (bool) Required, 22], [Property: User.LastModifiedAt (DateTime) Required, 23], [Property: User.LastModifiedBy (string), 24], [Property: User.LockoutEnabled (bool) Required, 25], [Property: User.LockoutEnd (DateTimeOffset?), 26], [Property: User.NormalizedEmail (string), 27], [Property: User.NormalizedUserName (string), 28], [Property: User.PasswordHash (string), 29], [Property: User.PhoneNumber (string), 30], [Property: User.PhoneNumberConfirmed (bool) Required, 31], [Property: User.SecurityStamp (string), 32], [Property: User.TwoFactorEnabled (bool) Required, 33], [Property: User.UserName (string), 34] }
+                2 -> Dictionary<IProperty, int> { [Property: TopicCategory.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 35], [Property: TopicCategory.CreatedAt (DateTime) Required ValueGenerated.OnAdd, 36], [Property: TopicCategory.CreatedBy (string), 37], [Property: TopicCategory.DeletedAt (DateTime?), 38], [Property: TopicCategory.Description (string), 39], [Property: TopicCategory.IsActive (bool) Required, 40], [Property: TopicCategory.LastModifiedAt (DateTime?), 41], [Property: TopicCategory.LastModifiedBy (string), 42], [Property: TopicCategory.Name (string) Required MaxLength(100), 43] }
+                3 -> Dictionary<IProperty, int> { [Property: Semester.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 44], [Property: Semester.CreatedAt (DateTime) Required, 45], [Property: Semester.CreatedBy (string), 46], [Property: Semester.DeletedAt (DateTime?), 47], [Property: Semester.EndDate (DateTime) Required, 48], [Property: Semester.IsActive (bool) Required, 49], [Property: Semester.LastModifiedAt (DateTime?), 50], [Property: Semester.LastModifiedBy (string), 51], [Property: Semester.Name (string) Required Index MaxLength(50), 52], [Property: Semester.StartDate (DateTime) Required, 53] }
+                4 -> 0
+                5 -> 16
+                6 -> 35
+                7 -> 44
+                8 -> Dictionary<IProperty, int> { [Property: TopicVersion.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 54], [Property: TopicVersion.CreatedAt (DateTime) Required ValueGenerated.OnAdd, 55], [Property: TopicVersion.CreatedBy (string), 56], [Property: TopicVersion.DeletedAt (DateTime?), 57], [Property: TopicVersion.Description (string), 58], [Property: TopicVersion.DocumentUrl (string) MaxLength(500), 59], [Property: TopicVersion.ExpectedOutcomes (string), 60], [Property: TopicVersion.IsActive (bool) Required, 61], [Property: TopicVersion.LastModifiedAt (DateTime?), 62], [Property: TopicVersion.LastModifiedBy (string), 63], [Property: TopicVersion.Methodology (string), 64], [Property: TopicVersion.Objectives (string), 65], [Property: TopicVersion.Requirements (string), 66], [Property: TopicVersion.Status (TopicStatus) Required Index ValueGenerated.OnAdd, 67], [Property: TopicVersion.SubmittedAt (DateTime?), 68], [Property: TopicVersion.SubmittedBy (int?) FK Index, 69], [Property: TopicVersion.Title (string) Required MaxLength(500), 70], [Property: TopicVersion.TopicId (int) Required FK Index, 71], [Property: TopicVersion.VersionNumber (int) Required Index, 72] }
+                9 -> 54
+            SELECT t1.Id, t1.CategoryId, t1.CreatedAt, t1.CreatedBy, t1.DeletedAt, t1.Description, t1.IsActive, t1.IsApproved, t1.IsLegacy, t1.LastModifiedAt, t1.LastModifiedBy, t1.MaxStudents, t1.Objectives, t1.SemesterId, t1.SupervisorId, t1.Title, t1.Id0, t1.AccessFailedCount, t1.ConcurrencyStamp, t1.CreatedAt0, t1.DeletedAt0, t1.Email, t1.EmailConfirmed, t1.LastModifiedAt0, t1.LastModifiedBy0, t1.LockoutEnabled, t1.LockoutEnd, t1.NormalizedEmail, t1.NormalizedUserName, t1.PasswordHash, t1.PhoneNumber, t1.PhoneNumberConfirmed, t1.SecurityStamp, t1.TwoFactorEnabled, t1.UserName, t1.Id1, t1.CreatedAt1, t1.CreatedBy0, t1.DeletedAt1, t1.Description0, t1.IsActive0, t1.LastModifiedAt1, t1.LastModifiedBy1, t1.Name, t1.Id2, t1.CreatedAt2, t1.CreatedBy1, t1.DeletedAt2, t1.EndDate, t1.IsActive1, t1.LastModifiedAt2, t1.LastModifiedBy2, t1.Name0, t1.StartDate, t2.Id, t2.CreatedAt, t2.CreatedBy, t2.DeletedAt, t2.Description, t2.DocumentUrl, t2.ExpectedOutcomes, t2.IsActive, t2.LastModifiedAt, t2.LastModifiedBy, t2.Methodology, t2.Objectives, t2.Requirements, t2.Status, t2.SubmittedAt, t2.SubmittedBy, t2.Title, t2.TopicId, t2.VersionNumber
+            FROM 
+            (
+                SELECT TOP(1) t.Id, t.CategoryId, t.CreatedAt, t.CreatedBy, t.DeletedAt, t.Description, t.IsActive, t.IsApproved, t.IsLegacy, t.LastModifiedAt, t.LastModifiedBy, t.MaxStudents, t.Objectives, t.SemesterId, t.SupervisorId, t.Title, u.Id AS Id0, u.AccessFailedCount, u.ConcurrencyStamp, u.CreatedAt AS CreatedAt0, u.DeletedAt AS DeletedAt0, u.Email, u.EmailConfirmed, u.LastModifiedAt AS LastModifiedAt0, u.LastModifiedBy AS LastModifiedBy0, u.LockoutEnabled, u.LockoutEnd, u.NormalizedEmail, u.NormalizedUserName, u.PasswordHash, u.PhoneNumber, u.PhoneNumberConfirmed, u.SecurityStamp, u.TwoFactorEnabled, u.UserName, t0.Id AS Id1, t0.CreatedAt AS CreatedAt1, t0.CreatedBy AS CreatedBy0, t0.DeletedAt AS DeletedAt1, t0.Description AS Description0, t0.IsActive AS IsActive0, t0.LastModifiedAt AS LastModifiedAt1, t0.LastModifiedBy AS LastModifiedBy1, t0.Name, s.Id AS Id2, s.CreatedAt AS CreatedAt2, s.CreatedBy AS CreatedBy1, s.DeletedAt AS DeletedAt2, s.EndDate, s.IsActive AS IsActive1, s.LastModifiedAt AS LastModifiedAt2, s.LastModifiedBy AS LastModifiedBy2, s.Name AS Name0, s.StartDate
+                FROM topics AS t
+                INNER JOIN users AS u ON t.SupervisorId == u.Id
+                LEFT JOIN topic_categories AS t0 ON t.CategoryId == t0.Id
+                INNER JOIN semesters AS s ON t.SemesterId == s.Id
+                WHERE ((t.Id == @__topicId_0) && t.IsActive) && (t.DeletedAt == NULL)
+            ) AS t1
+            LEFT JOIN topic_versions AS t2 ON t1.Id == t2.TopicId
+            ORDER BY t1.Id ASC, t1.Id0 ASC, t1.Id1 ASC, t1.Id2 ASC), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, Topic>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-07-12 00:41:05.224 +07:00 [DBG] Creating DbConnection.
+2025-07-12 00:41:05.224 +07:00 [DBG] Created DbConnection. (0ms).
+2025-07-12 00:41:05.224 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:05.224 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:05.225 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:41:05.225 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:41:05.225 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:41:05.225 +07:00 [DBG] Executing DbCommand [Parameters=[@__topicId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [t1].[Id], [t1].[CategoryId], [t1].[CreatedAt], [t1].[CreatedBy], [t1].[DeletedAt], [t1].[Description], [t1].[IsActive], [t1].[IsApproved], [t1].[IsLegacy], [t1].[LastModifiedAt], [t1].[LastModifiedBy], [t1].[MaxStudents], [t1].[Objectives], [t1].[SemesterId], [t1].[SupervisorId], [t1].[Title], [t1].[Id0], [t1].[AccessFailedCount], [t1].[ConcurrencyStamp], [t1].[CreatedAt0], [t1].[DeletedAt0], [t1].[Email], [t1].[EmailConfirmed], [t1].[LastModifiedAt0], [t1].[LastModifiedBy0], [t1].[LockoutEnabled], [t1].[LockoutEnd], [t1].[NormalizedEmail], [t1].[NormalizedUserName], [t1].[PasswordHash], [t1].[PhoneNumber], [t1].[PhoneNumberConfirmed], [t1].[SecurityStamp], [t1].[TwoFactorEnabled], [t1].[UserName], [t1].[Id1], [t1].[CreatedAt1], [t1].[CreatedBy0], [t1].[DeletedAt1], [t1].[Description0], [t1].[IsActive0], [t1].[LastModifiedAt1], [t1].[LastModifiedBy1], [t1].[Name], [t1].[Id2], [t1].[CreatedAt2], [t1].[CreatedBy1], [t1].[DeletedAt2], [t1].[EndDate], [t1].[IsActive1], [t1].[LastModifiedAt2], [t1].[LastModifiedBy2], [t1].[Name0], [t1].[StartDate], [t2].[Id], [t2].[CreatedAt], [t2].[CreatedBy], [t2].[DeletedAt], [t2].[Description], [t2].[DocumentUrl], [t2].[ExpectedOutcomes], [t2].[IsActive], [t2].[LastModifiedAt], [t2].[LastModifiedBy], [t2].[Methodology], [t2].[Objectives], [t2].[Requirements], [t2].[Status], [t2].[SubmittedAt], [t2].[SubmittedBy], [t2].[Title], [t2].[TopicId], [t2].[VersionNumber]
+FROM (
+    SELECT TOP(1) [t].[Id], [t].[CategoryId], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[IsActive], [t].[IsApproved], [t].[IsLegacy], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[MaxStudents], [t].[Objectives], [t].[SemesterId], [t].[SupervisorId], [t].[Title], [u].[Id] AS [Id0], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt] AS [CreatedAt0], [u].[DeletedAt] AS [DeletedAt0], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt] AS [LastModifiedAt0], [u].[LastModifiedBy] AS [LastModifiedBy0], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName], [t0].[Id] AS [Id1], [t0].[CreatedAt] AS [CreatedAt1], [t0].[CreatedBy] AS [CreatedBy0], [t0].[DeletedAt] AS [DeletedAt1], [t0].[Description] AS [Description0], [t0].[IsActive] AS [IsActive0], [t0].[LastModifiedAt] AS [LastModifiedAt1], [t0].[LastModifiedBy] AS [LastModifiedBy1], [t0].[Name], [s].[Id] AS [Id2], [s].[CreatedAt] AS [CreatedAt2], [s].[CreatedBy] AS [CreatedBy1], [s].[DeletedAt] AS [DeletedAt2], [s].[EndDate], [s].[IsActive] AS [IsActive1], [s].[LastModifiedAt] AS [LastModifiedAt2], [s].[LastModifiedBy] AS [LastModifiedBy2], [s].[Name] AS [Name0], [s].[StartDate]
+    FROM [topics] AS [t]
+    INNER JOIN [users] AS [u] ON [t].[SupervisorId] = [u].[Id]
+    LEFT JOIN [topic_categories] AS [t0] ON [t].[CategoryId] = [t0].[Id]
+    INNER JOIN [semesters] AS [s] ON [t].[SemesterId] = [s].[Id]
+    WHERE [t].[Id] = @__topicId_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+) AS [t1]
+LEFT JOIN [topic_versions] AS [t2] ON [t1].[Id] = [t2].[TopicId]
+ORDER BY [t1].[Id], [t1].[Id0], [t1].[Id1], [t1].[Id2]
+2025-07-12 00:41:05.232 +07:00 [INF] Executed DbCommand (7ms) [Parameters=[@__topicId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [t1].[Id], [t1].[CategoryId], [t1].[CreatedAt], [t1].[CreatedBy], [t1].[DeletedAt], [t1].[Description], [t1].[IsActive], [t1].[IsApproved], [t1].[IsLegacy], [t1].[LastModifiedAt], [t1].[LastModifiedBy], [t1].[MaxStudents], [t1].[Objectives], [t1].[SemesterId], [t1].[SupervisorId], [t1].[Title], [t1].[Id0], [t1].[AccessFailedCount], [t1].[ConcurrencyStamp], [t1].[CreatedAt0], [t1].[DeletedAt0], [t1].[Email], [t1].[EmailConfirmed], [t1].[LastModifiedAt0], [t1].[LastModifiedBy0], [t1].[LockoutEnabled], [t1].[LockoutEnd], [t1].[NormalizedEmail], [t1].[NormalizedUserName], [t1].[PasswordHash], [t1].[PhoneNumber], [t1].[PhoneNumberConfirmed], [t1].[SecurityStamp], [t1].[TwoFactorEnabled], [t1].[UserName], [t1].[Id1], [t1].[CreatedAt1], [t1].[CreatedBy0], [t1].[DeletedAt1], [t1].[Description0], [t1].[IsActive0], [t1].[LastModifiedAt1], [t1].[LastModifiedBy1], [t1].[Name], [t1].[Id2], [t1].[CreatedAt2], [t1].[CreatedBy1], [t1].[DeletedAt2], [t1].[EndDate], [t1].[IsActive1], [t1].[LastModifiedAt2], [t1].[LastModifiedBy2], [t1].[Name0], [t1].[StartDate], [t2].[Id], [t2].[CreatedAt], [t2].[CreatedBy], [t2].[DeletedAt], [t2].[Description], [t2].[DocumentUrl], [t2].[ExpectedOutcomes], [t2].[IsActive], [t2].[LastModifiedAt], [t2].[LastModifiedBy], [t2].[Methodology], [t2].[Objectives], [t2].[Requirements], [t2].[Status], [t2].[SubmittedAt], [t2].[SubmittedBy], [t2].[Title], [t2].[TopicId], [t2].[VersionNumber]
+FROM (
+    SELECT TOP(1) [t].[Id], [t].[CategoryId], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[IsActive], [t].[IsApproved], [t].[IsLegacy], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[MaxStudents], [t].[Objectives], [t].[SemesterId], [t].[SupervisorId], [t].[Title], [u].[Id] AS [Id0], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt] AS [CreatedAt0], [u].[DeletedAt] AS [DeletedAt0], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt] AS [LastModifiedAt0], [u].[LastModifiedBy] AS [LastModifiedBy0], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName], [t0].[Id] AS [Id1], [t0].[CreatedAt] AS [CreatedAt1], [t0].[CreatedBy] AS [CreatedBy0], [t0].[DeletedAt] AS [DeletedAt1], [t0].[Description] AS [Description0], [t0].[IsActive] AS [IsActive0], [t0].[LastModifiedAt] AS [LastModifiedAt1], [t0].[LastModifiedBy] AS [LastModifiedBy1], [t0].[Name], [s].[Id] AS [Id2], [s].[CreatedAt] AS [CreatedAt2], [s].[CreatedBy] AS [CreatedBy1], [s].[DeletedAt] AS [DeletedAt2], [s].[EndDate], [s].[IsActive] AS [IsActive1], [s].[LastModifiedAt] AS [LastModifiedAt2], [s].[LastModifiedBy] AS [LastModifiedBy2], [s].[Name] AS [Name0], [s].[StartDate]
+    FROM [topics] AS [t]
+    INNER JOIN [users] AS [u] ON [t].[SupervisorId] = [u].[Id]
+    LEFT JOIN [topic_categories] AS [t0] ON [t].[CategoryId] = [t0].[Id]
+    INNER JOIN [semesters] AS [s] ON [t].[SemesterId] = [s].[Id]
+    WHERE [t].[Id] = @__topicId_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+) AS [t1]
+LEFT JOIN [topic_versions] AS [t2] ON [t1].[Id] = [t2].[TopicId]
+ORDER BY [t1].[Id], [t1].[Id0], [t1].[Id1], [t1].[Id2]
+2025-07-12 00:41:05.235 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:05.235 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 2ms reading results.
+2025-07-12 00:41:05.235 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:05.235 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:41:05.238 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-07-12 00:41:05.238 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-07-12 00:41:05.238 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-07-12 00:41:05.240 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-07-12 00:41:05.240 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-07-12 00:41:05.256 +07:00 [INF] Executed action CapBot.api.Controllers.TopicController.GetDetail (CapBot.api) in 108.0595ms
+2025-07-12 00:41:05.256 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.TopicController.GetDetail (CapBot.api)'
+2025-07-12 00:41:05.257 +07:00 [DBG] 'MyDbContext' disposed.
+2025-07-12 00:41:05.257 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:05.257 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-07-12 00:41:05.258 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/topic/detail/1 - 200 null application/json; charset=utf-8 192.4155ms
+2025-07-12 00:41:46.400 +07:00 [INF] Request starting HTTP/2 PUT https://localhost:7190/api/topic/update - application/json 195
+2025-07-12 00:41:46.401 +07:00 [DBG] PUT requests are not supported
+2025-07-12 00:41:46.402 +07:00 [DBG] PUT requests are not supported
+2025-07-12 00:41:46.403 +07:00 [DBG] The request has an origin header: 'https://localhost:7190'.
+2025-07-12 00:41:46.403 +07:00 [INF] CORS policy execution successful.
+2025-07-12 00:41:46.406 +07:00 [DBG] 1 candidate(s) found for the request path '/api/topic/update'
+2025-07-12 00:41:46.406 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.TopicController.Update (CapBot.api)' with route pattern 'api/topic/update' is valid for the request path '/api/topic/update'
+2025-07-12 00:41:46.407 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.TopicController.Update (CapBot.api)'
+2025-07-12 00:41:46.409 +07:00 [DBG] Successfully validated the token.
+2025-07-12 00:41:46.410 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-07-12 00:41:46.412 +07:00 [DBG] Authorization was successful.
+2025-07-12 00:41:46.413 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.TopicController.Update (CapBot.api)'
+2025-07-12 00:41:46.417 +07:00 [INF] Route matched with {action = "Update", controller = "Topic"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Update(App.Entities.DTOs.Topics.UpdateTopicDTO) on controller CapBot.api.Controllers.TopicController (CapBot.api).
+2025-07-12 00:41:46.417 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-07-12 00:41:46.417 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-07-12 00:41:46.418 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-07-12 00:41:46.418 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-07-12 00:41:46.418 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-07-12 00:41:46.418 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.TopicController (CapBot.api)
+2025-07-12 00:41:46.419 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.TopicController (CapBot.api)
+2025-07-12 00:41:46.420 +07:00 [DBG] Attempting to bind parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO' ...
+2025-07-12 00:41:46.420 +07:00 [DBG] Attempting to bind parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO' using the name '' in request data ...
+2025-07-12 00:41:46.421 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:41:46.421 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:41:46.421 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:41:46.421 +07:00 [DBG] Selected input formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter' for content type 'application/json'.
+2025-07-12 00:41:46.426 +07:00 [DBG] Connection id "0HNE0K8CA5S99", Request id "0HNE0K8CA5S99:00000007": started reading request body.
+2025-07-12 00:41:46.426 +07:00 [DBG] Connection id "0HNE0K8CA5S99", Request id "0HNE0K8CA5S99:00000007": done reading request body.
+2025-07-12 00:41:46.428 +07:00 [DBG] JSON input formatter succeeded, deserializing to type 'App.Entities.DTOs.Topics.UpdateTopicDTO'
+2025-07-12 00:41:46.429 +07:00 [DBG] Done attempting to bind parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO'.
+2025-07-12 00:41:46.429 +07:00 [DBG] Done attempting to bind parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO'.
+2025-07-12 00:41:46.429 +07:00 [DBG] Attempting to validate the bound parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO' ...
+2025-07-12 00:41:46.433 +07:00 [DBG] Done attempting to validate the bound parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO'.
+2025-07-12 00:41:46.435 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-07-12 00:41:46.436 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-07-12 00:41:46.436 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-07-12 00:41:46.436 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-07-12 00:41:46.436 +07:00 [INF] Executing UnprocessableEntityObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-07-12 00:41:46.438 +07:00 [INF] Executed action CapBot.api.Controllers.TopicController.Update (CapBot.api) in 20.0805ms
+2025-07-12 00:41:46.438 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.TopicController.Update (CapBot.api)'
+2025-07-12 00:41:46.439 +07:00 [INF] Request finished HTTP/2 PUT https://localhost:7190/api/topic/update - 422 null application/json; charset=utf-8 38.9017ms
+2025-07-12 00:41:51.059 +07:00 [INF] Request starting HTTP/2 PUT https://localhost:7190/api/topic/update - application/json 194
+2025-07-12 00:41:51.060 +07:00 [DBG] PUT requests are not supported
+2025-07-12 00:41:51.060 +07:00 [DBG] PUT requests are not supported
+2025-07-12 00:41:51.061 +07:00 [DBG] The request has an origin header: 'https://localhost:7190'.
+2025-07-12 00:41:51.061 +07:00 [INF] CORS policy execution successful.
+2025-07-12 00:41:51.062 +07:00 [DBG] 1 candidate(s) found for the request path '/api/topic/update'
+2025-07-12 00:41:51.062 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.TopicController.Update (CapBot.api)' with route pattern 'api/topic/update' is valid for the request path '/api/topic/update'
+2025-07-12 00:41:51.062 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.TopicController.Update (CapBot.api)'
+2025-07-12 00:41:51.069 +07:00 [DBG] Successfully validated the token.
+2025-07-12 00:41:51.069 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-07-12 00:41:51.072 +07:00 [DBG] Authorization was successful.
+2025-07-12 00:41:51.072 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.TopicController.Update (CapBot.api)'
+2025-07-12 00:41:51.073 +07:00 [INF] Route matched with {action = "Update", controller = "Topic"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Update(App.Entities.DTOs.Topics.UpdateTopicDTO) on controller CapBot.api.Controllers.TopicController (CapBot.api).
+2025-07-12 00:41:51.073 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-07-12 00:41:51.073 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-07-12 00:41:51.073 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-07-12 00:41:51.073 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-07-12 00:41:51.073 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-07-12 00:41:51.073 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.TopicController (CapBot.api)
+2025-07-12 00:41:51.082 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.TopicController (CapBot.api)
+2025-07-12 00:41:51.082 +07:00 [DBG] Attempting to bind parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO' ...
+2025-07-12 00:41:51.082 +07:00 [DBG] Attempting to bind parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO' using the name '' in request data ...
+2025-07-12 00:41:51.082 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:41:51.082 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:41:51.082 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:41:51.082 +07:00 [DBG] Selected input formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter' for content type 'application/json'.
+2025-07-12 00:41:51.082 +07:00 [DBG] Connection id "0HNE0K8CA5S99", Request id "0HNE0K8CA5S99:00000009": started reading request body.
+2025-07-12 00:41:51.083 +07:00 [DBG] Connection id "0HNE0K8CA5S99", Request id "0HNE0K8CA5S99:00000009": done reading request body.
+2025-07-12 00:41:51.083 +07:00 [DBG] JSON input formatter succeeded, deserializing to type 'App.Entities.DTOs.Topics.UpdateTopicDTO'
+2025-07-12 00:41:51.083 +07:00 [DBG] Done attempting to bind parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO'.
+2025-07-12 00:41:51.083 +07:00 [DBG] Done attempting to bind parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO'.
+2025-07-12 00:41:51.083 +07:00 [DBG] Attempting to validate the bound parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO' ...
+2025-07-12 00:41:51.083 +07:00 [DBG] Done attempting to validate the bound parameter 'updateTopicDTO' of type 'App.Entities.DTOs.Topics.UpdateTopicDTO'.
+2025-07-12 00:41:51.092 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-07-12 00:41:51.097 +07:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .FirstOrDefault(e => EF.Property<int>(e, "Id") == __p_0)'
+2025-07-12 00:41:51.102 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<User>(
+    asyncEnumerable: new SingleQueryingEnumerable<User>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: User.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: User.AccessFailedCount (int) Required, 1], [Property: User.ConcurrencyStamp (string), 2], [Property: User.CreatedAt (DateTime) Required, 3], [Property: User.DeletedAt (DateTime?), 4], [Property: User.Email (string), 5], [Property: User.EmailConfirmed (bool) Required, 6], [Property: User.LastModifiedAt (DateTime) Required, 7], [Property: User.LastModifiedBy (string), 8], [Property: User.LockoutEnabled (bool) Required, 9], [Property: User.LockoutEnd (DateTimeOffset?), 10], [Property: User.NormalizedEmail (string), 11], [Property: User.NormalizedUserName (string), 12], [Property: User.PasswordHash (string), 13], [Property: User.PhoneNumber (string), 14], [Property: User.PhoneNumberConfirmed (bool) Required, 15], [Property: User.SecurityStamp (string), 16], [Property: User.TwoFactorEnabled (bool) Required, 17], [Property: User.UserName (string), 18] }
+            SELECT TOP(1) u.Id, u.AccessFailedCount, u.ConcurrencyStamp, u.CreatedAt, u.DeletedAt, u.Email, u.EmailConfirmed, u.LastModifiedAt, u.LastModifiedBy, u.LockoutEnabled, u.LockoutEnd, u.NormalizedEmail, u.NormalizedUserName, u.PasswordHash, u.PhoneNumber, u.PhoneNumberConfirmed, u.SecurityStamp, u.TwoFactorEnabled, u.UserName
+            FROM users AS u
+            WHERE u.Id == @__p_0), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, User>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-07-12 00:41:51.103 +07:00 [DBG] Creating DbConnection.
+2025-07-12 00:41:51.103 +07:00 [DBG] Created DbConnection. (0ms).
+2025-07-12 00:41:51.103 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:51.103 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:51.103 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:41:51.103 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:41:51.103 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:41:51.103 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-07-12 00:41:51.108 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-07-12 00:41:51.108 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:41:51.109 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:51.109 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:41:51.109 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:51.109 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:41:51.110 +07:00 [DBG] Compiling query expression: 
+'DbSet<Topic>()
+    .Include(x => x.Supervisor)
+    .Include(x => x.Category)
+    .Include(x => x.Semester)
+    .Include(x => x.TopicVersions)
+    .Where(x => x.Id == __updateTopicDTO_Id_0 && x.IsActive && x.DeletedAt == null)
+    .FirstOrDefault()'
+2025-07-12 00:41:51.111 +07:00 [DBG] Including navigation: 'Topic.Supervisor'.
+2025-07-12 00:41:51.111 +07:00 [DBG] Including navigation: 'Topic.Category'.
+2025-07-12 00:41:51.111 +07:00 [DBG] Including navigation: 'Topic.Semester'.
+2025-07-12 00:41:51.111 +07:00 [DBG] Including navigation: 'Topic.TopicVersions'.
+2025-07-12 00:41:51.132 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<Topic>(
+    asyncEnumerable: new SingleQueryingEnumerable<Topic>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Client Projections:
+                0 -> Dictionary<IProperty, int> { [Property: Topic.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Topic.CategoryId (int?) FK Index, 1], [Property: Topic.CreatedAt (DateTime) Required ValueGenerated.OnAdd, 2], [Property: Topic.CreatedBy (string), 3], [Property: Topic.DeletedAt (DateTime?), 4], [Property: Topic.Description (string), 5], [Property: Topic.IsActive (bool) Required, 6], [Property: Topic.IsApproved (bool) Required Index Sentinel:True ValueGenerated.OnAdd, 7], [Property: Topic.IsLegacy (bool) Required Index ValueGenerated.OnAdd, 8], [Property: Topic.LastModifiedAt (DateTime?), 9], [Property: Topic.LastModifiedBy (string), 10], [Property: Topic.MaxStudents (int) Required ValueGenerated.OnAdd, 11], [Property: Topic.Objectives (string), 12], [Property: Topic.SemesterId (int) Required FK Index, 13], [Property: Topic.SupervisorId (int) Required FK Index, 14], [Property: Topic.Title (string) Required MaxLength(500), 15] }
+                1 -> Dictionary<IProperty, int> { [Property: User.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 16], [Property: User.AccessFailedCount (int) Required, 17], [Property: User.ConcurrencyStamp (string), 18], [Property: User.CreatedAt (DateTime) Required, 19], [Property: User.DeletedAt (DateTime?), 20], [Property: User.Email (string), 21], [Property: User.EmailConfirmed (bool) Required, 22], [Property: User.LastModifiedAt (DateTime) Required, 23], [Property: User.LastModifiedBy (string), 24], [Property: User.LockoutEnabled (bool) Required, 25], [Property: User.LockoutEnd (DateTimeOffset?), 26], [Property: User.NormalizedEmail (string), 27], [Property: User.NormalizedUserName (string), 28], [Property: User.PasswordHash (string), 29], [Property: User.PhoneNumber (string), 30], [Property: User.PhoneNumberConfirmed (bool) Required, 31], [Property: User.SecurityStamp (string), 32], [Property: User.TwoFactorEnabled (bool) Required, 33], [Property: User.UserName (string), 34] }
+                2 -> Dictionary<IProperty, int> { [Property: TopicCategory.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 35], [Property: TopicCategory.CreatedAt (DateTime) Required ValueGenerated.OnAdd, 36], [Property: TopicCategory.CreatedBy (string), 37], [Property: TopicCategory.DeletedAt (DateTime?), 38], [Property: TopicCategory.Description (string), 39], [Property: TopicCategory.IsActive (bool) Required, 40], [Property: TopicCategory.LastModifiedAt (DateTime?), 41], [Property: TopicCategory.LastModifiedBy (string), 42], [Property: TopicCategory.Name (string) Required MaxLength(100), 43] }
+                3 -> Dictionary<IProperty, int> { [Property: Semester.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 44], [Property: Semester.CreatedAt (DateTime) Required, 45], [Property: Semester.CreatedBy (string), 46], [Property: Semester.DeletedAt (DateTime?), 47], [Property: Semester.EndDate (DateTime) Required, 48], [Property: Semester.IsActive (bool) Required, 49], [Property: Semester.LastModifiedAt (DateTime?), 50], [Property: Semester.LastModifiedBy (string), 51], [Property: Semester.Name (string) Required Index MaxLength(50), 52], [Property: Semester.StartDate (DateTime) Required, 53] }
+                4 -> 0
+                5 -> 16
+                6 -> 35
+                7 -> 44
+                8 -> Dictionary<IProperty, int> { [Property: TopicVersion.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 54], [Property: TopicVersion.CreatedAt (DateTime) Required ValueGenerated.OnAdd, 55], [Property: TopicVersion.CreatedBy (string), 56], [Property: TopicVersion.DeletedAt (DateTime?), 57], [Property: TopicVersion.Description (string), 58], [Property: TopicVersion.DocumentUrl (string) MaxLength(500), 59], [Property: TopicVersion.ExpectedOutcomes (string), 60], [Property: TopicVersion.IsActive (bool) Required, 61], [Property: TopicVersion.LastModifiedAt (DateTime?), 62], [Property: TopicVersion.LastModifiedBy (string), 63], [Property: TopicVersion.Methodology (string), 64], [Property: TopicVersion.Objectives (string), 65], [Property: TopicVersion.Requirements (string), 66], [Property: TopicVersion.Status (TopicStatus) Required Index ValueGenerated.OnAdd, 67], [Property: TopicVersion.SubmittedAt (DateTime?), 68], [Property: TopicVersion.SubmittedBy (int?) FK Index, 69], [Property: TopicVersion.Title (string) Required MaxLength(500), 70], [Property: TopicVersion.TopicId (int) Required FK Index, 71], [Property: TopicVersion.VersionNumber (int) Required Index, 72] }
+                9 -> 54
+            SELECT t1.Id, t1.CategoryId, t1.CreatedAt, t1.CreatedBy, t1.DeletedAt, t1.Description, t1.IsActive, t1.IsApproved, t1.IsLegacy, t1.LastModifiedAt, t1.LastModifiedBy, t1.MaxStudents, t1.Objectives, t1.SemesterId, t1.SupervisorId, t1.Title, t1.Id0, t1.AccessFailedCount, t1.ConcurrencyStamp, t1.CreatedAt0, t1.DeletedAt0, t1.Email, t1.EmailConfirmed, t1.LastModifiedAt0, t1.LastModifiedBy0, t1.LockoutEnabled, t1.LockoutEnd, t1.NormalizedEmail, t1.NormalizedUserName, t1.PasswordHash, t1.PhoneNumber, t1.PhoneNumberConfirmed, t1.SecurityStamp, t1.TwoFactorEnabled, t1.UserName, t1.Id1, t1.CreatedAt1, t1.CreatedBy0, t1.DeletedAt1, t1.Description0, t1.IsActive0, t1.LastModifiedAt1, t1.LastModifiedBy1, t1.Name, t1.Id2, t1.CreatedAt2, t1.CreatedBy1, t1.DeletedAt2, t1.EndDate, t1.IsActive1, t1.LastModifiedAt2, t1.LastModifiedBy2, t1.Name0, t1.StartDate, t2.Id, t2.CreatedAt, t2.CreatedBy, t2.DeletedAt, t2.Description, t2.DocumentUrl, t2.ExpectedOutcomes, t2.IsActive, t2.LastModifiedAt, t2.LastModifiedBy, t2.Methodology, t2.Objectives, t2.Requirements, t2.Status, t2.SubmittedAt, t2.SubmittedBy, t2.Title, t2.TopicId, t2.VersionNumber
+            FROM 
+            (
+                SELECT TOP(1) t.Id, t.CategoryId, t.CreatedAt, t.CreatedBy, t.DeletedAt, t.Description, t.IsActive, t.IsApproved, t.IsLegacy, t.LastModifiedAt, t.LastModifiedBy, t.MaxStudents, t.Objectives, t.SemesterId, t.SupervisorId, t.Title, u.Id AS Id0, u.AccessFailedCount, u.ConcurrencyStamp, u.CreatedAt AS CreatedAt0, u.DeletedAt AS DeletedAt0, u.Email, u.EmailConfirmed, u.LastModifiedAt AS LastModifiedAt0, u.LastModifiedBy AS LastModifiedBy0, u.LockoutEnabled, u.LockoutEnd, u.NormalizedEmail, u.NormalizedUserName, u.PasswordHash, u.PhoneNumber, u.PhoneNumberConfirmed, u.SecurityStamp, u.TwoFactorEnabled, u.UserName, t0.Id AS Id1, t0.CreatedAt AS CreatedAt1, t0.CreatedBy AS CreatedBy0, t0.DeletedAt AS DeletedAt1, t0.Description AS Description0, t0.IsActive AS IsActive0, t0.LastModifiedAt AS LastModifiedAt1, t0.LastModifiedBy AS LastModifiedBy1, t0.Name, s.Id AS Id2, s.CreatedAt AS CreatedAt2, s.CreatedBy AS CreatedBy1, s.DeletedAt AS DeletedAt2, s.EndDate, s.IsActive AS IsActive1, s.LastModifiedAt AS LastModifiedAt2, s.LastModifiedBy AS LastModifiedBy2, s.Name AS Name0, s.StartDate
+                FROM topics AS t
+                INNER JOIN users AS u ON t.SupervisorId == u.Id
+                LEFT JOIN topic_categories AS t0 ON t.CategoryId == t0.Id
+                INNER JOIN semesters AS s ON t.SemesterId == s.Id
+                WHERE ((t.Id == @__updateTopicDTO_Id_0) && t.IsActive) && (t.DeletedAt == NULL)
+            ) AS t1
+            LEFT JOIN topic_versions AS t2 ON t1.Id == t2.TopicId
+            ORDER BY t1.Id ASC, t1.Id0 ASC, t1.Id1 ASC, t1.Id2 ASC), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, Topic>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-07-12 00:41:51.134 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:51.135 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:51.135 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:41:51.135 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:41:51.135 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:41:51.135 +07:00 [DBG] Executing DbCommand [Parameters=[@__updateTopicDTO_Id_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [t1].[Id], [t1].[CategoryId], [t1].[CreatedAt], [t1].[CreatedBy], [t1].[DeletedAt], [t1].[Description], [t1].[IsActive], [t1].[IsApproved], [t1].[IsLegacy], [t1].[LastModifiedAt], [t1].[LastModifiedBy], [t1].[MaxStudents], [t1].[Objectives], [t1].[SemesterId], [t1].[SupervisorId], [t1].[Title], [t1].[Id0], [t1].[AccessFailedCount], [t1].[ConcurrencyStamp], [t1].[CreatedAt0], [t1].[DeletedAt0], [t1].[Email], [t1].[EmailConfirmed], [t1].[LastModifiedAt0], [t1].[LastModifiedBy0], [t1].[LockoutEnabled], [t1].[LockoutEnd], [t1].[NormalizedEmail], [t1].[NormalizedUserName], [t1].[PasswordHash], [t1].[PhoneNumber], [t1].[PhoneNumberConfirmed], [t1].[SecurityStamp], [t1].[TwoFactorEnabled], [t1].[UserName], [t1].[Id1], [t1].[CreatedAt1], [t1].[CreatedBy0], [t1].[DeletedAt1], [t1].[Description0], [t1].[IsActive0], [t1].[LastModifiedAt1], [t1].[LastModifiedBy1], [t1].[Name], [t1].[Id2], [t1].[CreatedAt2], [t1].[CreatedBy1], [t1].[DeletedAt2], [t1].[EndDate], [t1].[IsActive1], [t1].[LastModifiedAt2], [t1].[LastModifiedBy2], [t1].[Name0], [t1].[StartDate], [t2].[Id], [t2].[CreatedAt], [t2].[CreatedBy], [t2].[DeletedAt], [t2].[Description], [t2].[DocumentUrl], [t2].[ExpectedOutcomes], [t2].[IsActive], [t2].[LastModifiedAt], [t2].[LastModifiedBy], [t2].[Methodology], [t2].[Objectives], [t2].[Requirements], [t2].[Status], [t2].[SubmittedAt], [t2].[SubmittedBy], [t2].[Title], [t2].[TopicId], [t2].[VersionNumber]
+FROM (
+    SELECT TOP(1) [t].[Id], [t].[CategoryId], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[IsActive], [t].[IsApproved], [t].[IsLegacy], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[MaxStudents], [t].[Objectives], [t].[SemesterId], [t].[SupervisorId], [t].[Title], [u].[Id] AS [Id0], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt] AS [CreatedAt0], [u].[DeletedAt] AS [DeletedAt0], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt] AS [LastModifiedAt0], [u].[LastModifiedBy] AS [LastModifiedBy0], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName], [t0].[Id] AS [Id1], [t0].[CreatedAt] AS [CreatedAt1], [t0].[CreatedBy] AS [CreatedBy0], [t0].[DeletedAt] AS [DeletedAt1], [t0].[Description] AS [Description0], [t0].[IsActive] AS [IsActive0], [t0].[LastModifiedAt] AS [LastModifiedAt1], [t0].[LastModifiedBy] AS [LastModifiedBy1], [t0].[Name], [s].[Id] AS [Id2], [s].[CreatedAt] AS [CreatedAt2], [s].[CreatedBy] AS [CreatedBy1], [s].[DeletedAt] AS [DeletedAt2], [s].[EndDate], [s].[IsActive] AS [IsActive1], [s].[LastModifiedAt] AS [LastModifiedAt2], [s].[LastModifiedBy] AS [LastModifiedBy2], [s].[Name] AS [Name0], [s].[StartDate]
+    FROM [topics] AS [t]
+    INNER JOIN [users] AS [u] ON [t].[SupervisorId] = [u].[Id]
+    LEFT JOIN [topic_categories] AS [t0] ON [t].[CategoryId] = [t0].[Id]
+    INNER JOIN [semesters] AS [s] ON [t].[SemesterId] = [s].[Id]
+    WHERE [t].[Id] = @__updateTopicDTO_Id_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+) AS [t1]
+LEFT JOIN [topic_versions] AS [t2] ON [t1].[Id] = [t2].[TopicId]
+ORDER BY [t1].[Id], [t1].[Id0], [t1].[Id1], [t1].[Id2]
+2025-07-12 00:41:51.149 +07:00 [INF] Executed DbCommand (15ms) [Parameters=[@__updateTopicDTO_Id_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [t1].[Id], [t1].[CategoryId], [t1].[CreatedAt], [t1].[CreatedBy], [t1].[DeletedAt], [t1].[Description], [t1].[IsActive], [t1].[IsApproved], [t1].[IsLegacy], [t1].[LastModifiedAt], [t1].[LastModifiedBy], [t1].[MaxStudents], [t1].[Objectives], [t1].[SemesterId], [t1].[SupervisorId], [t1].[Title], [t1].[Id0], [t1].[AccessFailedCount], [t1].[ConcurrencyStamp], [t1].[CreatedAt0], [t1].[DeletedAt0], [t1].[Email], [t1].[EmailConfirmed], [t1].[LastModifiedAt0], [t1].[LastModifiedBy0], [t1].[LockoutEnabled], [t1].[LockoutEnd], [t1].[NormalizedEmail], [t1].[NormalizedUserName], [t1].[PasswordHash], [t1].[PhoneNumber], [t1].[PhoneNumberConfirmed], [t1].[SecurityStamp], [t1].[TwoFactorEnabled], [t1].[UserName], [t1].[Id1], [t1].[CreatedAt1], [t1].[CreatedBy0], [t1].[DeletedAt1], [t1].[Description0], [t1].[IsActive0], [t1].[LastModifiedAt1], [t1].[LastModifiedBy1], [t1].[Name], [t1].[Id2], [t1].[CreatedAt2], [t1].[CreatedBy1], [t1].[DeletedAt2], [t1].[EndDate], [t1].[IsActive1], [t1].[LastModifiedAt2], [t1].[LastModifiedBy2], [t1].[Name0], [t1].[StartDate], [t2].[Id], [t2].[CreatedAt], [t2].[CreatedBy], [t2].[DeletedAt], [t2].[Description], [t2].[DocumentUrl], [t2].[ExpectedOutcomes], [t2].[IsActive], [t2].[LastModifiedAt], [t2].[LastModifiedBy], [t2].[Methodology], [t2].[Objectives], [t2].[Requirements], [t2].[Status], [t2].[SubmittedAt], [t2].[SubmittedBy], [t2].[Title], [t2].[TopicId], [t2].[VersionNumber]
+FROM (
+    SELECT TOP(1) [t].[Id], [t].[CategoryId], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[IsActive], [t].[IsApproved], [t].[IsLegacy], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[MaxStudents], [t].[Objectives], [t].[SemesterId], [t].[SupervisorId], [t].[Title], [u].[Id] AS [Id0], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt] AS [CreatedAt0], [u].[DeletedAt] AS [DeletedAt0], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt] AS [LastModifiedAt0], [u].[LastModifiedBy] AS [LastModifiedBy0], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName], [t0].[Id] AS [Id1], [t0].[CreatedAt] AS [CreatedAt1], [t0].[CreatedBy] AS [CreatedBy0], [t0].[DeletedAt] AS [DeletedAt1], [t0].[Description] AS [Description0], [t0].[IsActive] AS [IsActive0], [t0].[LastModifiedAt] AS [LastModifiedAt1], [t0].[LastModifiedBy] AS [LastModifiedBy1], [t0].[Name], [s].[Id] AS [Id2], [s].[CreatedAt] AS [CreatedAt2], [s].[CreatedBy] AS [CreatedBy1], [s].[DeletedAt] AS [DeletedAt2], [s].[EndDate], [s].[IsActive] AS [IsActive1], [s].[LastModifiedAt] AS [LastModifiedAt2], [s].[LastModifiedBy] AS [LastModifiedBy2], [s].[Name] AS [Name0], [s].[StartDate]
+    FROM [topics] AS [t]
+    INNER JOIN [users] AS [u] ON [t].[SupervisorId] = [u].[Id]
+    LEFT JOIN [topic_categories] AS [t0] ON [t].[CategoryId] = [t0].[Id]
+    INNER JOIN [semesters] AS [s] ON [t].[SemesterId] = [s].[Id]
+    WHERE [t].[Id] = @__updateTopicDTO_Id_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+) AS [t1]
+LEFT JOIN [topic_versions] AS [t2] ON [t1].[Id] = [t2].[TopicId]
+ORDER BY [t1].[Id], [t1].[Id0], [t1].[Id1], [t1].[Id2]
+2025-07-12 00:41:51.151 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:51.151 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:41:51.151 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:51.151 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:41:51.152 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-07-12 00:41:51.155 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-07-12 00:41:51.156 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-07-12 00:41:51.156 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-07-12 00:41:51.156 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-07-12 00:41:51.157 +07:00 [INF] Executed action CapBot.api.Controllers.TopicController.Update (CapBot.api) in 84.0855ms
+2025-07-12 00:41:51.157 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.TopicController.Update (CapBot.api)'
+2025-07-12 00:41:51.159 +07:00 [DBG] 'MyDbContext' disposed.
+2025-07-12 00:41:51.159 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:41:51.159 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-07-12 00:41:51.160 +07:00 [INF] Request finished HTTP/2 PUT https://localhost:7190/api/topic/update - 409 null application/json; charset=utf-8 100.4003ms
+2025-07-12 00:42:36.651 +07:00 [INF] Request starting HTTP/2 PUT https://localhost:7190/api/topic-version/update - application/json 362
+2025-07-12 00:42:36.652 +07:00 [DBG] PUT requests are not supported
+2025-07-12 00:42:36.652 +07:00 [DBG] PUT requests are not supported
+2025-07-12 00:42:36.652 +07:00 [DBG] The request has an origin header: 'https://localhost:7190'.
+2025-07-12 00:42:36.652 +07:00 [INF] CORS policy execution successful.
+2025-07-12 00:42:36.653 +07:00 [DBG] 1 candidate(s) found for the request path '/api/topic-version/update'
+2025-07-12 00:42:36.653 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.TopicVersionController.Update (CapBot.api)' with route pattern 'api/topic-version/update' is valid for the request path '/api/topic-version/update'
+2025-07-12 00:42:36.653 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.TopicVersionController.Update (CapBot.api)'
+2025-07-12 00:42:36.654 +07:00 [DBG] Successfully validated the token.
+2025-07-12 00:42:36.654 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-07-12 00:42:36.654 +07:00 [DBG] Authorization was successful.
+2025-07-12 00:42:36.654 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.TopicVersionController.Update (CapBot.api)'
+2025-07-12 00:42:36.658 +07:00 [INF] Route matched with {action = "Update", controller = "TopicVersion"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Update(App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO) on controller CapBot.api.Controllers.TopicVersionController (CapBot.api).
+2025-07-12 00:42:36.658 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-07-12 00:42:36.658 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-07-12 00:42:36.658 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-07-12 00:42:36.658 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-07-12 00:42:36.659 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-07-12 00:42:36.659 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.TopicVersionController (CapBot.api)
+2025-07-12 00:42:36.660 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.TopicVersionController (CapBot.api)
+2025-07-12 00:42:36.660 +07:00 [DBG] Attempting to bind parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO' ...
+2025-07-12 00:42:36.660 +07:00 [DBG] Attempting to bind parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO' using the name '' in request data ...
+2025-07-12 00:42:36.660 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:42:36.660 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:42:36.660 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:42:36.660 +07:00 [DBG] Selected input formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter' for content type 'application/json'.
+2025-07-12 00:42:36.661 +07:00 [DBG] Connection id "0HNE0K8CA5S99", Request id "0HNE0K8CA5S99:0000000B": started reading request body.
+2025-07-12 00:42:36.661 +07:00 [DBG] Connection id "0HNE0K8CA5S99", Request id "0HNE0K8CA5S99:0000000B": done reading request body.
+2025-07-12 00:42:36.663 +07:00 [DBG] JSON input formatter succeeded, deserializing to type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO'
+2025-07-12 00:42:36.663 +07:00 [DBG] Done attempting to bind parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO'.
+2025-07-12 00:42:36.663 +07:00 [DBG] Done attempting to bind parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO'.
+2025-07-12 00:42:36.663 +07:00 [DBG] Attempting to validate the bound parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO' ...
+2025-07-12 00:42:36.665 +07:00 [DBG] Done attempting to validate the bound parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO'.
+2025-07-12 00:42:36.669 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-07-12 00:42:36.670 +07:00 [DBG] Creating DbConnection.
+2025-07-12 00:42:36.670 +07:00 [DBG] Created DbConnection. (0ms).
+2025-07-12 00:42:36.670 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:36.670 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:36.670 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:42:36.670 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:36.670 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:36.671 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-07-12 00:42:36.673 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-07-12 00:42:36.673 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:42:36.673 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:36.673 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:42:36.673 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:36.673 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:42:36.675 +07:00 [DBG] Compiling query expression: 
+'DbSet<TopicVersion>()
+    .Include(x => x.Topic)
+    .Where(x => x.Id == __updateTopicVersionDTO_Id_0 && x.IsActive && x.DeletedAt == null)
+    .FirstOrDefault()'
+2025-07-12 00:42:36.675 +07:00 [DBG] Including navigation: 'TopicVersion.Topic'.
+2025-07-12 00:42:36.680 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<TopicVersion>(
+    asyncEnumerable: new SingleQueryingEnumerable<TopicVersion>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Client Projections:
+                0 -> Dictionary<IProperty, int> { [Property: TopicVersion.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: TopicVersion.CreatedAt (DateTime) Required ValueGenerated.OnAdd, 1], [Property: TopicVersion.CreatedBy (string), 2], [Property: TopicVersion.DeletedAt (DateTime?), 3], [Property: TopicVersion.Description (string), 4], [Property: TopicVersion.DocumentUrl (string) MaxLength(500), 5], [Property: TopicVersion.ExpectedOutcomes (string), 6], [Property: TopicVersion.IsActive (bool) Required, 7], [Property: TopicVersion.LastModifiedAt (DateTime?), 8], [Property: TopicVersion.LastModifiedBy (string), 9], [Property: TopicVersion.Methodology (string), 10], [Property: TopicVersion.Objectives (string), 11], [Property: TopicVersion.Requirements (string), 12], [Property: TopicVersion.Status (TopicStatus) Required Index ValueGenerated.OnAdd, 13], [Property: TopicVersion.SubmittedAt (DateTime?), 14], [Property: TopicVersion.SubmittedBy (int?) FK Index, 15], [Property: TopicVersion.Title (string) Required MaxLength(500), 16], [Property: TopicVersion.TopicId (int) Required FK Index, 17], [Property: TopicVersion.VersionNumber (int) Required Index, 18] }
+                1 -> Dictionary<IProperty, int> { [Property: Topic.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 19], [Property: Topic.CategoryId (int?) FK Index, 20], [Property: Topic.CreatedAt (DateTime) Required ValueGenerated.OnAdd, 21], [Property: Topic.CreatedBy (string), 22], [Property: Topic.DeletedAt (DateTime?), 23], [Property: Topic.Description (string), 24], [Property: Topic.IsActive (bool) Required, 25], [Property: Topic.IsApproved (bool) Required Index Sentinel:True ValueGenerated.OnAdd, 26], [Property: Topic.IsLegacy (bool) Required Index ValueGenerated.OnAdd, 27], [Property: Topic.LastModifiedAt (DateTime?), 28], [Property: Topic.LastModifiedBy (string), 29], [Property: Topic.MaxStudents (int) Required ValueGenerated.OnAdd, 30], [Property: Topic.Objectives (string), 31], [Property: Topic.SemesterId (int) Required FK Index, 32], [Property: Topic.SupervisorId (int) Required FK Index, 33], [Property: Topic.Title (string) Required MaxLength(500), 34] }
+            SELECT TOP(1) t.Id, t.CreatedAt, t.CreatedBy, t.DeletedAt, t.Description, t.DocumentUrl, t.ExpectedOutcomes, t.IsActive, t.LastModifiedAt, t.LastModifiedBy, t.Methodology, t.Objectives, t.Requirements, t.Status, t.SubmittedAt, t.SubmittedBy, t.Title, t.TopicId, t.VersionNumber, t0.Id, t0.CategoryId, t0.CreatedAt, t0.CreatedBy, t0.DeletedAt, t0.Description, t0.IsActive, t0.IsApproved, t0.IsLegacy, t0.LastModifiedAt, t0.LastModifiedBy, t0.MaxStudents, t0.Objectives, t0.SemesterId, t0.SupervisorId, t0.Title
+            FROM topic_versions AS t
+            INNER JOIN topics AS t0 ON t.TopicId == t0.Id
+            WHERE ((t.Id == @__updateTopicVersionDTO_Id_0) && t.IsActive) && (t.DeletedAt == NULL)), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, TopicVersion>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-07-12 00:42:36.681 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:36.681 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:36.681 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:42:36.681 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:36.681 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:36.681 +07:00 [DBG] Executing DbCommand [Parameters=[@__updateTopicVersionDTO_Id_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[DocumentUrl], [t].[ExpectedOutcomes], [t].[IsActive], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[Methodology], [t].[Objectives], [t].[Requirements], [t].[Status], [t].[SubmittedAt], [t].[SubmittedBy], [t].[Title], [t].[TopicId], [t].[VersionNumber], [t0].[Id], [t0].[CategoryId], [t0].[CreatedAt], [t0].[CreatedBy], [t0].[DeletedAt], [t0].[Description], [t0].[IsActive], [t0].[IsApproved], [t0].[IsLegacy], [t0].[LastModifiedAt], [t0].[LastModifiedBy], [t0].[MaxStudents], [t0].[Objectives], [t0].[SemesterId], [t0].[SupervisorId], [t0].[Title]
+FROM [topic_versions] AS [t]
+INNER JOIN [topics] AS [t0] ON [t].[TopicId] = [t0].[Id]
+WHERE [t].[Id] = @__updateTopicVersionDTO_Id_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+2025-07-12 00:42:36.703 +07:00 [INF] Executed DbCommand (22ms) [Parameters=[@__updateTopicVersionDTO_Id_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[DocumentUrl], [t].[ExpectedOutcomes], [t].[IsActive], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[Methodology], [t].[Objectives], [t].[Requirements], [t].[Status], [t].[SubmittedAt], [t].[SubmittedBy], [t].[Title], [t].[TopicId], [t].[VersionNumber], [t0].[Id], [t0].[CategoryId], [t0].[CreatedAt], [t0].[CreatedBy], [t0].[DeletedAt], [t0].[Description], [t0].[IsActive], [t0].[IsApproved], [t0].[IsLegacy], [t0].[LastModifiedAt], [t0].[LastModifiedBy], [t0].[MaxStudents], [t0].[Objectives], [t0].[SemesterId], [t0].[SupervisorId], [t0].[Title]
+FROM [topic_versions] AS [t]
+INNER JOIN [topics] AS [t0] ON [t].[TopicId] = [t0].[Id]
+WHERE [t].[Id] = @__updateTopicVersionDTO_Id_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+2025-07-12 00:42:36.704 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:36.704 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:42:36.704 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:36.704 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:42:36.704 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-07-12 00:42:36.704 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-07-12 00:42:36.704 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-07-12 00:42:36.704 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-07-12 00:42:36.704 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-07-12 00:42:36.704 +07:00 [INF] Executed action CapBot.api.Controllers.TopicVersionController.Update (CapBot.api) in 45.6645ms
+2025-07-12 00:42:36.704 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.TopicVersionController.Update (CapBot.api)'
+2025-07-12 00:42:36.704 +07:00 [DBG] 'MyDbContext' disposed.
+2025-07-12 00:42:36.704 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:36.704 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-07-12 00:42:36.704 +07:00 [INF] Request finished HTTP/2 PUT https://localhost:7190/api/topic-version/update - 404 null application/json; charset=utf-8 53.623ms
+2025-07-12 00:42:44.479 +07:00 [INF] Request starting HTTP/2 PUT https://localhost:7190/api/topic-version/update - application/json 362
+2025-07-12 00:42:44.479 +07:00 [DBG] PUT requests are not supported
+2025-07-12 00:42:44.479 +07:00 [DBG] PUT requests are not supported
+2025-07-12 00:42:44.479 +07:00 [DBG] The request has an origin header: 'https://localhost:7190'.
+2025-07-12 00:42:44.479 +07:00 [INF] CORS policy execution successful.
+2025-07-12 00:42:44.480 +07:00 [DBG] 1 candidate(s) found for the request path '/api/topic-version/update'
+2025-07-12 00:42:44.480 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.TopicVersionController.Update (CapBot.api)' with route pattern 'api/topic-version/update' is valid for the request path '/api/topic-version/update'
+2025-07-12 00:42:44.480 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.TopicVersionController.Update (CapBot.api)'
+2025-07-12 00:42:44.481 +07:00 [DBG] Successfully validated the token.
+2025-07-12 00:42:44.481 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-07-12 00:42:44.481 +07:00 [DBG] Authorization was successful.
+2025-07-12 00:42:44.481 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.TopicVersionController.Update (CapBot.api)'
+2025-07-12 00:42:44.481 +07:00 [INF] Route matched with {action = "Update", controller = "TopicVersion"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Update(App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO) on controller CapBot.api.Controllers.TopicVersionController (CapBot.api).
+2025-07-12 00:42:44.481 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-07-12 00:42:44.481 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-07-12 00:42:44.481 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-07-12 00:42:44.481 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-07-12 00:42:44.481 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-07-12 00:42:44.481 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.TopicVersionController (CapBot.api)
+2025-07-12 00:42:44.482 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.TopicVersionController (CapBot.api)
+2025-07-12 00:42:44.482 +07:00 [DBG] Attempting to bind parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO' ...
+2025-07-12 00:42:44.482 +07:00 [DBG] Attempting to bind parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO' using the name '' in request data ...
+2025-07-12 00:42:44.482 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:42:44.482 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:42:44.482 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-07-12 00:42:44.482 +07:00 [DBG] Selected input formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter' for content type 'application/json'.
+2025-07-12 00:42:44.483 +07:00 [DBG] Connection id "0HNE0K8CA5S99", Request id "0HNE0K8CA5S99:0000000D": started reading request body.
+2025-07-12 00:42:44.483 +07:00 [DBG] Connection id "0HNE0K8CA5S99", Request id "0HNE0K8CA5S99:0000000D": done reading request body.
+2025-07-12 00:42:44.483 +07:00 [DBG] JSON input formatter succeeded, deserializing to type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO'
+2025-07-12 00:42:44.483 +07:00 [DBG] Done attempting to bind parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO'.
+2025-07-12 00:42:44.483 +07:00 [DBG] Done attempting to bind parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO'.
+2025-07-12 00:42:44.483 +07:00 [DBG] Attempting to validate the bound parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO' ...
+2025-07-12 00:42:44.483 +07:00 [DBG] Done attempting to validate the bound parameter 'updateTopicVersionDTO' of type 'App.Entities.DTOs.TopicVersions.UpdateTopicVersionDTO'.
+2025-07-12 00:42:44.484 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-07-12 00:42:44.484 +07:00 [DBG] Creating DbConnection.
+2025-07-12 00:42:44.485 +07:00 [DBG] Created DbConnection. (0ms).
+2025-07-12 00:42:44.485 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.485 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.485 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:42:44.485 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:44.485 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:44.485 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-07-12 00:42:44.488 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-07-12 00:42:44.488 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:42:44.488 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.488 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:42:44.488 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.489 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:42:44.489 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.490 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.490 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:42:44.490 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:44.490 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:44.490 +07:00 [DBG] Executing DbCommand [Parameters=[@__updateTopicVersionDTO_Id_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[DocumentUrl], [t].[ExpectedOutcomes], [t].[IsActive], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[Methodology], [t].[Objectives], [t].[Requirements], [t].[Status], [t].[SubmittedAt], [t].[SubmittedBy], [t].[Title], [t].[TopicId], [t].[VersionNumber], [t0].[Id], [t0].[CategoryId], [t0].[CreatedAt], [t0].[CreatedBy], [t0].[DeletedAt], [t0].[Description], [t0].[IsActive], [t0].[IsApproved], [t0].[IsLegacy], [t0].[LastModifiedAt], [t0].[LastModifiedBy], [t0].[MaxStudents], [t0].[Objectives], [t0].[SemesterId], [t0].[SupervisorId], [t0].[Title]
+FROM [topic_versions] AS [t]
+INNER JOIN [topics] AS [t0] ON [t].[TopicId] = [t0].[Id]
+WHERE [t].[Id] = @__updateTopicVersionDTO_Id_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+2025-07-12 00:42:44.496 +07:00 [INF] Executed DbCommand (6ms) [Parameters=[@__updateTopicVersionDTO_Id_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[DocumentUrl], [t].[ExpectedOutcomes], [t].[IsActive], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[Methodology], [t].[Objectives], [t].[Requirements], [t].[Status], [t].[SubmittedAt], [t].[SubmittedBy], [t].[Title], [t].[TopicId], [t].[VersionNumber], [t0].[Id], [t0].[CategoryId], [t0].[CreatedAt], [t0].[CreatedBy], [t0].[DeletedAt], [t0].[Description], [t0].[IsActive], [t0].[IsApproved], [t0].[IsLegacy], [t0].[LastModifiedAt], [t0].[LastModifiedBy], [t0].[MaxStudents], [t0].[Objectives], [t0].[SemesterId], [t0].[SupervisorId], [t0].[Title]
+FROM [topic_versions] AS [t]
+INNER JOIN [topics] AS [t0] ON [t].[TopicId] = [t0].[Id]
+WHERE [t].[Id] = @__updateTopicVersionDTO_Id_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+2025-07-12 00:42:44.500 +07:00 [DBG] Context 'MyDbContext' started tracking 'TopicVersion' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:42:44.528 +07:00 [DBG] The navigation 'TopicVersion.Topic' was detected as changed. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:42:44.529 +07:00 [DBG] Context 'MyDbContext' started tracking 'Topic' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:42:44.539 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.539 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 42ms reading results.
+2025-07-12 00:42:44.539 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.539 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:42:44.556 +07:00 [DBG] The unchanged property 'TopicVersion.Description' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-07-12 00:42:44.559 +07:00 [DBG] An entity of type 'TopicVersion' tracked by 'MyDbContext' changed state from '"Unchanged"' to '"Modified"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:42:44.559 +07:00 [DBG] The unchanged property 'TopicVersion.DocumentUrl' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-07-12 00:42:44.559 +07:00 [DBG] The unchanged property 'TopicVersion.ExpectedOutcomes' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-07-12 00:42:44.559 +07:00 [DBG] The unchanged property 'TopicVersion.LastModifiedAt' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-07-12 00:42:44.559 +07:00 [DBG] The unchanged property 'TopicVersion.LastModifiedBy' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-07-12 00:42:44.559 +07:00 [DBG] The unchanged property 'TopicVersion.Methodology' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-07-12 00:42:44.559 +07:00 [DBG] The unchanged property 'TopicVersion.Objectives' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-07-12 00:42:44.560 +07:00 [DBG] The unchanged property 'TopicVersion.Requirements' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-07-12 00:42:44.561 +07:00 [DBG] The unchanged property 'TopicVersion.Title' was detected as changed and will be marked as modified. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see property values.
+2025-07-12 00:42:44.565 +07:00 [DBG] SaveChanges starting for 'MyDbContext'.
+2025-07-12 00:42:44.566 +07:00 [DBG] DetectChanges starting for 'MyDbContext'.
+2025-07-12 00:42:44.567 +07:00 [DBG] DetectChanges completed for 'MyDbContext'.
+2025-07-12 00:42:44.595 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.596 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.597 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:42:44.597 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:44.598 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:44.598 +07:00 [DBG] Executing DbCommand [Parameters=[@p18='?' (DbType = Int32), @p0='?' (DbType = DateTime2), @p1='?' (Size = 4000), @p2='?' (DbType = DateTime2), @p3='?' (Size = 4000), @p4='?' (Size = 500), @p5='?' (Size = 4000), @p6='?' (DbType = Boolean), @p7='?' (DbType = DateTime2), @p8='?' (Size = 4000), @p9='?' (Size = 4000), @p10='?' (Size = 4000), @p11='?' (Size = 4000), @p12='?' (DbType = Int32), @p13='?' (DbType = DateTime2), @p14='?' (DbType = Int32), @p15='?' (Size = 500), @p16='?' (DbType = Int32), @p17='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+UPDATE [topic_versions] SET [CreatedAt] = @p0, [CreatedBy] = @p1, [DeletedAt] = @p2, [Description] = @p3, [DocumentUrl] = @p4, [ExpectedOutcomes] = @p5, [IsActive] = @p6, [LastModifiedAt] = @p7, [LastModifiedBy] = @p8, [Methodology] = @p9, [Objectives] = @p10, [Requirements] = @p11, [Status] = @p12, [SubmittedAt] = @p13, [SubmittedBy] = @p14, [Title] = @p15, [TopicId] = @p16, [VersionNumber] = @p17
+OUTPUT 1
+WHERE [Id] = @p18;
+2025-07-12 00:42:44.618 +07:00 [INF] Executed DbCommand (21ms) [Parameters=[@p18='?' (DbType = Int32), @p0='?' (DbType = DateTime2), @p1='?' (Size = 4000), @p2='?' (DbType = DateTime2), @p3='?' (Size = 4000), @p4='?' (Size = 500), @p5='?' (Size = 4000), @p6='?' (DbType = Boolean), @p7='?' (DbType = DateTime2), @p8='?' (Size = 4000), @p9='?' (Size = 4000), @p10='?' (Size = 4000), @p11='?' (Size = 4000), @p12='?' (DbType = Int32), @p13='?' (DbType = DateTime2), @p14='?' (DbType = Int32), @p15='?' (Size = 500), @p16='?' (DbType = Int32), @p17='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SET IMPLICIT_TRANSACTIONS OFF;
+SET NOCOUNT ON;
+UPDATE [topic_versions] SET [CreatedAt] = @p0, [CreatedBy] = @p1, [DeletedAt] = @p2, [Description] = @p3, [DocumentUrl] = @p4, [ExpectedOutcomes] = @p5, [IsActive] = @p6, [LastModifiedAt] = @p7, [LastModifiedBy] = @p8, [Methodology] = @p9, [Objectives] = @p10, [Requirements] = @p11, [Status] = @p12, [SubmittedAt] = @p13, [SubmittedBy] = @p14, [Title] = @p15, [TopicId] = @p16, [VersionNumber] = @p17
+OUTPUT 1
+WHERE [Id] = @p18;
+2025-07-12 00:42:44.621 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.621 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 2ms reading results.
+2025-07-12 00:42:44.621 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.622 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:42:44.623 +07:00 [DBG] An entity of type 'TopicVersion' tracked by 'MyDbContext' changed state from '"Modified"' to '"Unchanged"'. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-07-12 00:42:44.624 +07:00 [DBG] SaveChanges completed for 'MyDbContext' with 1 entities written to the database.
+2025-07-12 00:42:44.624 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-07-12 00:42:44.624 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-07-12 00:42:44.624 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-07-12 00:42:44.624 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-07-12 00:42:44.624 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-07-12 00:42:44.625 +07:00 [INF] Executed action CapBot.api.Controllers.TopicVersionController.Update (CapBot.api) in 143.2985ms
+2025-07-12 00:42:44.625 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.TopicVersionController.Update (CapBot.api)'
+2025-07-12 00:42:44.625 +07:00 [DBG] 'MyDbContext' disposed.
+2025-07-12 00:42:44.625 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:44.625 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-07-12 00:42:44.625 +07:00 [INF] Request finished HTTP/2 PUT https://localhost:7190/api/topic-version/update - 200 null application/json; charset=utf-8 146.876ms
+2025-07-12 00:42:54.598 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/topic/detail/1 - null null
+2025-07-12 00:42:54.599 +07:00 [DBG] The request path /api/topic/detail/1 does not match a supported file type
+2025-07-12 00:42:54.599 +07:00 [DBG] The request path /api/topic/detail/1 does not match a supported file type
+2025-07-12 00:42:54.599 +07:00 [DBG] 1 candidate(s) found for the request path '/api/topic/detail/1'
+2025-07-12 00:42:54.599 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.TopicController.GetDetail (CapBot.api)' with route pattern 'api/topic/detail/{topicId}' is valid for the request path '/api/topic/detail/1'
+2025-07-12 00:42:54.600 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.TopicController.GetDetail (CapBot.api)'
+2025-07-12 00:42:54.600 +07:00 [DBG] Successfully validated the token.
+2025-07-12 00:42:54.600 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-07-12 00:42:54.600 +07:00 [DBG] Authorization was successful.
+2025-07-12 00:42:54.601 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.TopicController.GetDetail (CapBot.api)'
+2025-07-12 00:42:54.601 +07:00 [INF] Route matched with {action = "GetDetail", controller = "Topic"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetDetail(Int32) on controller CapBot.api.Controllers.TopicController (CapBot.api).
+2025-07-12 00:42:54.601 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-07-12 00:42:54.602 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-07-12 00:42:54.602 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-07-12 00:42:54.602 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-07-12 00:42:54.602 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-07-12 00:42:54.602 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.TopicController (CapBot.api)
+2025-07-12 00:42:54.602 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.TopicController (CapBot.api)
+2025-07-12 00:42:54.602 +07:00 [DBG] Attempting to bind parameter 'topicId' of type 'System.Int32' ...
+2025-07-12 00:42:54.603 +07:00 [DBG] Attempting to bind parameter 'topicId' of type 'System.Int32' using the name 'topicId' in request data ...
+2025-07-12 00:42:54.603 +07:00 [DBG] Done attempting to bind parameter 'topicId' of type 'System.Int32'.
+2025-07-12 00:42:54.603 +07:00 [DBG] Done attempting to bind parameter 'topicId' of type 'System.Int32'.
+2025-07-12 00:42:54.603 +07:00 [DBG] Attempting to validate the bound parameter 'topicId' of type 'System.Int32' ...
+2025-07-12 00:42:54.603 +07:00 [DBG] Done attempting to validate the bound parameter 'topicId' of type 'System.Int32'.
+2025-07-12 00:42:54.605 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-07-12 00:42:54.606 +07:00 [DBG] Creating DbConnection.
+2025-07-12 00:42:54.606 +07:00 [DBG] Created DbConnection. (0ms).
+2025-07-12 00:42:54.606 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:54.606 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:54.607 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:42:54.607 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:54.607 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:42:54.607 +07:00 [DBG] Executing DbCommand [Parameters=[@__topicId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [t1].[Id], [t1].[CategoryId], [t1].[CreatedAt], [t1].[CreatedBy], [t1].[DeletedAt], [t1].[Description], [t1].[IsActive], [t1].[IsApproved], [t1].[IsLegacy], [t1].[LastModifiedAt], [t1].[LastModifiedBy], [t1].[MaxStudents], [t1].[Objectives], [t1].[SemesterId], [t1].[SupervisorId], [t1].[Title], [t1].[Id0], [t1].[AccessFailedCount], [t1].[ConcurrencyStamp], [t1].[CreatedAt0], [t1].[DeletedAt0], [t1].[Email], [t1].[EmailConfirmed], [t1].[LastModifiedAt0], [t1].[LastModifiedBy0], [t1].[LockoutEnabled], [t1].[LockoutEnd], [t1].[NormalizedEmail], [t1].[NormalizedUserName], [t1].[PasswordHash], [t1].[PhoneNumber], [t1].[PhoneNumberConfirmed], [t1].[SecurityStamp], [t1].[TwoFactorEnabled], [t1].[UserName], [t1].[Id1], [t1].[CreatedAt1], [t1].[CreatedBy0], [t1].[DeletedAt1], [t1].[Description0], [t1].[IsActive0], [t1].[LastModifiedAt1], [t1].[LastModifiedBy1], [t1].[Name], [t1].[Id2], [t1].[CreatedAt2], [t1].[CreatedBy1], [t1].[DeletedAt2], [t1].[EndDate], [t1].[IsActive1], [t1].[LastModifiedAt2], [t1].[LastModifiedBy2], [t1].[Name0], [t1].[StartDate], [t2].[Id], [t2].[CreatedAt], [t2].[CreatedBy], [t2].[DeletedAt], [t2].[Description], [t2].[DocumentUrl], [t2].[ExpectedOutcomes], [t2].[IsActive], [t2].[LastModifiedAt], [t2].[LastModifiedBy], [t2].[Methodology], [t2].[Objectives], [t2].[Requirements], [t2].[Status], [t2].[SubmittedAt], [t2].[SubmittedBy], [t2].[Title], [t2].[TopicId], [t2].[VersionNumber]
+FROM (
+    SELECT TOP(1) [t].[Id], [t].[CategoryId], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[IsActive], [t].[IsApproved], [t].[IsLegacy], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[MaxStudents], [t].[Objectives], [t].[SemesterId], [t].[SupervisorId], [t].[Title], [u].[Id] AS [Id0], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt] AS [CreatedAt0], [u].[DeletedAt] AS [DeletedAt0], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt] AS [LastModifiedAt0], [u].[LastModifiedBy] AS [LastModifiedBy0], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName], [t0].[Id] AS [Id1], [t0].[CreatedAt] AS [CreatedAt1], [t0].[CreatedBy] AS [CreatedBy0], [t0].[DeletedAt] AS [DeletedAt1], [t0].[Description] AS [Description0], [t0].[IsActive] AS [IsActive0], [t0].[LastModifiedAt] AS [LastModifiedAt1], [t0].[LastModifiedBy] AS [LastModifiedBy1], [t0].[Name], [s].[Id] AS [Id2], [s].[CreatedAt] AS [CreatedAt2], [s].[CreatedBy] AS [CreatedBy1], [s].[DeletedAt] AS [DeletedAt2], [s].[EndDate], [s].[IsActive] AS [IsActive1], [s].[LastModifiedAt] AS [LastModifiedAt2], [s].[LastModifiedBy] AS [LastModifiedBy2], [s].[Name] AS [Name0], [s].[StartDate]
+    FROM [topics] AS [t]
+    INNER JOIN [users] AS [u] ON [t].[SupervisorId] = [u].[Id]
+    LEFT JOIN [topic_categories] AS [t0] ON [t].[CategoryId] = [t0].[Id]
+    INNER JOIN [semesters] AS [s] ON [t].[SemesterId] = [s].[Id]
+    WHERE [t].[Id] = @__topicId_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+) AS [t1]
+LEFT JOIN [topic_versions] AS [t2] ON [t1].[Id] = [t2].[TopicId]
+ORDER BY [t1].[Id], [t1].[Id0], [t1].[Id1], [t1].[Id2]
+2025-07-12 00:42:54.610 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@__topicId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [t1].[Id], [t1].[CategoryId], [t1].[CreatedAt], [t1].[CreatedBy], [t1].[DeletedAt], [t1].[Description], [t1].[IsActive], [t1].[IsApproved], [t1].[IsLegacy], [t1].[LastModifiedAt], [t1].[LastModifiedBy], [t1].[MaxStudents], [t1].[Objectives], [t1].[SemesterId], [t1].[SupervisorId], [t1].[Title], [t1].[Id0], [t1].[AccessFailedCount], [t1].[ConcurrencyStamp], [t1].[CreatedAt0], [t1].[DeletedAt0], [t1].[Email], [t1].[EmailConfirmed], [t1].[LastModifiedAt0], [t1].[LastModifiedBy0], [t1].[LockoutEnabled], [t1].[LockoutEnd], [t1].[NormalizedEmail], [t1].[NormalizedUserName], [t1].[PasswordHash], [t1].[PhoneNumber], [t1].[PhoneNumberConfirmed], [t1].[SecurityStamp], [t1].[TwoFactorEnabled], [t1].[UserName], [t1].[Id1], [t1].[CreatedAt1], [t1].[CreatedBy0], [t1].[DeletedAt1], [t1].[Description0], [t1].[IsActive0], [t1].[LastModifiedAt1], [t1].[LastModifiedBy1], [t1].[Name], [t1].[Id2], [t1].[CreatedAt2], [t1].[CreatedBy1], [t1].[DeletedAt2], [t1].[EndDate], [t1].[IsActive1], [t1].[LastModifiedAt2], [t1].[LastModifiedBy2], [t1].[Name0], [t1].[StartDate], [t2].[Id], [t2].[CreatedAt], [t2].[CreatedBy], [t2].[DeletedAt], [t2].[Description], [t2].[DocumentUrl], [t2].[ExpectedOutcomes], [t2].[IsActive], [t2].[LastModifiedAt], [t2].[LastModifiedBy], [t2].[Methodology], [t2].[Objectives], [t2].[Requirements], [t2].[Status], [t2].[SubmittedAt], [t2].[SubmittedBy], [t2].[Title], [t2].[TopicId], [t2].[VersionNumber]
+FROM (
+    SELECT TOP(1) [t].[Id], [t].[CategoryId], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[IsActive], [t].[IsApproved], [t].[IsLegacy], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[MaxStudents], [t].[Objectives], [t].[SemesterId], [t].[SupervisorId], [t].[Title], [u].[Id] AS [Id0], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt] AS [CreatedAt0], [u].[DeletedAt] AS [DeletedAt0], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt] AS [LastModifiedAt0], [u].[LastModifiedBy] AS [LastModifiedBy0], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName], [t0].[Id] AS [Id1], [t0].[CreatedAt] AS [CreatedAt1], [t0].[CreatedBy] AS [CreatedBy0], [t0].[DeletedAt] AS [DeletedAt1], [t0].[Description] AS [Description0], [t0].[IsActive] AS [IsActive0], [t0].[LastModifiedAt] AS [LastModifiedAt1], [t0].[LastModifiedBy] AS [LastModifiedBy1], [t0].[Name], [s].[Id] AS [Id2], [s].[CreatedAt] AS [CreatedAt2], [s].[CreatedBy] AS [CreatedBy1], [s].[DeletedAt] AS [DeletedAt2], [s].[EndDate], [s].[IsActive] AS [IsActive1], [s].[LastModifiedAt] AS [LastModifiedAt2], [s].[LastModifiedBy] AS [LastModifiedBy2], [s].[Name] AS [Name0], [s].[StartDate]
+    FROM [topics] AS [t]
+    INNER JOIN [users] AS [u] ON [t].[SupervisorId] = [u].[Id]
+    LEFT JOIN [topic_categories] AS [t0] ON [t].[CategoryId] = [t0].[Id]
+    INNER JOIN [semesters] AS [s] ON [t].[SemesterId] = [s].[Id]
+    WHERE [t].[Id] = @__topicId_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+) AS [t1]
+LEFT JOIN [topic_versions] AS [t2] ON [t1].[Id] = [t2].[TopicId]
+ORDER BY [t1].[Id], [t1].[Id0], [t1].[Id1], [t1].[Id2]
+2025-07-12 00:42:54.612 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:54.612 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:42:54.612 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:54.612 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:42:54.613 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-07-12 00:42:54.613 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-07-12 00:42:54.613 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-07-12 00:42:54.613 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-07-12 00:42:54.613 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-07-12 00:42:54.613 +07:00 [INF] Executed action CapBot.api.Controllers.TopicController.GetDetail (CapBot.api) in 11.6489ms
+2025-07-12 00:42:54.613 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.TopicController.GetDetail (CapBot.api)'
+2025-07-12 00:42:54.614 +07:00 [DBG] 'MyDbContext' disposed.
+2025-07-12 00:42:54.614 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:42:54.614 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-07-12 00:42:54.614 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/topic/detail/1 - 200 null application/json; charset=utf-8 15.3343ms
