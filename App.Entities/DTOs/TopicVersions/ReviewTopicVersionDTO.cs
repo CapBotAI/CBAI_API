@@ -12,8 +12,6 @@ public class ReviewTopicVersionDTO : IValidationPipeline
 
     [Required(ErrorMessage = "Trạng thái không được để trống")]
     public TopicStatus Status { get; set; }
-
-    [StringLength(1000, ErrorMessage = "Ghi chú không được vượt quá 1000 ký tự")]
     public string? ReviewNote { get; set; }
 
     public BaseResponseModel Validate()

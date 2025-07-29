@@ -334,7 +334,7 @@ namespace CapBot.api.Controllers
 
             try
             {
-                var result = await _topicVersionService.ReviewTopicVersion(reviewTopicVersionDTO, UserId);
+                var result = await _topicVersionService.ReviewTopicVersion(reviewTopicVersionDTO, UserId, IsReviewer);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)

@@ -12,6 +12,6 @@ public interface ITopicVersionService
     Task<BaseResponseModel<PagingDataModel<TopicVersionOverviewDTO, GetTopicVersionQueryDTO>>> GetTopicVersionHistory(GetTopicVersionQueryDTO query, int topicId);
     Task<BaseResponseModel<TopicVersionDetailDTO>> GetTopicVersionDetail(int versionId);
     Task<BaseResponseModel> SubmitTopicVersion(SubmitTopicVersionDTO submitTopicVersionDTO, int userId);
-    Task<BaseResponseModel> ReviewTopicVersion(ReviewTopicVersionDTO reviewTopicVersionDTO, int userId);
+    Task<BaseResponseModel> ReviewTopicVersion(ReviewTopicVersionDTO reviewTopicVersionDTO, int userId, bool isReviewer);
     Task<BaseResponseModel> DeleteTopicVersion(int versionId, int userId);
 }

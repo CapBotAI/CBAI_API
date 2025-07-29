@@ -2959,3 +2959,165 @@ ORDER BY [t0].[CreatedAt] DESC
 2025-07-12 00:51:39.255 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
 2025-07-12 00:51:39.255 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
 2025-07-12 00:51:39.256 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/topic-version/history/1?PageNumber=1&PageSize=12 - 200 null application/json; charset=utf-8 223.4569ms
+2025-07-12 00:52:19.315 +07:00 [DBG] Connection id "0HNE0KEA4THCL" received FIN.
+2025-07-12 00:52:19.318 +07:00 [DBG] Connection id "0HNE0KEA4THCL" is closed. The last processed stream ID was 5.
+2025-07-12 00:52:19.319 +07:00 [DBG] Connection id "0HNE0KEA4THCL" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-07-12 00:52:19.320 +07:00 [DBG] The connection queue processing loop for 0HNE0KEA4THCL completed.
+2025-07-12 00:52:19.323 +07:00 [DBG] Connection id "0HNE0KEA4THCL" stopped.
+2025-07-12 00:54:29.421 +07:00 [DBG] Connection id "0HNE0KEA4THCM" accepted.
+2025-07-12 00:54:29.421 +07:00 [DBG] Connection id "0HNE0KEA4THCM" started.
+2025-07-12 00:54:29.441 +07:00 [DBG] Connection 0HNE0KEA4THCM established using the following protocol: "Tls12"
+2025-07-12 00:54:29.445 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/topic-version/detail/6 - null null
+2025-07-12 00:54:29.446 +07:00 [DBG] The request path /api/topic-version/detail/6 does not match a supported file type
+2025-07-12 00:54:29.447 +07:00 [DBG] The request path /api/topic-version/detail/6 does not match a supported file type
+2025-07-12 00:54:29.451 +07:00 [DBG] 1 candidate(s) found for the request path '/api/topic-version/detail/6'
+2025-07-12 00:54:29.452 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.TopicVersionController.GetDetail (CapBot.api)' with route pattern 'api/topic-version/detail/{versionId}' is valid for the request path '/api/topic-version/detail/6'
+2025-07-12 00:54:29.452 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.TopicVersionController.GetDetail (CapBot.api)'
+2025-07-12 00:54:29.457 +07:00 [DBG] Successfully validated the token.
+2025-07-12 00:54:29.457 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-07-12 00:54:29.459 +07:00 [DBG] Authorization was successful.
+2025-07-12 00:54:29.459 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.TopicVersionController.GetDetail (CapBot.api)'
+2025-07-12 00:54:29.463 +07:00 [INF] Route matched with {action = "GetDetail", controller = "TopicVersion"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetDetail(Int32) on controller CapBot.api.Controllers.TopicVersionController (CapBot.api).
+2025-07-12 00:54:29.464 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-07-12 00:54:29.464 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-07-12 00:54:29.464 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-07-12 00:54:29.464 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-07-12 00:54:29.464 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-07-12 00:54:29.464 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.TopicVersionController (CapBot.api)
+2025-07-12 00:54:29.466 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.TopicVersionController (CapBot.api)
+2025-07-12 00:54:29.466 +07:00 [DBG] Attempting to bind parameter 'versionId' of type 'System.Int32' ...
+2025-07-12 00:54:29.466 +07:00 [DBG] Attempting to bind parameter 'versionId' of type 'System.Int32' using the name 'versionId' in request data ...
+2025-07-12 00:54:29.467 +07:00 [DBG] Done attempting to bind parameter 'versionId' of type 'System.Int32'.
+2025-07-12 00:54:29.467 +07:00 [DBG] Done attempting to bind parameter 'versionId' of type 'System.Int32'.
+2025-07-12 00:54:29.467 +07:00 [DBG] Attempting to validate the bound parameter 'versionId' of type 'System.Int32' ...
+2025-07-12 00:54:29.467 +07:00 [DBG] Done attempting to validate the bound parameter 'versionId' of type 'System.Int32'.
+2025-07-12 00:54:29.475 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-07-12 00:54:29.476 +07:00 [DBG] Compiling query expression: 
+'DbSet<TopicVersion>()
+    .AsNoTracking()
+    .Include(x => x.SubmittedByUser)
+    .Where(x => x.Id == __versionId_0 && x.IsActive && x.DeletedAt == null)
+    .FirstOrDefault()'
+2025-07-12 00:54:29.477 +07:00 [DBG] Including navigation: 'TopicVersion.SubmittedByUser'.
+2025-07-12 00:54:29.483 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<TopicVersion>(
+    asyncEnumerable: new SingleQueryingEnumerable<TopicVersion>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Client Projections:
+                0 -> Dictionary<IProperty, int> { [Property: TopicVersion.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: TopicVersion.CreatedAt (DateTime) Required ValueGenerated.OnAdd, 1], [Property: TopicVersion.CreatedBy (string), 2], [Property: TopicVersion.DeletedAt (DateTime?), 3], [Property: TopicVersion.Description (string), 4], [Property: TopicVersion.DocumentUrl (string) MaxLength(500), 5], [Property: TopicVersion.ExpectedOutcomes (string), 6], [Property: TopicVersion.IsActive (bool) Required, 7], [Property: TopicVersion.LastModifiedAt (DateTime?), 8], [Property: TopicVersion.LastModifiedBy (string), 9], [Property: TopicVersion.Methodology (string), 10], [Property: TopicVersion.Objectives (string), 11], [Property: TopicVersion.Requirements (string), 12], [Property: TopicVersion.Status (TopicStatus) Required Index ValueGenerated.OnAdd, 13], [Property: TopicVersion.SubmittedAt (DateTime?), 14], [Property: TopicVersion.SubmittedBy (int?) FK Index, 15], [Property: TopicVersion.Title (string) Required MaxLength(500), 16], [Property: TopicVersion.TopicId (int) Required FK Index, 17], [Property: TopicVersion.VersionNumber (int) Required Index, 18] }
+                1 -> Dictionary<IProperty, int> { [Property: User.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 19], [Property: User.AccessFailedCount (int) Required, 20], [Property: User.ConcurrencyStamp (string), 21], [Property: User.CreatedAt (DateTime) Required, 22], [Property: User.DeletedAt (DateTime?), 23], [Property: User.Email (string), 24], [Property: User.EmailConfirmed (bool) Required, 25], [Property: User.LastModifiedAt (DateTime) Required, 26], [Property: User.LastModifiedBy (string), 27], [Property: User.LockoutEnabled (bool) Required, 28], [Property: User.LockoutEnd (DateTimeOffset?), 29], [Property: User.NormalizedEmail (string), 30], [Property: User.NormalizedUserName (string), 31], [Property: User.PasswordHash (string), 32], [Property: User.PhoneNumber (string), 33], [Property: User.PhoneNumberConfirmed (bool) Required, 34], [Property: User.SecurityStamp (string), 35], [Property: User.TwoFactorEnabled (bool) Required, 36], [Property: User.UserName (string), 37] }
+            SELECT TOP(1) t.Id, t.CreatedAt, t.CreatedBy, t.DeletedAt, t.Description, t.DocumentUrl, t.ExpectedOutcomes, t.IsActive, t.LastModifiedAt, t.LastModifiedBy, t.Methodology, t.Objectives, t.Requirements, t.Status, t.SubmittedAt, t.SubmittedBy, t.Title, t.TopicId, t.VersionNumber, u.Id, u.AccessFailedCount, u.ConcurrencyStamp, u.CreatedAt, u.DeletedAt, u.Email, u.EmailConfirmed, u.LastModifiedAt, u.LastModifiedBy, u.LockoutEnabled, u.LockoutEnd, u.NormalizedEmail, u.NormalizedUserName, u.PasswordHash, u.PhoneNumber, u.PhoneNumberConfirmed, u.SecurityStamp, u.TwoFactorEnabled, u.UserName
+            FROM topic_versions AS t
+            LEFT JOIN users AS u ON t.SubmittedBy == u.Id
+            WHERE ((t.Id == @__versionId_0) && t.IsActive) && (t.DeletedAt == NULL)), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, TopicVersion>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-07-12 00:54:29.483 +07:00 [DBG] Creating DbConnection.
+2025-07-12 00:54:29.484 +07:00 [DBG] Created DbConnection. (0ms).
+2025-07-12 00:54:29.484 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:54:29.484 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:54:29.484 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:54:29.484 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:54:29.484 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:54:29.484 +07:00 [DBG] Executing DbCommand [Parameters=[@__versionId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[DocumentUrl], [t].[ExpectedOutcomes], [t].[IsActive], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[Methodology], [t].[Objectives], [t].[Requirements], [t].[Status], [t].[SubmittedAt], [t].[SubmittedBy], [t].[Title], [t].[TopicId], [t].[VersionNumber], [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [topic_versions] AS [t]
+LEFT JOIN [users] AS [u] ON [t].[SubmittedBy] = [u].[Id]
+WHERE [t].[Id] = @__versionId_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+2025-07-12 00:54:29.510 +07:00 [INF] Executed DbCommand (26ms) [Parameters=[@__versionId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[DocumentUrl], [t].[ExpectedOutcomes], [t].[IsActive], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[Methodology], [t].[Objectives], [t].[Requirements], [t].[Status], [t].[SubmittedAt], [t].[SubmittedBy], [t].[Title], [t].[TopicId], [t].[VersionNumber], [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [topic_versions] AS [t]
+LEFT JOIN [users] AS [u] ON [t].[SubmittedBy] = [u].[Id]
+WHERE [t].[Id] = @__versionId_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+2025-07-12 00:54:29.510 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:54:29.510 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:54:29.510 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:54:29.511 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:54:29.512 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-07-12 00:54:29.512 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-07-12 00:54:29.512 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-07-12 00:54:29.512 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-07-12 00:54:29.512 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-07-12 00:54:29.516 +07:00 [INF] Executed action CapBot.api.Controllers.TopicVersionController.GetDetail (CapBot.api) in 51.7481ms
+2025-07-12 00:54:29.516 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.TopicVersionController.GetDetail (CapBot.api)'
+2025-07-12 00:54:29.517 +07:00 [DBG] 'MyDbContext' disposed.
+2025-07-12 00:54:29.517 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:54:29.517 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-07-12 00:54:29.517 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/topic-version/detail/6 - 200 null application/json; charset=utf-8 72.3129ms
+2025-07-12 00:54:34.336 +07:00 [DBG] Connection id "0HNE0KEA4THCM" received FIN.
+2025-07-12 00:54:34.337 +07:00 [DBG] Connection id "0HNE0KEA4THCM" is closed. The last processed stream ID was 1.
+2025-07-12 00:54:34.338 +07:00 [DBG] Connection id "0HNE0KEA4THCM" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-07-12 00:54:34.338 +07:00 [DBG] The connection queue processing loop for 0HNE0KEA4THCM completed.
+2025-07-12 00:54:34.339 +07:00 [DBG] Connection id "0HNE0KEA4THCM" stopped.
+2025-07-12 00:54:39.966 +07:00 [DBG] Connection id "0HNE0KEA4THCN" accepted.
+2025-07-12 00:54:39.966 +07:00 [DBG] Connection id "0HNE0KEA4THCN" started.
+2025-07-12 00:54:39.983 +07:00 [DBG] Connection 0HNE0KEA4THCN established using the following protocol: "Tls12"
+2025-07-12 00:54:39.985 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/topic-version/detail/3221 - null null
+2025-07-12 00:54:39.985 +07:00 [DBG] The request path /api/topic-version/detail/3221 does not match a supported file type
+2025-07-12 00:54:39.986 +07:00 [DBG] The request path /api/topic-version/detail/3221 does not match a supported file type
+2025-07-12 00:54:39.986 +07:00 [DBG] 1 candidate(s) found for the request path '/api/topic-version/detail/3221'
+2025-07-12 00:54:39.986 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.TopicVersionController.GetDetail (CapBot.api)' with route pattern 'api/topic-version/detail/{versionId}' is valid for the request path '/api/topic-version/detail/3221'
+2025-07-12 00:54:39.986 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.TopicVersionController.GetDetail (CapBot.api)'
+2025-07-12 00:54:39.989 +07:00 [DBG] Successfully validated the token.
+2025-07-12 00:54:39.989 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-07-12 00:54:39.991 +07:00 [DBG] Authorization was successful.
+2025-07-12 00:54:39.991 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.TopicVersionController.GetDetail (CapBot.api)'
+2025-07-12 00:54:39.992 +07:00 [INF] Route matched with {action = "GetDetail", controller = "TopicVersion"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetDetail(Int32) on controller CapBot.api.Controllers.TopicVersionController (CapBot.api).
+2025-07-12 00:54:39.992 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-07-12 00:54:39.992 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-07-12 00:54:39.992 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-07-12 00:54:39.992 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-07-12 00:54:39.992 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-07-12 00:54:39.992 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.TopicVersionController (CapBot.api)
+2025-07-12 00:54:40.001 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.TopicVersionController (CapBot.api)
+2025-07-12 00:54:40.002 +07:00 [DBG] Attempting to bind parameter 'versionId' of type 'System.Int32' ...
+2025-07-12 00:54:40.002 +07:00 [DBG] Attempting to bind parameter 'versionId' of type 'System.Int32' using the name 'versionId' in request data ...
+2025-07-12 00:54:40.002 +07:00 [DBG] Done attempting to bind parameter 'versionId' of type 'System.Int32'.
+2025-07-12 00:54:40.002 +07:00 [DBG] Done attempting to bind parameter 'versionId' of type 'System.Int32'.
+2025-07-12 00:54:40.002 +07:00 [DBG] Attempting to validate the bound parameter 'versionId' of type 'System.Int32' ...
+2025-07-12 00:54:40.002 +07:00 [DBG] Done attempting to validate the bound parameter 'versionId' of type 'System.Int32'.
+2025-07-12 00:54:40.002 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-07-12 00:54:40.003 +07:00 [DBG] Creating DbConnection.
+2025-07-12 00:54:40.003 +07:00 [DBG] Created DbConnection. (0ms).
+2025-07-12 00:54:40.003 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:54:40.003 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:54:40.003 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-07-12 00:54:40.003 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:54:40.003 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-07-12 00:54:40.003 +07:00 [DBG] Executing DbCommand [Parameters=[@__versionId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[DocumentUrl], [t].[ExpectedOutcomes], [t].[IsActive], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[Methodology], [t].[Objectives], [t].[Requirements], [t].[Status], [t].[SubmittedAt], [t].[SubmittedBy], [t].[Title], [t].[TopicId], [t].[VersionNumber], [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [topic_versions] AS [t]
+LEFT JOIN [users] AS [u] ON [t].[SubmittedBy] = [u].[Id]
+WHERE [t].[Id] = @__versionId_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+2025-07-12 00:54:40.008 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@__versionId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [t].[Id], [t].[CreatedAt], [t].[CreatedBy], [t].[DeletedAt], [t].[Description], [t].[DocumentUrl], [t].[ExpectedOutcomes], [t].[IsActive], [t].[LastModifiedAt], [t].[LastModifiedBy], [t].[Methodology], [t].[Objectives], [t].[Requirements], [t].[Status], [t].[SubmittedAt], [t].[SubmittedBy], [t].[Title], [t].[TopicId], [t].[VersionNumber], [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [topic_versions] AS [t]
+LEFT JOIN [users] AS [u] ON [t].[SubmittedBy] = [u].[Id]
+WHERE [t].[Id] = @__versionId_0 AND [t].[IsActive] = CAST(1 AS bit) AND [t].[DeletedAt] IS NULL
+2025-07-12 00:54:40.008 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-07-12 00:54:40.008 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-07-12 00:54:40.008 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:54:40.008 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-07-12 00:54:40.008 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-07-12 00:54:40.008 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-07-12 00:54:40.009 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-07-12 00:54:40.009 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-07-12 00:54:40.009 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-07-12 00:54:40.009 +07:00 [INF] Executed action CapBot.api.Controllers.TopicVersionController.GetDetail (CapBot.api) in 16.5943ms
+2025-07-12 00:54:40.009 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.TopicVersionController.GetDetail (CapBot.api)'
+2025-07-12 00:54:40.009 +07:00 [DBG] 'MyDbContext' disposed.
+2025-07-12 00:54:40.009 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-07-12 00:54:40.009 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-07-12 00:54:40.009 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/topic-version/detail/3221 - 404 null application/json; charset=utf-8 24.1675ms
+2025-07-12 00:54:44.337 +07:00 [DBG] Connection id "0HNE0KEA4THCN" received FIN.
+2025-07-12 00:54:44.337 +07:00 [DBG] Connection id "0HNE0KEA4THCN" is closed. The last processed stream ID was 1.
+2025-07-12 00:54:44.337 +07:00 [DBG] Connection id "0HNE0KEA4THCN" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-07-12 00:54:44.338 +07:00 [DBG] The connection queue processing loop for 0HNE0KEA4THCN completed.
+2025-07-12 00:54:44.338 +07:00 [DBG] Connection id "0HNE0KEA4THCN" stopped.

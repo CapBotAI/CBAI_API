@@ -299,7 +299,6 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
-            // Check permission - only supervisor can submit
             if (topicVersion.Topic.SupervisorId != userId)
             {
                 return new BaseResponseModel
@@ -310,7 +309,6 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
-            // Only draft versions can be submitted
             if (topicVersion.Status != TopicStatus.Draft)
             {
                 return new BaseResponseModel
@@ -343,7 +341,7 @@ public class TopicVersionService : ITopicVersionService
         }
     }
 
-    public async Task<BaseResponseModel> ReviewTopicVersion(ReviewTopicVersionDTO reviewTopicVersionDTO, int userId)
+    public async Task<BaseResponseModel> ReviewTopicVersion(ReviewTopicVersionDTO reviewTopicVersionDTO, int userId, bool isReviewer)
     {
         try
         {
@@ -358,8 +356,7 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
-            // Check if user is admin/reviewer (implement based on your role system)
-            if (!IsUserReviewer(user))
+            if (!isReviewer)
             {
                 return new BaseResponseModel
                 {
@@ -385,7 +382,6 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
-            // Only submitted versions can be reviewed
             if (topicVersion.Status != TopicStatus.Submitted)
             {
                 return new BaseResponseModel
@@ -448,18 +444,16 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
-            // Check permission - only supervisor or admin can delete
-            if (topicVersion.Topic.SupervisorId != userId && !IsUserAdmin(user))
-            {
-                return new BaseResponseModel
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status403Forbidden,
-                    Message = "Bạn không có quyền xóa phiên bản này"
-                };
-            }
+            // if (topicVersion.Topic.SupervisorId != userId && !IsUserAdmin(user))
+            // {
+            //     return new BaseResponseModel
+            //     {
+            //         IsSuccess = false,
+            //         StatusCode = StatusCodes.Status403Forbidden,
+            //         Message = "Bạn không có quyền xóa phiên bản này"
+            //     };
+            // }
 
-            // Only draft versions can be deleted
             if (topicVersion.Status != TopicStatus.Draft)
             {
                 return new BaseResponseModel
@@ -486,17 +480,5 @@ public class TopicVersionService : ITopicVersionService
         {
             throw;
         }
-    }
-
-    private bool IsUserAdmin(object user)
-    {
-        // Implement admin check logic based on your user roles structure
-        return true; // Replace with actual implementation
-    }
-
-    private bool IsUserReviewer(object user)
-    {
-        // Implement reviewer check logic based on your user roles structure
-        return true; // Replace with actual implementation
     }
 }
