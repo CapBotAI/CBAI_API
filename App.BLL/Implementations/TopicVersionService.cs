@@ -412,7 +412,7 @@ public class TopicVersionService : ITopicVersionService
         }
     }
 
-    public async Task<BaseResponseModel> DeleteTopicVersion(int versionId, int userId)
+    public async Task<BaseResponseModel> DeleteTopicVersion(int versionId, int userId, bool isAdmin)
     {
         try
         {
@@ -444,15 +444,15 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
-            // if (topicVersion.Topic.SupervisorId != userId && !IsUserAdmin(user))
-            // {
-            //     return new BaseResponseModel
-            //     {
-            //         IsSuccess = false,
-            //         StatusCode = StatusCodes.Status403Forbidden,
-            //         Message = "Bạn không có quyền xóa phiên bản này"
-            //     };
-            // }
+            if (topicVersion.Topic.SupervisorId != userId && !isAdmin)
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Message = "Bạn không có quyền xóa phiên bản này"
+                };
+            }
 
             if (topicVersion.Status != TopicStatus.Draft)
             {

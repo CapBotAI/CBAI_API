@@ -13,5 +13,5 @@ public interface ITopicVersionService
     Task<BaseResponseModel<TopicVersionDetailDTO>> GetTopicVersionDetail(int versionId);
     Task<BaseResponseModel> SubmitTopicVersion(SubmitTopicVersionDTO submitTopicVersionDTO, int userId);
     Task<BaseResponseModel> ReviewTopicVersion(ReviewTopicVersionDTO reviewTopicVersionDTO, int userId, bool isReviewer);
-    Task<BaseResponseModel> DeleteTopicVersion(int versionId, int userId);
+    Task<BaseResponseModel> DeleteTopicVersion(int versionId, int userId, bool isAdmin);
 }

@@ -376,7 +376,7 @@ namespace CapBot.api.Controllers
         {
             try
             {
-                var result = await _topicVersionService.DeleteTopicVersion(versionId, UserId);
+                var result = await _topicVersionService.DeleteTopicVersion(versionId, UserId, IsAdmin);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)
