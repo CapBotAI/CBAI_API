@@ -6,7 +6,7 @@ using FS.Commons.Interfaces;
 
 namespace App.Entities.DTOs.TopicCategories;
 
-public class CreateTopicCategoryDTO : IEntity<TopicCategory>, IValiationPipeline
+public class CreateTopicCategoryDTO : IEntity<TopicCategory>, IValidationPipeline
 {
     [Required(ErrorMessage = "Tên danh mục chủ đề không được để trống")]
     [StringLength(200, ErrorMessage = "Tên danh mục chủ đề không được vượt quá 200 ký tự")]

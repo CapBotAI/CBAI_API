@@ -346,6 +346,22 @@ public class BaseAPIController : ControllerBase
         }
     }
 
+    /// <summary>
+    /// Get the logged in user is reviewer
+    /// </summary>
+    protected bool IsReviewer
+    {
+        get
+        {
+            var is_reviewer = User.FindFirst(ConstantModel.IS_REVIEWER)?.Value;
+            bool.TryParse(is_reviewer, out bool isReviewer);
+            return isReviewer;
+        }
+    }
+
+    /// <summary>
+    /// Get the logged in user is remember
+    /// </summary>
     protected bool IsRemember
     {
         get

@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Http;
 
 namespace App.Entities.DTOs.Semesters;
 
-public class UpdateSemesterDTO : IValiationPipeline
+public class UpdateSemesterDTO : IValidationPipeline
 {
     [Required(ErrorMessage = "Id là bắt buộc")]
     public int Id { get; set; }
