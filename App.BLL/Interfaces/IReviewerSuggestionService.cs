@@ -1,4 +1,5 @@
 ﻿using System.Threading.Tasks;
+using App.Commons.ResponseModel;
 using App.Entities.DTOs.ReviewerSuggestion;
 
 namespace App.BLL.Interfaces
@@ -8,6 +9,6 @@ namespace App.BLL.Interfaces
     /// </summary>
     public interface IReviewerSuggestionService
     {
-        Task<ReviewerSuggestionOutputDTO> SuggestReviewersAsync(ReviewerSuggestionInputDTO input);
+        Task<BaseResponseModel> SuggestReviewersAsync(ReviewerSuggestionInputDTO input);
     }
 }

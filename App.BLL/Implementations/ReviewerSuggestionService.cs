@@ -5,12 +5,14 @@ using System.Threading.Tasks;
 using App.BLL.Interfaces;
 using App.BLL.Mapping;
 using App.BLL.Services;
+using App.Commons.ResponseModel;
 using App.DAL.Queries.Implementations;
 using App.DAL.UnitOfWork;
 using App.Entities.DTOs.ReviewerSuggestion;
 using App.Entities.Entities.App;
 using App.Entities.Entities.Core;
 using App.Entities.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace App.BLL.Implementations
 {
@@ -30,7 +32,7 @@ namespace App.BLL.Implementations
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<ReviewerSuggestionOutputDTO> SuggestReviewersAsync(ReviewerSuggestionInputDTO input)
+        public async Task<BaseResponseModel> SuggestReviewersAsync(ReviewerSuggestionInputDTO input)
         {
             // 1. Get TopicVersion (with Topic & Category)
             var topicVersionRepo = _unitOfWork.GetRepo<TopicVersion>();
@@ -180,7 +182,13 @@ Suggest the most suitable reviewers (Reviewer 1, 2, 3) for this topic and explai
                 }
             }
 
-            return ReviewerSuggestionMapper.ToOutputDTO(sorted, explanation);
+            return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+            {
+                Data = ReviewerSuggestionMapper.ToOutputDTO(sorted, explanation),
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Gợi ý reviewer thành công"
+            };
         }
     }
 }
