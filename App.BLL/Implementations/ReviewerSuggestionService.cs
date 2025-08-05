@@ -5,9 +5,9 @@ using System.Threading.Tasks;
 using App.BLL.Interfaces;
 using App.BLL.Mapping;
 using App.BLL.Services;
+using App.DAL.UnitOfWork;
 using App.Entities.DTOs.ReviewerSuggestion;
 using App.Entities.Entities.App;
-using App.Entities.Entities.Core;
 
 namespace App.BLL.Implementations
 {
@@ -17,37 +17,36 @@ namespace App.BLL.Implementations
     public class ReviewerSuggestionService : IReviewerSuggestionService
     {
         private readonly GeminiAIService _aiService;
-        private readonly IUserRepository _userRepository;
-        private readonly IReviewerPerformanceRepository _reviewerPerformanceRepository;
-        private readonly ITopicVersionRepository _topicVersionRepository;
-        private readonly IReviewerAssignmentRepository _reviewerAssignmentRepository;
+        private readonly IUnitOfWork _unitOfWork;
 
         public ReviewerSuggestionService(
             GeminiAIService aiService,
-            IUserRepository userRepository,
-            IReviewerPerformanceRepository reviewerPerformanceRepository,
-            ITopicVersionRepository topicVersionRepository,
-            IReviewerAssignmentRepository reviewerAssignmentRepository)
+            IUnitOfWork unitOfWork)
         {
             _aiService = aiService;
-            _userRepository = userRepository;
-            _reviewerPerformanceRepository = reviewerPerformanceRepository;
-            _topicVersionRepository = topicVersionRepository;
-            _reviewerAssignmentRepository = reviewerAssignmentRepository;
+            _unitOfWork = unitOfWork;
         }
 
         public async Task<ReviewerSuggestionOutputDTO> SuggestReviewersAsync(ReviewerSuggestionInputDTO input)
         {
-            // Load topic, reviewers, performance, workload
-            var topicVersion = await _topicVersionRepository.GetByIdAsync(input.TopicVersionId)
+            // Load topic version
+            var topicVersion = await _unitOfWork.TopicVersionRepository.GetByIdAsync(input.TopicVersionId)
                 ?? throw new Exception("Topic version not found");
-            var reviewers = await _userRepository.GetAllReviewersAsync();
-            var reviewerPerformances = (await _reviewerPerformanceRepository.GetCurrentSemesterPerformances())
+
+            // Load reviewers
+            var reviewers = await _unitOfWork.UserRepository.GetAllReviewersAsync();
+
+            // Load reviewer performances (current semester)
+            var reviewerPerformances = (await _unitOfWork.ReviewerPerformanceRepository.GetCurrentSemesterPerformances())
                 .ToDictionary(rp => rp.ReviewerId);
+
+            // Build topic string and get embedding
             var topicText = $"{topicVersion.Title} {topicVersion.Description} {topicVersion.Objectives} {topicVersion.Methodology} {topicVersion.ExpectedOutcomes}";
             var topicVec = await _aiService.GetEmbeddingAsync(topicText);
-            var activeAssignments = await _reviewerAssignmentRepository.GetActiveAssignmentsCountByReviewerAsync();
-            var completedAssignments = await _reviewerAssignmentRepository.GetCompletedAssignmentsCountByReviewerAsync();
+
+            // Load workload info
+            var activeAssignments = await _unitOfWork.ReviewerAssignmentRepository.GetActiveAssignmentsCountByReviewerAsync();
+            var completedAssignments = await _unitOfWork.ReviewerAssignmentRepository.GetCompletedAssignmentsCountByReviewerAsync();
 
             var suggestionList = new List<ReviewerSuggestionDTO>();
             foreach (var reviewer in reviewers)
@@ -58,14 +57,14 @@ namespace App.BLL.Implementations
                 var reviewerVec = await _aiService.GetEmbeddingAsync(skillText);
                 decimal skillMatchScore = VectorMath.CosineSimilarity(topicVec, reviewerVec);
 
-                // Matched skills: simple intersection
+                // Matched skills (intersection by keyword)
                 var topicKeywords = topicText.ToLower().Split(' ', ',', '.', ';', ':').Distinct();
                 var matchedSkills = reviewer.LecturerSkills
                     .Where(s => topicKeywords.Contains(s.SkillTag.ToLower()))
                     .Select(s => s.SkillTag)
                     .ToList();
 
-                // Workload
+                // Workload calculation
                 int currActive = activeAssignments.TryGetValue(reviewer.Id, out var ca) ? ca : 0;
                 int completed = completedAssignments.TryGetValue(reviewer.Id, out var co) ? co : 0;
                 decimal workloadScore = 1 - Math.Min(1, currActive / 5m);
@@ -106,7 +105,7 @@ namespace App.BLL.Implementations
 
             var sorted = suggestionList.OrderByDescending(x => x.OverallScore).Take(input.MaxSuggestions).ToList();
 
-            // Optional: prompt-based Gemini explanation
+            // Optional: Gemini prompt-based explanation
             string? explanation = null;
             if (input.UsePrompt)
             {
