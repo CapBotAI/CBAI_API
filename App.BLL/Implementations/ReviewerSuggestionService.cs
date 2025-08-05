@@ -5,23 +5,26 @@ using System.Threading.Tasks;
 using App.BLL.Interfaces;
 using App.BLL.Mapping;
 using App.BLL.Services;
+using App.DAL.Queries.Implementations;
 using App.DAL.UnitOfWork;
 using App.Entities.DTOs.ReviewerSuggestion;
 using App.Entities.Entities.App;
+using App.Entities.Entities.Core;
+using App.Entities.Enums;
 
 namespace App.BLL.Implementations
 {
     /// <summary>
-    /// Main logic for suggesting reviewers given a topic version, using Gemini API for skills, workload, and performance.
+    /// Reviewer suggestion logic using Gemini API.
+    /// Fetches and analyzes Users (with Reviewer role), LecturerSkills, ReviewerPerformance,
+    /// ReviewerAssignment, Topic, TopicCategory, TopicVersion to sharpen reviewer selection.
     /// </summary>
     public class ReviewerSuggestionService : IReviewerSuggestionService
     {
         private readonly GeminiAIService _aiService;
         private readonly IUnitOfWork _unitOfWork;
 
-        public ReviewerSuggestionService(
-            GeminiAIService aiService,
-            IUnitOfWork unitOfWork)
+        public ReviewerSuggestionService(GeminiAIService aiService, IUnitOfWork unitOfWork)
         {
             _aiService = aiService;
             _unitOfWork = unitOfWork;
@@ -29,47 +32,97 @@ namespace App.BLL.Implementations
 
         public async Task<ReviewerSuggestionOutputDTO> SuggestReviewersAsync(ReviewerSuggestionInputDTO input)
         {
-            // Load topic version
-            var topicVersion = await _unitOfWork.TopicVersionRepository.GetByIdAsync(input.TopicVersionId)
-                ?? throw new Exception("Topic version not found");
+            // 1. Get TopicVersion (with Topic & Category)
+            var topicVersionRepo = _unitOfWork.GetRepo<TopicVersion>();
+            var topicVersion = await topicVersionRepo.GetSingleAsync(
+                new QueryBuilder<TopicVersion>()
+                    .WithPredicate(tv => tv.Id == input.TopicVersionId)
+                    .WithInclude(tv => tv.Topic)
+                    .WithInclude(tv => tv.Topic.Category)
+                    .Build()
+            );
+            if (topicVersion == null)
+                throw new Exception("Topic version not found.");
 
-            // Load reviewers
-            var reviewers = await _unitOfWork.UserRepository.GetAllReviewersAsync();
+            var topic = topicVersion.Topic;
+            var topicCategory = topic?.Category;
 
-            // Load reviewer performances (current semester)
-            var reviewerPerformances = (await _unitOfWork.ReviewerPerformanceRepository.GetCurrentSemesterPerformances())
-                .ToDictionary(rp => rp.ReviewerId);
+            // 2. Build context string for Gemini embedding
+            var topicContext = $"{topicCategory?.Name ?? ""} {topic?.Title ?? ""} {topicVersion.Title ?? ""} {topicVersion.Description ?? ""} {topicVersion.Objectives ?? ""} {topicVersion.Methodology ?? ""} {topicVersion.ExpectedOutcomes ?? ""}";
 
-            // Build topic string and get embedding
-            var topicText = $"{topicVersion.Title} {topicVersion.Description} {topicVersion.Objectives} {topicVersion.Methodology} {topicVersion.ExpectedOutcomes}";
-            var topicVec = await _aiService.GetEmbeddingAsync(topicText);
+            // 3. Get reviewers: Users with Reviewer role and at least one LecturerSkill
+            var userRepo = _unitOfWork.GetRepo<User>();
+            var allUsers = await userRepo.GetAllAsync(
+                new QueryBuilder<User>()
+                    .WithInclude(u => u.LecturerSkills)
+                    .WithInclude(u => u.UserRoles)
+                    .Build()
+            );
 
-            // Load workload info
-            var activeAssignments = await _unitOfWork.ReviewerAssignmentRepository.GetActiveAssignmentsCountByReviewerAsync();
-            var completedAssignments = await _unitOfWork.ReviewerAssignmentRepository.GetCompletedAssignmentsCountByReviewerAsync();
+            var reviewers = allUsers
+                .Where(u => u.UserRoles.Any(ur => ur.Role != null && ur.Role.Name == "Reviewer") && u.LecturerSkills.Any())
+                .ToList();
+
+            // 4. Get ReviewerPerformance for all reviewers
+            var reviewerIds = reviewers.Select(r => r.Id).ToList();
+            var reviewerPerfRepo = _unitOfWork.GetRepo<ReviewerPerformance>();
+            var reviewerPerformances = (await reviewerPerfRepo.GetAllAsync(
+                new QueryBuilder<ReviewerPerformance>()
+                    .WithPredicate(rp => reviewerIds.Contains(rp.ReviewerId))
+                    .Build()
+            ))
+            .GroupBy(rp => rp.ReviewerId)
+            .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.LastUpdated).First());
+
+            // 5. Workload: Get ReviewerAssignment for each reviewer
+            var reviewerAssignmentRepo = _unitOfWork.GetRepo<ReviewerAssignment>();
+            var allAssignments = await reviewerAssignmentRepo.GetAllAsync(
+                new QueryBuilder<ReviewerAssignment>()
+                    .WithPredicate(a => reviewerIds.Contains(a.ReviewerId))
+                    .Build()
+            );
+            // Define what statuses are considered "active" and "completed" in your project
+            var activeStatuses = new[] { AssignmentStatus.Assigned, AssignmentStatus.InProgress }; // adjust to your codebase
+            var completedStatuses = new[] { AssignmentStatus.Completed };
+            var reviewerAssignmentCounts = reviewers.ToDictionary(
+                reviewer => reviewer.Id,
+                reviewer =>
+                {
+                    var assignments = allAssignments.Where(a => a.ReviewerId == reviewer.Id);
+                    int active = assignments.Count(a => activeStatuses.Contains(a.Status));
+                    int completed = assignments.Count(a => completedStatuses.Contains(a.Status));
+                    return (active, completed);
+                });
+
+            // 6. Get Gemini embedding for topic context
+            var topicVec = await _aiService.GetEmbeddingAsync(topicContext);
 
             var suggestionList = new List<ReviewerSuggestionDTO>();
+
             foreach (var reviewer in reviewers)
             {
-                // Skill matching
+                // Skill string for reviewer (LecturerSkill)
                 var skillDict = reviewer.LecturerSkills.ToDictionary(s => s.SkillTag, s => s.ProficiencyLevel.ToString());
                 var skillText = string.Join(", ", reviewer.LecturerSkills.Select(s => $"{s.SkillTag} ({s.ProficiencyLevel})"));
                 var reviewerVec = await _aiService.GetEmbeddingAsync(skillText);
+
+                // Skill match: cosine similarity
                 decimal skillMatchScore = VectorMath.CosineSimilarity(topicVec, reviewerVec);
 
-                // Matched skills (intersection by keyword)
-                var topicKeywords = topicText.ToLower().Split(' ', ',', '.', ';', ':').Distinct();
+                // Matched skills: intersection with topic keywords
+                var topicKeywords = topicContext.ToLower().Split(' ', ',', '.', ';', ':').Distinct();
                 var matchedSkills = reviewer.LecturerSkills
                     .Where(s => topicKeywords.Contains(s.SkillTag.ToLower()))
                     .Select(s => s.SkillTag)
                     .ToList();
 
-                // Workload calculation
-                int currActive = activeAssignments.TryGetValue(reviewer.Id, out var ca) ? ca : 0;
-                int completed = completedAssignments.TryGetValue(reviewer.Id, out var co) ? co : 0;
+                // Workload
+                reviewerAssignmentCounts.TryGetValue(reviewer.Id, out var assignInfo);
+                int currActive = assignInfo.active;
+                int completed = assignInfo.completed;
                 decimal workloadScore = 1 - Math.Min(1, currActive / 5m);
 
-                // Performance
+                // ReviewerPerformance
                 reviewerPerformances.TryGetValue(reviewer.Id, out var perf);
                 decimal perfScore = perf != null
                     ? (perf.QualityRating ?? 0) * 0.5m + (perf.OnTimeRate ?? 0) * 0.3m + (perf.AverageScoreGiven ?? 0) * 0.2m
@@ -80,13 +133,14 @@ namespace App.BLL.Implementations
                 var ineligibilityReasons = new List<string>();
                 if (currActive > 5) { isEligible = false; ineligibilityReasons.Add("Too many active assignments"); }
                 if (perf?.QualityRating is decimal q && q < 2) { isEligible = false; ineligibilityReasons.Add("Low quality rating"); }
+
                 decimal overallScore = skillMatchScore * 0.4m + workloadScore * 0.2m + perfScore * 0.3m;
                 if (!isEligible) overallScore -= 0.5m;
 
                 suggestionList.Add(new ReviewerSuggestionDTO
                 {
                     ReviewerId = reviewer.Id,
-                    ReviewerName = reviewer.FullName,
+                    ReviewerName = reviewer.Email,
                     SkillMatchScore = skillMatchScore,
                     MatchedSkills = matchedSkills,
                     ReviewerSkills = skillDict,
@@ -113,7 +167,7 @@ namespace App.BLL.Implementations
                 {
                     string prompt = $@"Given the topic:
 ---
-{topicText}
+{topicContext}
 ---
 and these reviewer expertise profiles:
 {string.Join("\n", sorted.Select((s, i) => $"Reviewer {i + 1}: {string.Join(", ", s.ReviewerSkills.Select(kv => $"{kv.Key} ({kv.Value})"))}"))}
