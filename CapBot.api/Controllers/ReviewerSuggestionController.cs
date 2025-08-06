@@ -43,9 +43,9 @@ namespace CapBot.api.Controllers
         ///     }
         /// </remarks>
         [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
-        [HttpPost("suggest")]
+        [HttpPost("ai-suggest")]
         [SwaggerOperation(
-            Summary = "Gợi ý reviewer phù hợp cho phiên bản chủ đề",
+            Summary = "AI agent gợi ý reviewer phù hợp cho phiên bản chủ đề",
             Description = "Chỉ Supervisor/Admin/Moderator có quyền truy cập"
         )]
         [SwaggerResponse(200, "Gợi ý reviewer thành công")]
