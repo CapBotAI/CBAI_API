@@ -44,6 +44,7 @@ public class Program
         {
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         }).AddOData(options =>
         {
             options.Select().Filter().OrderBy().Expand().SetMaxTop(null).Count();

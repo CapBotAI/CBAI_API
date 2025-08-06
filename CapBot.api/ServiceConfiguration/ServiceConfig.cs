@@ -52,5 +52,9 @@ public class ServiceConfig
 
         // Reviewer Suggestion Service
         services.AddScoped<IReviewerSuggestionService, ReviewerSuggestionService>();
+
+        services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
+
+        services.AddScoped<ISkillMatchingService, SkillMatchingService>();
     }
 }
