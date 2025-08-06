@@ -366,3 +366,4 @@ FodyWeavers.xsd
 *.sln.iml
 # Ignore development config
 appsettings.Development.json
+appsettings.json

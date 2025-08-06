@@ -1,6 +1,7 @@
 using App.BLL.Implementations;
 using App.BLL.Interfaces;
 using App.BLL.Mapper;
+using App.BLL.Services;
 using App.DAL.Implementations;
 using App.DAL.Interfaces;
 using App.DAL.UnitOfWork;
@@ -46,5 +47,14 @@ public class ServiceConfig
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 
+        //Gemini AI Service 
+        services.AddSingleton<GeminiAIService>();
+
+        // Reviewer Suggestion Service
+        services.AddScoped<IReviewerSuggestionService, ReviewerSuggestionService>();
+
+        services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
+
+        services.AddScoped<ISkillMatchingService, SkillMatchingService>();
     }
 }
