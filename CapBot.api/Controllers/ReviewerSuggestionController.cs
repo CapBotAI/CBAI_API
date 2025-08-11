@@ -27,21 +27,6 @@ namespace CapBot.api.Controllers
         /// <summary>
         /// Gợi ý reviewer phù hợp cho phiên bản chủ đề
         /// </summary>
-        /// <param name="input">Thông tin gợi ý reviewer</param>
-        /// <returns>Danh sách reviewer phù hợp</returns>
-        /// <remarks>
-        /// - Chỉ Supervisor, Admin hoặc Moderator mới có thể gọi API này.
-        /// - Gợi ý reviewer dựa trên kỹ năng, workload, hiệu suất, v.v.
-        /// 
-        /// Sample request:
-        /// 
-        ///     POST /api/reviewer-suggestion/suggest
-        ///     {
-        ///         "topicVersionId": 1,
-        ///         "maxSuggestions": 3,
-        ///         "usePrompt": true
-        ///     }
-        /// </remarks>
         [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
         [HttpPost("ai-suggest")]
         [SwaggerOperation(
@@ -75,6 +60,9 @@ namespace CapBot.api.Controllers
             }
         }
 
+        /// <summary>
+        /// Lấy danh sách reviewer ít workload nhất cho một phiên bản chủ đề
+        /// </summary>
         [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
         [HttpGet("top")]
         [SwaggerOperation(
@@ -99,6 +87,91 @@ namespace CapBot.api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while getting top reviewers");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Gợi ý reviewer cho nhiều phiên bản chủ đề (bulk)
+        /// </summary>
+        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
+        [HttpPost("bulk-ai-suggest")]
+        [SwaggerOperation(
+            Summary = "Gợi ý reviewer cho nhiều phiên bản chủ đề",
+            Description = "Gợi ý reviewer sử dụng AI cho nhiều TopicVersionId cùng lúc"
+        )]
+        [SwaggerResponse(200, "Bulk reviewer suggestions successful")]
+        [SwaggerResponse(400, "Invalid input")]
+        [SwaggerResponse(500, "Internal server error")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        public async Task<IActionResult> BulkSuggest([FromBody] BulkReviewerSuggestionInputDTO input)
+        {
+            if (!ModelState.IsValid)
+                return ModelInvalid();
+
+            if (input == null || input.TopicVersionIds == null || !input.TopicVersionIds.Any())
+                return Error("Dữ liệu đầu vào không hợp lệ");
+
+            try
+            {
+                var result = await _reviewerSuggestionService.BulkSuggestReviewersAsync(input);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while bulk suggesting reviewers");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Kiểm tra reviewer có đủ điều kiện cho một phiên bản chủ đề không
+        /// </summary>
+        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
+        [HttpGet("check-eligibility")]
+        [SwaggerOperation(
+            Summary = "Kiểm tra reviewer có đủ điều kiện cho một phiên bản chủ đề",
+            Description = "Kiểm tra eligibility dựa trên kỹ năng, workload, hiệu suất, v.v."
+        )]
+        [SwaggerResponse(200, "Kiểm tra eligibility thành công")]
+        [SwaggerResponse(404, "Reviewer không tìm thấy")]
+        [Produces("application/json")]
+        public async Task<IActionResult> CheckEligibility([FromQuery] int reviewerId, [FromQuery] int topicVersionId)
+        {
+            try
+            {
+                var result = await _reviewerSuggestionService.CheckReviewerEligibilityAsync(reviewerId, topicVersionId);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking reviewer eligibility");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Lấy lịch sử gợi ý reviewer cho một phiên bản chủ đề
+        /// </summary>
+        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
+        [HttpGet("history")]
+        [SwaggerOperation(
+            Summary = "Lấy lịch sử gợi ý reviewer cho một phiên bản chủ đề",
+            Description = "Trả về lịch sử các lần gợi ý reviewer cho topic version"
+        )]
+        [SwaggerResponse(200, "Lấy lịch sử thành công")]
+        [Produces("application/json")]
+        public async Task<IActionResult> SuggestionHistory([FromQuery] int topicVersionId)
+        {
+            try
+            {
+                var result = await _reviewerSuggestionService.GetSuggestionHistoryAsync(topicVersionId);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting suggestion history");
                 return Error(ConstantModel.ErrorMessage);
             }
         }
