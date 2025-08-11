@@ -9,6 +9,9 @@ namespace App.BLL.Interfaces
     /// </summary>
     public interface IReviewerSuggestionService
     {
-        Task<BaseResponseModel> SuggestReviewersAsync(ReviewerSuggestionInputDTO input);
+        Task<BaseResponseModel<ReviewerSuggestionOutputDTO>> SuggestReviewersAsync(ReviewerSuggestionInputDTO input);
+        Task<BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>> BulkSuggestReviewersAsync(BulkReviewerSuggestionInputDTO input);
+        Task<BaseResponseModel<ReviewerEligibilityDTO>> CheckReviewerEligibilityAsync(int reviewerId, int topicVersionId);
+        Task<BaseResponseModel<List<ReviewerSuggestionHistoryDTO>>> GetSuggestionHistoryAsync(int topicVersionId);
     }
 }
