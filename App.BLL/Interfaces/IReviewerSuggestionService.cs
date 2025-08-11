@@ -9,6 +9,6 @@ namespace App.BLL.Interfaces
     /// </summary>
     public interface IReviewerSuggestionService
     {
-        Task<BaseResponseModel> SuggestReviewersAsync(ReviewerSuggestionInputDTO input);
+        Task<BaseResponseModel<ReviewerSuggestionOutputDTO>> SuggestReviewersAsync(ReviewerSuggestionInputDTO input);
     }
 }

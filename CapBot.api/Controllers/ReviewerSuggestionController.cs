@@ -74,5 +74,33 @@ namespace CapBot.api.Controllers
                 return Error(ConstantModel.ErrorMessage);
             }
         }
+
+        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
+        [HttpGet("top")]
+        [SwaggerOperation(
+            Summary = "Lấy danh sách reviewer ít workload nhất cho một phiên bản chủ đề",
+            Description = "Dựa trên số lượng assignment đang hoạt động, kỹ năng và hiệu suất"
+        )]
+        [SwaggerResponse(200, "Danh sách reviewer thành công")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetTopReviewers([FromQuery] int topicVersionId, [FromQuery] int count = 5)
+        {
+            try
+            {
+                var input = new ReviewerSuggestionInputDTO
+                {
+                    TopicVersionId = topicVersionId,
+                    MaxSuggestions = count,
+                    UsePrompt = false
+                };
+                var result = await _reviewerSuggestionService.SuggestReviewersAsync(input);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting top reviewers");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
     }
 }
