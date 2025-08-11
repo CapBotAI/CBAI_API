@@ -187,6 +187,67 @@ Suggest the most suitable reviewers (Reviewer 1, 2, 3) for this topic and explai
             };
         }
 
+        public async Task<BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>> BulkSuggestReviewersAsync(BulkReviewerSuggestionInputDTO input)
+        {
+            var results = new List<BulkReviewerSuggestionOutputDTO>();
+            foreach (var topicVersionId in input.TopicVersionIds)
+            {
+                var singleInput = new ReviewerSuggestionInputDTO
+                {
+                    TopicVersionId = topicVersionId,
+                    MaxSuggestions = input.MaxSuggestions,
+                    UsePrompt = input.UsePrompt
+                };
+                var suggestionResult = await SuggestReviewersAsync(singleInput);
+                results.Add(new BulkReviewerSuggestionOutputDTO
+                {
+                    TopicVersionId = topicVersionId,
+                    Suggestion = suggestionResult.Data
+                });
+            }
+            return new BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>
+            {
+                Data = results,
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Bulk reviewer suggestion completed successfully."
+            };
+        }
+
+        public async Task<BaseResponseModel<ReviewerEligibilityDTO>> CheckReviewerEligibilityAsync(int reviewerId, int topicVersionId)
+        {
+            var input = new ReviewerSuggestionInputDTO
+            {
+                TopicVersionId = topicVersionId,
+                MaxSuggestions = 10,
+                UsePrompt = false
+            };
+            var suggestion = await SuggestReviewersAsync(input);
+            var reviewer = suggestion.Data.Suggestions.FirstOrDefault(r => r.ReviewerId == reviewerId);
+            if (reviewer == null)
+            {
+                return new BaseResponseModel<ReviewerEligibilityDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Reviewer not found for given topic"
+                };
+            }
+            return new BaseResponseModel<ReviewerEligibilityDTO>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Data = new ReviewerEligibilityDTO
+                {
+                    ReviewerId = reviewerId,
+                    TopicVersionId = topicVersionId,
+                    IsEligible = reviewer.IsEligible,
+                    Reasons = reviewer.IneligibilityReasons ?? new List<string>()
+                },
+                Message = reviewer.IsEligible ? "Reviewer is eligible" : "Reviewer is not eligible"
+            };
+        }
+
         // Example GET: Return top reviewers by lowest current workload (fake data for demo)
         public async Task<BaseResponseModel<List<ReviewerSuggestionDTO>>> GetTopReviewersAsync(int count = 5)
         {
@@ -217,6 +278,11 @@ Suggest the most suitable reviewers (Reviewer 1, 2, 3) for this topic and explai
                 StatusCode = StatusCodes.Status200OK,
                 Message = "Top reviewers retrieved successfully"
             };
+        }
+
+        public Task<BaseResponseModel<List<ReviewerSuggestionHistoryDTO>>> GetSuggestionHistoryAsync(int topicVersionId)
+        {
+            throw new NotImplementedException();
         }
     }
 }
