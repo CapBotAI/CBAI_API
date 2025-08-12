@@ -56,5 +56,8 @@ public class ServiceConfig
         services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
 
         services.AddScoped<ISkillMatchingService, SkillMatchingService>();
+
+        // Document Validation Service
+        services.AddScoped<IDocumentValidationService, DocumentValidationService>();
     }
 }

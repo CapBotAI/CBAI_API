@@ -16,6 +16,7 @@ using Microsoft.AspNetCore.Identity;
 using App.Entities.Entities.Core;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using Microsoft.AspNetCore.Mvc;
+using App.BLL.Implementations;
 
 namespace CapBot.api;
 
@@ -40,6 +41,8 @@ public class Program
         builder.Host.UseSerilog();
 
         // Add services to the container
+        
+
         builder.Services.AddControllers().AddJsonOptions(options =>
         {
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
