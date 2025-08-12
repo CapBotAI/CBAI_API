@@ -298,6 +298,23 @@ public class IdentityRepository : IIdentityRepository
         }
     }
 
+    public async Task<List<Role>> GetUserRolesAsync(long userId)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString());
+        if (user == null)
+            return null;
+
+        var roleNames = await _userManager.GetRolesAsync(user);
+        if (roleNames == null || roleNames.Count == 0)
+            return new List<Role>();
+
+        var roles = await _roleManager.Roles
+            .Where(r => roleNames.Contains(r.Name))
+            .ToListAsync();
+
+        return roles;
+    }
+
     public Task<bool> VerifyPermission(long userId, string claim)
     {
         throw new NotImplementedException();

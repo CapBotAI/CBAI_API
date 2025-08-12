@@ -25,6 +25,7 @@ public class ServiceConfig
 
         //register service
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAccountService, AccountService>();
 
         //SignalR Service
         services.AddSignalR();
