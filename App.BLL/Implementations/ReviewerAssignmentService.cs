@@ -18,11 +18,16 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly IPerformanceMatchingService _performanceMatchingService;
+    private readonly ISkillMatchingService skillMatchingService;
 
-    public ReviewerAssignmentService(IUnitOfWork unitOfWork, IMapper mapper)
+    public ReviewerAssignmentService(IUnitOfWork unitOfWork, IMapper mapper, IPerformanceMatchingService performanceMatchingService, ISkillMatchingService skillMatchingService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _performanceMatchingService = performanceMatchingService;
+        this.skillMatchingService = skillMatchingService;
+        _skillMatchingService = skillMatchingService;
     }
 
     public async Task<BaseResponseModel<ReviewerAssignmentResponseDTO>> AssignReviewerAsync(AssignReviewerDTO dto, int assignedById)
@@ -574,6 +579,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        this.skillMatchingService = skillMatchingService;
         _skillMatchingService = skillMatchingService;
     }
 
@@ -603,20 +609,15 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 };
             }
 
-            // Get skill tags for the topic
-            var topicSkillTags = dto.TopicSkillTags.Any()
-                ? dto.TopicSkillTags
-                : await _skillMatchingService.ExtractTopicSkillTagsAsync(dto.SubmissionId);
-
-            // Find best matching reviewers
-            var matchingReviewers = await _skillMatchingService.FindBestMatchingReviewersAsync(dto.SubmissionId, dto);
+            // Find best performing reviewers (thay vì skill-based)
+            var matchingReviewers = await _performanceMatchingService.FindBestPerformingReviewersAsync(dto.SubmissionId, dto);
             var eligibleReviewers = matchingReviewers.Where(r => r.IsEligible).ToList();
 
             var result = new AutoAssignmentResult
             {
                 SubmissionId = dto.SubmissionId,
                 TopicTitle = submission.TopicVersion.Topic.Title,
-                TopicSkillTags = topicSkillTags,
+                TopicSkillTags = new List<string> { "Performance-Based Assignment" }, // Placeholder
                 ConsideredReviewers = matchingReviewers,
                 RequestedReviewers = dto.NumberOfReviewers,
                 AssignedCount = 0,
@@ -625,7 +626,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
 
             if (!eligibleReviewers.Any())
             {
-                result.Warnings.Add("Không tìm thấy reviewer phù hợp với tiêu chí");
+                result.Warnings.Add("Không tìm thấy reviewer phù hợp với tiêu chí performance");
                 return new BaseResponseModel<AutoAssignmentResult>
                 {
                     IsSuccess = false,
@@ -635,7 +636,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 };
             }
 
-            // Select top reviewers to assign
+            // Select top performers to assign
             var reviewersToAssign = eligibleReviewers
                 .Take(dto.NumberOfReviewers)
                 .ToList();
@@ -651,7 +652,8 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                     ReviewerId = reviewer.ReviewerId,
                     AssignmentType = dto.AssignmentType,
                     Deadline = dto.Deadline,
-                    SkillMatchScore = reviewer.SkillMatchScore
+                    SkillMatchScore = reviewer.PerformanceScore, // Use performance score instead
+                    Notes = $"Auto-assigned based on performance score: {reviewer.PerformanceScore:F2}"
                 };
 
                 var assignResult = await AssignReviewerAsync(assignDto, assignedById);
@@ -681,8 +683,8 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
             }
 
             var message = result.IsFullyAssigned
-                ? $"Auto assign thành công {result.AssignedCount} reviewer"
-                : $"Auto assign thành công {result.AssignedCount}/{dto.NumberOfReviewers} reviewer";
+                ? $"Auto assign thành công {result.AssignedCount} reviewer dựa trên performance"
+                : $"Auto assign thành công {result.AssignedCount}/{dto.NumberOfReviewers} reviewer dựa trên performance";
 
             return new BaseResponseModel<AutoAssignmentResult>
             {
@@ -705,13 +707,13 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
         {
             criteria ??= new AutoAssignReviewerDTO { SubmissionId = submissionId };
 
-            var matchingReviewers = await _skillMatchingService.FindBestMatchingReviewersAsync(submissionId, criteria);
+            var matchingReviewers = await _performanceMatchingService.FindBestPerformingReviewersAsync(submissionId, criteria);
 
             return new BaseResponseModel<List<ReviewerMatchingResult>>
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
-                Message = "Lấy danh sách reviewer được recommend thành công",
+                Message = "Lấy danh sách reviewer được recommend dựa trên performance thành công",
                 Data = matchingReviewers
             };
         }

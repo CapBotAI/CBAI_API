@@ -109,13 +109,12 @@ public class SkillMatchingService : ISkillMatchingService
         return skillTags.Distinct().ToList();
     }
 
+
     public async Task<List<ReviewerMatchingResult>> FindBestMatchingReviewersAsync(
         int submissionId, AutoAssignReviewerDTO criteria)
     {
-        // Get topic skill tags
-        var topicSkillTags = criteria.TopicSkillTags.Any()
-            ? criteria.TopicSkillTags
-            : await ExtractTopicSkillTagsAsync(submissionId);
+        // Get topic skill tags - luôn extract từ submission vì không có TopicSkillTags trong DTO nữa
+        var topicSkillTags = await ExtractTopicSkillTagsAsync(submissionId);
 
         // Get all reviewers with their skills and performance data
         var userRoleOptions = new QueryOptions<UserRole>
@@ -169,9 +168,10 @@ public class SkillMatchingService : ISkillMatchingService
             var activeAssignmentOptions = new QueryOptions<ReviewerAssignment>
             {
                 Predicate = ra => ra.ReviewerId == reviewer.Id &&
-                               (ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress)
+                                  (ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress)
             };
-            var activeAssignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(activeAssignmentOptions);
+            var activeAssignments =
+                await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(activeAssignmentOptions);
             matchingResult.CurrentActiveAssignments = activeAssignments.Count();
 
             // Calculate performance score
@@ -208,7 +208,7 @@ public class SkillMatchingService : ISkillMatchingService
         var performanceOptions = new QueryOptions<ReviewerPerformance>
         {
             Predicate = rp => rp.ReviewerId == reviewerId &&
-                            (!semesterId.HasValue || rp.SemesterId == semesterId.Value)
+                              (!semesterId.HasValue || rp.SemesterId == semesterId.Value)
         };
         var performances = await _unitOfWork.GetRepo<ReviewerPerformance>().GetAllAsync(performanceOptions);
 
@@ -250,7 +250,7 @@ public class SkillMatchingService : ISkillMatchingService
         var activeAssignmentOptions = new QueryOptions<ReviewerAssignment>
         {
             Predicate = ra => ra.ReviewerId == reviewerId &&
-                           (ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress)
+                              (ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress)
         };
         var activeAssignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(activeAssignmentOptions);
 
@@ -360,7 +360,8 @@ public class SkillMatchingService : ISkillMatchingService
         var reasons = new List<string>();
 
         if (result.SkillMatchScore < criteria.MinimumSkillMatchScore)
-            reasons.Add($"Skill match score ({result.SkillMatchScore:F2}) dưới mức yêu cầu ({criteria.MinimumSkillMatchScore:F2})");
+            reasons.Add(
+                $"Skill match score ({result.SkillMatchScore:F2}) dưới mức yêu cầu ({criteria.MinimumSkillMatchScore:F2})");
 
         if (result.CurrentActiveAssignments >= criteria.MaxWorkload)
             reasons.Add($"Quá tải assignment ({result.CurrentActiveAssignments}/{criteria.MaxWorkload})");

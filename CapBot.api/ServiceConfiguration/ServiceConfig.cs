@@ -57,5 +57,6 @@ public class ServiceConfig
         services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
 
         services.AddScoped<ISkillMatchingService, SkillMatchingService>();
+        services.AddScoped<IPerformanceMatchingService, PerformanceMatchingService>();
     }
 }
