@@ -25,6 +25,7 @@ public class ServiceConfig
 
         //register service
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAccountService, AccountService>();
 
         //SignalR Service
         services.AddSignalR();
@@ -56,5 +57,6 @@ public class ServiceConfig
         services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
 
         services.AddScoped<ISkillMatchingService, SkillMatchingService>();
+        services.AddScoped<IPerformanceMatchingService, PerformanceMatchingService>();
     }
 }
