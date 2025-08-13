@@ -24,6 +24,7 @@ public class ServiceConfig
 
         //register service
         services.AddScoped<IAuthService, AuthService>();
+        services.AddScoped<IAccountService, AccountService>();
 
         //SignalR Service
         services.AddSignalR();
@@ -43,11 +44,14 @@ public class ServiceConfig
         //Topic Version Service
         services.AddScoped<ITopicVersionService, TopicVersionService>();
 
+        //Phase Type Service
+        services.AddScoped<IPhaseTypeService, PhaseTypeService>();
+
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
-        
+
         services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
-        
+
         services.AddScoped<ISkillMatchingService, SkillMatchingService>();
 
     }

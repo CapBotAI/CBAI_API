@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using App.BLL.Interfaces;
 using App.Commons.ResponseModel;
 using App.DAL.Interfaces;
