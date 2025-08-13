@@ -1,6 +1,7 @@
 using App.BLL.Implementations;
 using App.BLL.Interfaces;
 using App.BLL.Mapper;
+using App.BLL.Services;
 using App.DAL.Implementations;
 using App.DAL.Interfaces;
 using App.DAL.UnitOfWork;
@@ -59,6 +60,12 @@ public class ServiceConfig
         services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
 
         services.AddScoped<ISkillMatchingService, SkillMatchingService>();
+
+        //Gemni Ai Service
+
+        services.AddSingleton < GeminiAIService>();
+
+        services.AddScoped<IPerformanceMatchingService, PerformanceMatchingService>();
 
     }
 }
