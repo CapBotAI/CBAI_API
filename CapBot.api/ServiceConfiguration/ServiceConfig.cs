@@ -48,7 +48,10 @@ public class ServiceConfig
         services.AddScoped<IPhaseTypeService, PhaseTypeService>();
 
         //Phase Service
-        services.AddScoped<IPhaseService, PhaseService>();
+        services.AddScoped<ISubmissionService, SubmissionService>();
+
+        //Submission Service
+        services.AddScoped<ISubmissionService, SubmissionService>();
 
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
