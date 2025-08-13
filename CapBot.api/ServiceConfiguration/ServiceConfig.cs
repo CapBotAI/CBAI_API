@@ -63,7 +63,7 @@ public class ServiceConfig
 
         //Gemni Ai Service
 
-        services.AddSingleton < GeminiAIService>();
+        services.AddSingleton<GeminiAIService>();
 
         services.AddScoped<IPerformanceMatchingService, PerformanceMatchingService>();
 
