@@ -111,13 +111,6 @@ public interface IIdentityRepository
     Task<string[]> GetRolesAsync(long userId);
 
     /// <summary>
-    /// Get list roles by userId
-    /// </summary>
-    /// <param name="userId">The user identified.</param>
-    /// <returns></returns>
-    Task<List<Role>> GetUserRolesAsync(long userId);
-
-    /// <summary>
     /// Verified user can be access to the function.
     /// </summary>
     Task<bool> VerifyPermission(long userId, string claim);
