@@ -4,6 +4,7 @@ using App.Commons.Interfaces;
 using App.Commons.ResponseModel;
 using App.Entities.Entities.App;
 using FS.Commons.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace App.Entities.DTOs.Phases;
 
@@ -15,8 +16,13 @@ public class CreatePhaseDTO : IValidationPipeline, IEntity<Phase>
     [Required]
     public string Name { get; set; } = null!;
 
+    [DataType(DataType.Date)]
     public DateTime StartDate { get; set; }
+
+    [DataType(DataType.Date)]
     public DateTime EndDate { get; set; }
+
+    [DataType(DataType.Date)]
     public DateTime? SubmissionDeadline { get; set; }
     public Phase GetEntity() => new Phase
     {
@@ -36,6 +42,7 @@ public class CreatePhaseDTO : IValidationPipeline, IEntity<Phase>
             return new BaseResponseModel
             {
                 IsSuccess = false,
+                StatusCode = StatusCodes.Status422UnprocessableEntity,
                 Message = "StartDate must be less than EndDate"
             };
         }
@@ -45,6 +52,7 @@ public class CreatePhaseDTO : IValidationPipeline, IEntity<Phase>
             return new BaseResponseModel
             {
                 IsSuccess = false,
+                StatusCode = StatusCodes.Status422UnprocessableEntity,
                 Message = "SubmissionDeadline must be less than or equal to EndDate"
             };
         }
@@ -54,6 +62,7 @@ public class CreatePhaseDTO : IValidationPipeline, IEntity<Phase>
             return new BaseResponseModel
             {
                 IsSuccess = false,
+                StatusCode = StatusCodes.Status422UnprocessableEntity,
                 Message = "Name is required"
             };
         }
@@ -63,6 +72,7 @@ public class CreatePhaseDTO : IValidationPipeline, IEntity<Phase>
             return new BaseResponseModel
             {
                 IsSuccess = false,
+                StatusCode = StatusCodes.Status422UnprocessableEntity,
                 Message = "Invalid SemesterId or PhaseTypeId"
             };
         }

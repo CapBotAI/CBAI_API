@@ -47,6 +47,9 @@ public class ServiceConfig
         //Phase Type Service
         services.AddScoped<IPhaseTypeService, PhaseTypeService>();
 
+        //Phase Service
+        services.AddScoped<IPhaseService, PhaseService>();
+
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 

@@ -2,6 +2,7 @@ using System;
 using System.ComponentModel.DataAnnotations;
 using App.Commons.Interfaces;
 using App.Commons.ResponseModel;
+using Microsoft.AspNetCore.Http;
 
 namespace App.Entities.DTOs.Phases;
 
@@ -13,8 +14,14 @@ public class UpdatePhaseDTO : IValidationPipeline
     public int PhaseTypeId { get; set; }
     [Required]
     public string Name { get; set; } = null!;
+
+    [DataType(DataType.Date)]
     public DateTime StartDate { get; set; }
+
+    [DataType(DataType.Date)]
     public DateTime EndDate { get; set; }
+
+    [DataType(DataType.Date)]
     public DateTime? SubmissionDeadline { get; set; }
 
     BaseResponseModel IValidationPipeline.Validate()
@@ -25,6 +32,7 @@ public class UpdatePhaseDTO : IValidationPipeline
             return new BaseResponseModel
             {
                 IsSuccess = false,
+                StatusCode = StatusCodes.Status422UnprocessableEntity,
                 Message = "StartDate must be less than EndDate"
             };
         }
@@ -34,6 +42,7 @@ public class UpdatePhaseDTO : IValidationPipeline
             return new BaseResponseModel
             {
                 IsSuccess = false,
+                StatusCode = StatusCodes.Status422UnprocessableEntity,
                 Message = "SubmissionDeadline must be less than or equal to EndDate"
             };
         }
@@ -43,6 +52,7 @@ public class UpdatePhaseDTO : IValidationPipeline
             return new BaseResponseModel
             {
                 IsSuccess = false,
+                StatusCode = StatusCodes.Status422UnprocessableEntity,
                 Message = "Name is required"
             };
         }
@@ -52,6 +62,7 @@ public class UpdatePhaseDTO : IValidationPipeline
             return new BaseResponseModel
             {
                 IsSuccess = false,
+                StatusCode = StatusCodes.Status422UnprocessableEntity,
                 Message = "Invalid SemesterId or PhaseTypeId"
             };
         }
