@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using App.Entities.Entities.Core;
 
 namespace App.Entities.DTOs.Accounts;

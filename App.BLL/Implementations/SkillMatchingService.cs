@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using App.BLL.Interfaces;
 using App.DAL.UnitOfWork;
 using App.DAL.Queries;
@@ -41,7 +41,7 @@ public class SkillMatchingService : ISkillMatchingService
 
         foreach (var topicSkill in topicSkillTags)
         {
-            var matchingSkill = reviewerSkills.FirstOrDefault(rs =>
+            var matchingSkill = reviewerSkills.FirstOrDefault(rs => 
                 IsSkillMatch(rs.SkillTag, topicSkill));
 
             if (matchingSkill != null)
@@ -59,7 +59,7 @@ public class SkillMatchingService : ISkillMatchingService
         // Calculate average score and apply match coverage bonus
         decimal averageScore = totalScore / matchedSkills;
         decimal coverageBonus = (decimal)matchedSkills / topicSkillTags.Count * 0.5m;
-
+        
         return Math.Min(5.0m, averageScore + coverageBonus);
     }
 
@@ -109,12 +109,13 @@ public class SkillMatchingService : ISkillMatchingService
         return skillTags.Distinct().ToList();
     }
 
-
     public async Task<List<ReviewerMatchingResult>> FindBestMatchingReviewersAsync(
         int submissionId, AutoAssignReviewerDTO criteria)
     {
-        // Get topic skill tags - luôn extract từ submission vì không có TopicSkillTags trong DTO nữa
-        var topicSkillTags = await ExtractTopicSkillTagsAsync(submissionId);
+        // Get topic skill tags
+        var topicSkillTags = criteria.TopicSkillTags.Any() 
+            ? criteria.TopicSkillTags 
+            : await ExtractTopicSkillTagsAsync(submissionId);
 
         // Get all reviewers with their skills and performance data
         var userRoleOptions = new QueryOptions<UserRole>
@@ -157,26 +158,25 @@ public class SkillMatchingService : ISkillMatchingService
             // Calculate skill match score
             matchingResult.SkillMatchScore = await CalculateSkillMatchScoreAsync(reviewer.Id, topicSkillTags);
             matchingResult.ReviewerSkills = reviewer.LecturerSkills.ToDictionary(
-                ls => ls.SkillTag,
+                ls => ls.SkillTag, 
                 ls => ls.ProficiencyLevel);
             matchingResult.MatchedSkills = GetMatchedSkills(reviewer.LecturerSkills.ToList(), topicSkillTags);
 
             // Calculate workload score
             matchingResult.WorkloadScore = await CalculateWorkloadScoreAsync(reviewer.Id);
-
+            
             // Get active assignments count
             var activeAssignmentOptions = new QueryOptions<ReviewerAssignment>
             {
-                Predicate = ra => ra.ReviewerId == reviewer.Id &&
-                                  (ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress)
+                Predicate = ra => ra.ReviewerId == reviewer.Id && 
+                               (ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress)
             };
-            var activeAssignments =
-                await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(activeAssignmentOptions);
+            var activeAssignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(activeAssignmentOptions);
             matchingResult.CurrentActiveAssignments = activeAssignments.Count();
 
             // Calculate performance score
             matchingResult.PerformanceScore = await CalculatePerformanceScoreAsync(reviewer.Id);
-
+            
             // Get performance details
             var performance = reviewer.ReviewerPerformances.FirstOrDefault();
             if (performance != null)
@@ -207,8 +207,8 @@ public class SkillMatchingService : ISkillMatchingService
     {
         var performanceOptions = new QueryOptions<ReviewerPerformance>
         {
-            Predicate = rp => rp.ReviewerId == reviewerId &&
-                              (!semesterId.HasValue || rp.SemesterId == semesterId.Value)
+            Predicate = rp => rp.ReviewerId == reviewerId && 
+                            (!semesterId.HasValue || rp.SemesterId == semesterId.Value)
         };
         var performances = await _unitOfWork.GetRepo<ReviewerPerformance>().GetAllAsync(performanceOptions);
 
@@ -216,7 +216,7 @@ public class SkillMatchingService : ISkillMatchingService
             return 2.5m; // Default neutral score
 
         var avgPerformance = performances.First(); // Most recent or specific semester
-
+        
         decimal performanceScore = 0;
         int factors = 0;
 
@@ -249,13 +249,13 @@ public class SkillMatchingService : ISkillMatchingService
     {
         var activeAssignmentOptions = new QueryOptions<ReviewerAssignment>
         {
-            Predicate = ra => ra.ReviewerId == reviewerId &&
-                              (ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress)
+            Predicate = ra => ra.ReviewerId == reviewerId && 
+                           (ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress)
         };
         var activeAssignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(activeAssignmentOptions);
-
+        
         int activeCount = activeAssignments.Count();
-
+        
         // Workload score: higher load = lower score
         // 0 assignments = 5.0, 10+ assignments = 0.0
         return Math.Max(0, 5.0m - (activeCount * 0.5m));
@@ -273,7 +273,7 @@ public class SkillMatchingService : ISkillMatchingService
             return true;
 
         // Partial match
-        if (normalizedReviewerSkill.Contains(normalizedTopicSkill) ||
+        if (normalizedReviewerSkill.Contains(normalizedTopicSkill) || 
             normalizedTopicSkill.Contains(normalizedReviewerSkill))
             return true;
 
@@ -281,7 +281,7 @@ public class SkillMatchingService : ISkillMatchingService
         var synonyms = GetTechnologySynonyms();
         if (synonyms.ContainsKey(normalizedTopicSkill))
         {
-            return synonyms[normalizedTopicSkill].Any(synonym =>
+            return synonyms[normalizedTopicSkill].Any(synonym => 
                 normalizedReviewerSkill.Contains(synonym));
         }
 
@@ -291,11 +291,11 @@ public class SkillMatchingService : ISkillMatchingService
     private List<string> ExtractSkillsFromText(string text)
     {
         var skills = new List<string>();
-
+        
         // Common technology keywords
         var techKeywords = new[]
         {
-            "C#", "Java", "Python", "JavaScript", "React", "Angular", "Vue",
+            "C#", "Java", "Python", "JavaScript", "React", "Angular", "Vue", 
             "Node.js", "ASP.NET", ".NET", "Spring", "Django", "Flask",
             "SQL", "MySQL", "PostgreSQL", "MongoDB", "Redis",
             "AI", "Machine Learning", "Deep Learning", "Data Science",
@@ -330,7 +330,7 @@ public class SkillMatchingService : ISkillMatchingService
     private List<string> GetMatchedSkills(List<LecturerSkill> reviewerSkills, List<string> topicSkills)
     {
         var matched = new List<string>();
-
+        
         foreach (var topicSkill in topicSkills)
         {
             if (reviewerSkills.Any(rs => IsSkillMatch(rs.SkillTag, topicSkill)))
@@ -338,7 +338,7 @@ public class SkillMatchingService : ISkillMatchingService
                 matched.Add(topicSkill);
             }
         }
-
+        
         return matched;
     }
 
@@ -360,8 +360,7 @@ public class SkillMatchingService : ISkillMatchingService
         var reasons = new List<string>();
 
         if (result.SkillMatchScore < criteria.MinimumSkillMatchScore)
-            reasons.Add(
-                $"Skill match score ({result.SkillMatchScore:F2}) dưới mức yêu cầu ({criteria.MinimumSkillMatchScore:F2})");
+            reasons.Add($"Skill match score ({result.SkillMatchScore:F2}) dưới mức yêu cầu ({criteria.MinimumSkillMatchScore:F2})");
 
         if (result.CurrentActiveAssignments >= criteria.MaxWorkload)
             reasons.Add($"Quá tải assignment ({result.CurrentActiveAssignments}/{criteria.MaxWorkload})");
@@ -379,7 +378,7 @@ public class SkillMatchingService : ISkillMatchingService
         decimal workloadWeight = 0.3m;
         decimal performanceWeight = criteria.PrioritizeHighPerformance ? 0.3m : 0.1m;
 
-        decimal overallScore =
+        decimal overallScore = 
             (result.SkillMatchScore * skillWeight) +
             (result.WorkloadScore * workloadWeight) +
             (result.PerformanceScore * performanceWeight);

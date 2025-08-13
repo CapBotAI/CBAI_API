@@ -6,7 +6,6 @@ namespace App.Entities.DTOs.Auth;
 public class LoginDTO
 {
     [Required(ErrorMessage = ConstantModel.Required)]
-    [EmailAddress(ErrorMessage = ConstantModel.EmailAddressFormatError)]
     public string EmailOrUsername { get; set; } = null!;
 
     [Required(ErrorMessage = "Password is required")]

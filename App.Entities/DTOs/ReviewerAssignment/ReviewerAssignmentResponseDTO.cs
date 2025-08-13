@@ -1,4 +1,4 @@
-﻿using App.Entities.DTOs.Accounts;
+using App.Entities.DTOs.Accounts;
 using App.Entities.Enums;
 
 namespace App.Entities.DTOs.ReviewerAssignment;

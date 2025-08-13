@@ -1,4 +1,4 @@
-﻿using App.Commons.ResponseModel;
+using App.Commons.ResponseModel;
 using App.Entities.DTOs.ReviewerAssignment;
 using App.Entities.Enums;
 
@@ -10,37 +10,37 @@ public interface IReviewerAssignmentService
     /// Phân công reviewer cho một submission
     /// </summary>
     Task<BaseResponseModel<ReviewerAssignmentResponseDTO>> AssignReviewerAsync(AssignReviewerDTO dto, int assignedById);
-
+    
     /// <summary>
     /// Phân công nhiều reviewer cùng lúc
     /// </summary>
     Task<BaseResponseModel<List<ReviewerAssignmentResponseDTO>>> BulkAssignReviewersAsync(BulkAssignReviewerDTO dto, int assignedById);
-
+    
     /// <summary>
     /// Lấy danh sách reviewer có thể phân công cho submission
     /// </summary>
     Task<BaseResponseModel<List<AvailableReviewerDTO>>> GetAvailableReviewersAsync(int submissionId);
-
+    
     /// <summary>
     /// Lấy danh sách assignment theo submission
     /// </summary>
     Task<BaseResponseModel<List<ReviewerAssignmentResponseDTO>>> GetAssignmentsBySubmissionAsync(int submissionId);
-
+    
     /// <summary>
     /// Lấy danh sách assignment của một reviewer
     /// </summary>
     Task<BaseResponseModel<List<ReviewerAssignmentResponseDTO>>> GetAssignmentsByReviewerAsync(int reviewerId);
-
+    
     /// <summary>
     /// Cập nhật status của assignment
     /// </summary>
     Task<BaseResponseModel<ReviewerAssignmentResponseDTO>> UpdateAssignmentStatusAsync(int assignmentId, AssignmentStatus newStatus, int updatedById);
-
+    
     /// <summary>
     /// Hủy assignment
     /// </summary>
     Task<BaseResponseModel> RemoveAssignmentAsync(int assignmentId, int removedById);
-
+    
     /// <summary>
     /// Lấy thống kê workload của reviewers
     /// </summary>

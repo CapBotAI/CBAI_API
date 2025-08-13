@@ -45,18 +45,27 @@ public class ServiceConfig
         //Topic Version Service
         services.AddScoped<ITopicVersionService, TopicVersionService>();
 
+        //Phase Type Service
+        services.AddScoped<IPhaseTypeService, PhaseTypeService>();
+
+        //Phase Service
+        services.AddScoped<ISubmissionService, SubmissionService>();
+
+        //Submission Service
+        services.AddScoped<ISubmissionService, SubmissionService>();
+
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
-
-        //Gemini AI Service 
-        services.AddSingleton<GeminiAIService>();
-
-        // Reviewer Suggestion Service
-        services.AddScoped<IReviewerSuggestionService, ReviewerSuggestionService>();
 
         services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
 
         services.AddScoped<ISkillMatchingService, SkillMatchingService>();
+
+        //Gemni Ai Service
+
+        services.AddSingleton < GeminiAIService>();
+
         services.AddScoped<IPerformanceMatchingService, PerformanceMatchingService>();
+
     }
 }

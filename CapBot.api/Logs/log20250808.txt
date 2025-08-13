@@ -1,0 +1,1242 @@
+2025-08-08 20:24:10.306 +07:00 [DBG] An 'IServiceProvider' was created for internal use by Entity Framework.
+2025-08-08 20:24:10.365 +07:00 [INF] User profile is available. Using '/Users/tamnguyen/.aspnet/DataProtection-Keys' as key repository; keys will not be encrypted at rest.
+2025-08-08 20:24:10.468 +07:00 [DBG] No relationship from 'ReviewerAssignment' to 'User' has been configured by convention because there are multiple properties on one entity type - {'AssignedByUser', 'Reviewer'} that could be matched with the properties on the other entity type - {'ReviewerAssignments'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.475 +07:00 [DBG] No relationship from 'SubmissionWorkflowLog' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromStateLogs', 'ToStateLogs'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.479 +07:00 [DBG] No relationship from 'User' to 'ReviewerAssignment' has been configured by convention because there are multiple properties on one entity type - {'ReviewerAssignments'} that could be matched with the properties on the other entity type - {'AssignedByUser', 'Reviewer'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.480 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.480 +07:00 [DBG] No relationship from 'WorkflowState' to 'WorkflowTransition' has been configured by convention because there are multiple properties on one entity type - {'FromTransitions', 'ToTransitions'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.480 +07:00 [DBG] No relationship from 'WorkflowTransition' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromTransitions', 'ToTransitions'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.557 +07:00 [DBG] No relationship from 'ReviewerAssignment' to 'User' has been configured by convention because there are multiple properties on one entity type - {'AssignedByUser', 'Reviewer'} that could be matched with the properties on the other entity type - {'ReviewerAssignments'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.557 +07:00 [DBG] No relationship from 'User' to 'ReviewerAssignment' has been configured by convention because there are multiple properties on one entity type - {'ReviewerAssignments'} that could be matched with the properties on the other entity type - {'AssignedByUser', 'Reviewer'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.565 +07:00 [DBG] No relationship from 'WorkflowTransition' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromTransitions', 'ToTransitions'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.565 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.566 +07:00 [DBG] No relationship from 'WorkflowState' to 'WorkflowTransition' has been configured by convention because there are multiple properties on one entity type - {'FromTransitions', 'ToTransitions'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.566 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.568 +07:00 [DBG] No relationship from 'SubmissionWorkflowLog' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromStateLogs', 'ToStateLogs'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.568 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-08-08 20:24:10.579 +07:00 [DBG] The index {'LecturerId'} was not created on entity type 'LecturerSkill' as the properties are already covered by the index {'LecturerId', 'SkillTag'}.
+2025-08-08 20:24:10.579 +07:00 [DBG] The index {'SemesterId'} was not created on entity type 'Phase' as the properties are already covered by the index {'SemesterId', 'PhaseTypeId'}.
+2025-08-08 20:24:10.579 +07:00 [DBG] The index {'AssignmentId'} was not created on entity type 'Review' as the properties are already covered by the index {'AssignmentId', 'Status'}.
+2025-08-08 20:24:10.579 +07:00 [DBG] The index {'ReviewId'} was not created on entity type 'ReviewComment' as the properties are already covered by the index {'ReviewId', 'SectionName'}.
+2025-08-08 20:24:10.579 +07:00 [DBG] The index {'ReviewId'} was not created on entity type 'ReviewCriteriaScore' as the properties are already covered by the index {'ReviewId', 'CriteriaId'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'ReviewerId'} was not created on entity type 'ReviewerAssignment' as the properties are already covered by the index {'ReviewerId', 'Status'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'SubmissionId'} was not created on entity type 'ReviewerAssignment' as the properties are already covered by the index {'SubmissionId', 'ReviewerId'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'ReviewerId'} was not created on entity type 'ReviewerPerformance' as the properties are already covered by the index {'ReviewerId', 'SemesterId'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'PhaseId'} was not created on entity type 'Submission' as the properties are already covered by the index {'PhaseId', 'Status'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'PhaseId'} was not created on entity type 'Submission' as the properties are already covered by the index {'PhaseId', 'Status', 'SubmittedAt'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'TopicVersionId'} was not created on entity type 'Submission' as the properties are already covered by the index {'TopicVersionId', 'PhaseId', 'SubmissionRound'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'SubmissionId'} was not created on entity type 'SubmissionWorkflowLog' as the properties are already covered by the index {'SubmissionId', 'CreatedAt'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'UserId'} was not created on entity type 'SystemNotification' as the properties are already covered by the index {'UserId', 'IsRead', 'CreatedAt'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'SemesterId'} was not created on entity type 'Topic' as the properties are already covered by the index {'SemesterId', 'IsApproved'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'SupervisorId'} was not created on entity type 'Topic' as the properties are already covered by the index {'SupervisorId', 'SemesterId'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'TopicVersion' as the properties are already covered by the index {'TopicId', 'Status'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'TopicVersion' as the properties are already covered by the index {'TopicId', 'VersionNumber'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'UserId'} was not created on entity type 'UserRole' as the properties are already covered by the index {'UserId', 'RoleId'}.
+2025-08-08 20:24:10.580 +07:00 [DBG] The index {'UserId'} was not created on entity type 'UserToken' as the properties are already covered by the index {'UserId', 'LoginProvider', 'Name'}.
+2025-08-08 20:24:10.652 +07:00 [WRN] The 'ProficiencyLevels' property 'ProficiencyLevel' on entity type 'LecturerSkill' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ProficiencyLevels' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-08-08 20:24:10.652 +07:00 [WRN] The 'ReviewRecommendations' property 'Recommendation' on entity type 'Review' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ReviewRecommendations' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-08-08 20:24:10.652 +07:00 [WRN] The 'ReviewStatus' property 'Status' on entity type 'Review' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ReviewStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-08-08 20:24:10.652 +07:00 [WRN] The 'CommentTypes' property 'CommentType' on entity type 'ReviewComment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'CommentTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-08-08 20:24:10.652 +07:00 [WRN] The 'PriorityLevels' property 'Priority' on entity type 'ReviewComment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'PriorityLevels' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-08-08 20:24:10.652 +07:00 [WRN] The 'AssignmentTypes' property 'AssignmentType' on entity type 'ReviewerAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AssignmentTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-08-08 20:24:10.652 +07:00 [WRN] The 'AssignmentStatus' property 'Status' on entity type 'ReviewerAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AssignmentStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-08-08 20:24:10.652 +07:00 [WRN] The 'AiCheckStatus' property 'AiCheckStatus' on entity type 'Submission' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AiCheckStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-08-08 20:24:10.652 +07:00 [WRN] The 'SubmissionStatus' property 'Status' on entity type 'Submission' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'SubmissionStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-08-08 20:24:10.652 +07:00 [WRN] The 'NotificationTypes' property 'Type' on entity type 'SystemNotification' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'NotificationTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-08-08 20:24:10.652 +07:00 [WRN] The 'TopicStatus' property 'Status' on entity type 'TopicVersion' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'TopicStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-08-08 20:24:10.728 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-08-08 20:24:10.766 +07:00 [DBG] Compiling query expression: 
+'DbSet<Role>()
+    .FirstOrDefault(r => r.NormalizedName == __normalizedName_0)'
+2025-08-08 20:24:10.845 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<Role>(
+    asyncEnumerable: new SingleQueryingEnumerable<Role>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: Role.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Role.ConcurrencyStamp (string), 1], [Property: Role.IsAdmin (bool) Required, 2], [Property: Role.Name (string), 3], [Property: Role.NormalizedName (string), 4] }
+            SELECT TOP(1) r.Id, r.ConcurrencyStamp, r.IsAdmin, r.Name, r.NormalizedName
+            FROM roles AS r
+            WHERE r.NormalizedName == @__normalizedName_0), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, Role>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-08-08 20:24:10.862 +07:00 [DBG] Creating DbConnection.
+2025-08-08 20:24:10.870 +07:00 [DBG] Created DbConnection. (7ms).
+2025-08-08 20:24:10.872 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.031 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.032 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:24:11.034 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (1ms).
+2025-08-08 20:24:11.037 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (4ms).
+2025-08-08 20:24:11.040 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-08-08 20:24:11.069 +07:00 [INF] Executed DbCommand (30ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-08-08 20:24:11.085 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:24:11.093 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.095 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 24ms reading results.
+2025-08-08 20:24:11.096 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.098 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (1ms).
+2025-08-08 20:24:11.099 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.100 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.100 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:24:11.100 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.100 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.100 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-08-08 20:24:11.103 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-08-08 20:24:11.103 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:24:11.103 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.103 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:24:11.103 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.103 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:24:11.103 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.103 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.103 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:24:11.103 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.103 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.103 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-08-08 20:24:11.105 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-08-08 20:24:11.105 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:24:11.105 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.105 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:24:11.105 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.105 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:24:11.105 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.105 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.105 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:24:11.106 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.106 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.106 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-08-08 20:24:11.107 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-08-08 20:24:11.107 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:24:11.107 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.107 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:24:11.107 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.107 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:24:11.111 +07:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .SingleOrDefault(u => u.NormalizedEmail == __normalizedEmail_0)'
+2025-08-08 20:24:11.114 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<User>(
+    asyncEnumerable: new SingleQueryingEnumerable<User>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: User.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: User.AccessFailedCount (int) Required, 1], [Property: User.ConcurrencyStamp (string), 2], [Property: User.CreatedAt (DateTime) Required, 3], [Property: User.DeletedAt (DateTime?), 4], [Property: User.Email (string), 5], [Property: User.EmailConfirmed (bool) Required, 6], [Property: User.LastModifiedAt (DateTime) Required, 7], [Property: User.LastModifiedBy (string), 8], [Property: User.LockoutEnabled (bool) Required, 9], [Property: User.LockoutEnd (DateTimeOffset?), 10], [Property: User.NormalizedEmail (string), 11], [Property: User.NormalizedUserName (string), 12], [Property: User.PasswordHash (string), 13], [Property: User.PhoneNumber (string), 14], [Property: User.PhoneNumberConfirmed (bool) Required, 15], [Property: User.SecurityStamp (string), 16], [Property: User.TwoFactorEnabled (bool) Required, 17], [Property: User.UserName (string), 18] }
+            SELECT TOP(2) u.Id, u.AccessFailedCount, u.ConcurrencyStamp, u.CreatedAt, u.DeletedAt, u.Email, u.EmailConfirmed, u.LastModifiedAt, u.LastModifiedBy, u.LockoutEnabled, u.LockoutEnd, u.NormalizedEmail, u.NormalizedUserName, u.PasswordHash, u.PhoneNumber, u.PhoneNumberConfirmed, u.SecurityStamp, u.TwoFactorEnabled, u.UserName
+            FROM users AS u
+            WHERE u.NormalizedEmail == @__normalizedEmail_0), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, User>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-08-08 20:24:11.114 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.114 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.114 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:24:11.114 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.114 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.114 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-08-08 20:24:11.119 +07:00 [INF] Executed DbCommand (5ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-08-08 20:24:11.127 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:24:11.136 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.136 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 16ms reading results.
+2025-08-08 20:24:11.136 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.136 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:24:11.137 +07:00 [INF] Admin user 'fptslayer@gmail.com' already exists
+2025-08-08 20:24:11.138 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.138 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.138 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:24:11.138 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.138 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.138 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-08-08 20:24:11.140 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-08-08 20:24:11.140 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:24:11.141 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.141 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:24:11.141 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.141 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:24:11.141 +07:00 [INF] Sample moderator 'moderator@example.com' already exists
+2025-08-08 20:24:11.141 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.141 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.141 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:24:11.141 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.141 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.141 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-08-08 20:24:11.143 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-08-08 20:24:11.143 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:24:11.143 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.143 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:24:11.143 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.143 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:24:11.143 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.143 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.143 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:24:11.143 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.143 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:24:11.143 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-08-08 20:24:11.145 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-08-08 20:24:11.145 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:24:11.145 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.145 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:24:11.145 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.145 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:24:11.145 +07:00 [INF] Data seeding completed successfully
+2025-08-08 20:24:11.146 +07:00 [DBG] 'MyDbContext' disposed.
+2025-08-08 20:24:11.147 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:24:11.147 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-08-08 20:24:11.216 +07:00 [DBG] Registered model binder providers, in the following order: ["Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BinderTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ServicesModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BodyModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.HeaderModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FloatingPointTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.EnumTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.DateTimeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.SimpleTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.TryParseModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CancellationTokenModelBinderProvider"]
+2025-08-08 20:24:11.252 +07:00 [DBG] Hosting starting
+2025-08-08 20:24:11.255 +07:00 [DBG] Reading data from file '/Users/tamnguyen/.aspnet/DataProtection-Keys/key-45734ab9-a8cc-4c68-9ae5-36f9a5253115.xml'.
+2025-08-08 20:24:11.257 +07:00 [DBG] Reading data from file '/Users/tamnguyen/.aspnet/DataProtection-Keys/key-5ef59ac5-f01b-4400-a43d-e0e7d8af5c7b.xml'.
+2025-08-08 20:24:11.257 +07:00 [DBG] Reading data from file '/Users/tamnguyen/.aspnet/DataProtection-Keys/key-f4e99ca9-6656-4066-996f-feec683eb80e.xml'.
+2025-08-08 20:24:11.258 +07:00 [DBG] Reading data from file '/Users/tamnguyen/.aspnet/DataProtection-Keys/key-443ab2bd-ad7c-414b-bf76-a2dcf79d813d.xml'.
+2025-08-08 20:24:11.260 +07:00 [DBG] Found key {45734ab9-a8cc-4c68-9ae5-36f9a5253115}.
+2025-08-08 20:24:11.261 +07:00 [DBG] Found key {5ef59ac5-f01b-4400-a43d-e0e7d8af5c7b}.
+2025-08-08 20:24:11.261 +07:00 [DBG] Found key {f4e99ca9-6656-4066-996f-feec683eb80e}.
+2025-08-08 20:24:11.261 +07:00 [DBG] Found key {443ab2bd-ad7c-414b-bf76-a2dcf79d813d}.
+2025-08-08 20:24:11.263 +07:00 [DBG] Considering key {45734ab9-a8cc-4c68-9ae5-36f9a5253115} with expiration date 2025-10-09 15:18:15Z as default key.
+2025-08-08 20:24:11.264 +07:00 [DBG] Forwarded activator type request from Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2025-08-08 20:24:11.264 +07:00 [DBG] Using managed symmetric algorithm 'System.Security.Cryptography.Aes'.
+2025-08-08 20:24:11.264 +07:00 [DBG] Using managed keyed hash algorithm 'System.Security.Cryptography.HMACSHA256'.
+2025-08-08 20:24:11.265 +07:00 [DBG] Using key {45734ab9-a8cc-4c68-9ae5-36f9a5253115} as the default key.
+2025-08-08 20:24:11.265 +07:00 [DBG] Key ring with default key {45734ab9-a8cc-4c68-9ae5-36f9a5253115} was loaded during application startup.
+2025-08-08 20:24:11.409 +07:00 [INF] Now listening on: https://localhost:7190
+2025-08-08 20:24:11.410 +07:00 [DBG] Loaded hosting startup assembly CapBot.api
+2025-08-08 20:24:11.410 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-08-08 20:24:11.410 +07:00 [INF] Hosting environment: Development
+2025-08-08 20:24:11.410 +07:00 [INF] Content root path: /Users/tamnguyen/Documents/SideProject/CapBot-CapStone/CapBot.api
+2025-08-08 20:24:11.410 +07:00 [DBG] Hosting started
+2025-08-08 20:24:13.693 +07:00 [DBG] Connection id "0HNEMFRF1JAS1" accepted.
+2025-08-08 20:24:13.693 +07:00 [DBG] Connection id "0HNEMFRF1JAS1" started.
+2025-08-08 20:24:13.733 +07:00 [DBG] Connection 0HNEMFRF1JAS1 established using the following protocol: "Tls12"
+2025-08-08 20:24:13.759 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/index.html - null null
+2025-08-08 20:24:13.760 +07:00 [DBG] Wildcard detected, all requests with hosts will be allowed.
+2025-08-08 20:24:13.803 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/index.html - 200 null text/html;charset=utf-8 44.7165ms
+2025-08-08 20:24:13.819 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/swagger-ui.css - null null
+2025-08-08 20:24:13.819 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/swagger-ui-standalone-preset.js - null null
+2025-08-08 20:24:13.819 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/swagger-ui-bundle.js - null null
+2025-08-08 20:24:13.829 +07:00 [INF] Sending file. Request path: '/swagger-ui.css'. Physical path: 'N/A'
+2025-08-08 20:24:13.830 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/swagger-ui.css - 200 144929 text/css 10.5225ms
+2025-08-08 20:24:13.831 +07:00 [INF] Sending file. Request path: '/swagger-ui-standalone-preset.js'. Physical path: 'N/A'
+2025-08-08 20:24:13.831 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/swagger-ui-standalone-preset.js - 200 312163 text/javascript 12.1921ms
+2025-08-08 20:24:13.835 +07:00 [INF] Sending file. Request path: '/swagger-ui-bundle.js'. Physical path: 'N/A'
+2025-08-08 20:24:13.835 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/swagger-ui-bundle.js - 200 1061536 text/javascript 15.7817ms
+2025-08-08 20:24:13.916 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/swagger/v1/swagger.json - null null
+2025-08-08 20:24:13.988 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 72.4341ms
+2025-08-08 20:24:53.242 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/Account/user-roles/1 - null null
+2025-08-08 20:24:53.248 +07:00 [DBG] The request path /api/Account/user-roles/1 does not match a supported file type
+2025-08-08 20:24:53.252 +07:00 [DBG] The request path /api/Account/user-roles/1 does not match a supported file type
+2025-08-08 20:24:53.286 +07:00 [DBG] 1 candidate(s) found for the request path '/api/Account/user-roles/1'
+2025-08-08 20:24:53.287 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)' with route pattern 'api/Account/user-roles/{userId}' is valid for the request path '/api/Account/user-roles/1'
+2025-08-08 20:24:53.287 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:24:53.321 +07:00 [DBG] AuthenticationScheme: Bearer was not authenticated.
+2025-08-08 20:24:53.323 +07:00 [DBG] Policy authentication schemes  did not succeed
+2025-08-08 20:24:53.324 +07:00 [INF] Authorization failed. These requirements were not met:
+DenyAnonymousAuthorizationRequirement: Requires an authenticated user.
+2025-08-08 20:24:53.326 +07:00 [INF] AuthenticationScheme: Bearer was challenged.
+2025-08-08 20:24:53.328 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/Account/user-roles/1 - 401 0 null 85.5088ms
+2025-08-08 20:25:22.492 +07:00 [INF] Request starting HTTP/2 POST https://localhost:7190/api/auth/login - application/json 82
+2025-08-08 20:25:22.493 +07:00 [DBG] POST requests are not supported
+2025-08-08 20:25:22.493 +07:00 [DBG] POST requests are not supported
+2025-08-08 20:25:22.495 +07:00 [DBG] The request has an origin header: 'https://localhost:7190'.
+2025-08-08 20:25:22.496 +07:00 [INF] CORS policy execution successful.
+2025-08-08 20:25:22.499 +07:00 [DBG] 1 candidate(s) found for the request path '/api/auth/login'
+2025-08-08 20:25:22.499 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.AuthController.Login (CapBot.api)' with route pattern 'api/auth/login' is valid for the request path '/api/auth/login'
+2025-08-08 20:25:22.500 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.AuthController.Login (CapBot.api)'
+2025-08-08 20:25:22.509 +07:00 [DBG] AuthenticationScheme: Bearer was not authenticated.
+2025-08-08 20:25:22.516 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.AuthController.Login (CapBot.api)'
+2025-08-08 20:25:22.530 +07:00 [INF] Route matched with {action = "Login", controller = "Auth"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] Login(App.Entities.DTOs.Auth.LoginDTO) on controller CapBot.api.Controllers.AuthController (CapBot.api).
+2025-08-08 20:25:22.530 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-08-08 20:25:22.531 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-08-08 20:25:22.531 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-08-08 20:25:22.531 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-08-08 20:25:22.531 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-08-08 20:25:22.531 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.AuthController (CapBot.api)
+2025-08-08 20:25:22.536 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.AuthController (CapBot.api)
+2025-08-08 20:25:22.540 +07:00 [DBG] Attempting to bind parameter 'loginDTO' of type 'App.Entities.DTOs.Auth.LoginDTO' ...
+2025-08-08 20:25:22.541 +07:00 [DBG] Attempting to bind parameter 'loginDTO' of type 'App.Entities.DTOs.Auth.LoginDTO' using the name '' in request data ...
+2025-08-08 20:25:22.544 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-08-08 20:25:22.544 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-08-08 20:25:22.544 +07:00 [DBG] Rejected input formatter 'Microsoft.AspNetCore.OData.Formatter.ODataInputFormatter' for content type 'application/json'.
+2025-08-08 20:25:22.544 +07:00 [DBG] Selected input formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonInputFormatter' for content type 'application/json'.
+2025-08-08 20:25:22.550 +07:00 [DBG] Connection id "0HNEMFRF1JAS1", Request id "0HNEMFRF1JAS1:0000000D": started reading request body.
+2025-08-08 20:25:22.551 +07:00 [DBG] Connection id "0HNEMFRF1JAS1", Request id "0HNEMFRF1JAS1:0000000D": done reading request body.
+2025-08-08 20:25:22.552 +07:00 [DBG] JSON input formatter succeeded, deserializing to type 'App.Entities.DTOs.Auth.LoginDTO'
+2025-08-08 20:25:22.552 +07:00 [DBG] Done attempting to bind parameter 'loginDTO' of type 'App.Entities.DTOs.Auth.LoginDTO'.
+2025-08-08 20:25:22.552 +07:00 [DBG] Done attempting to bind parameter 'loginDTO' of type 'App.Entities.DTOs.Auth.LoginDTO'.
+2025-08-08 20:25:22.552 +07:00 [DBG] Attempting to validate the bound parameter 'loginDTO' of type 'App.Entities.DTOs.Auth.LoginDTO' ...
+2025-08-08 20:25:22.555 +07:00 [DBG] Done attempting to validate the bound parameter 'loginDTO' of type 'App.Entities.DTOs.Auth.LoginDTO'.
+2025-08-08 20:25:22.581 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-08-08 20:25:22.583 +07:00 [DBG] Creating DbConnection.
+2025-08-08 20:25:22.584 +07:00 [DBG] Created DbConnection. (1ms).
+2025-08-08 20:25:22.584 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:22.584 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:22.584 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:22.584 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:22.585 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:22.585 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-08-08 20:25:22.594 +07:00 [INF] Executed DbCommand (9ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-08-08 20:25:22.595 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:25:22.595 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:22.595 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:22.595 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:22.595 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:22.639 +07:00 [DBG] Compiling query expression: 
+'DbSet<UserRole>()
+    .Join(
+        inner: DbSet<Role>(), 
+        outerKeySelector: userRole => userRole.RoleId, 
+        innerKeySelector: role => role.Id, 
+        resultSelector: (userRole, role) => new { 
+            userRole = userRole, 
+            role = role
+         })
+    .Where(<>h__TransparentIdentifier0 => <>h__TransparentIdentifier0.userRole.UserId.Equals(__userId_0))
+    .Select(<>h__TransparentIdentifier0 => <>h__TransparentIdentifier0.role.Name)'
+2025-08-08 20:25:22.655 +07:00 [DBG] Generated query execution expression: 
+'queryContext => new SingleQueryingEnumerable<string>(
+    (RelationalQueryContext)queryContext, 
+    RelationalCommandCache.QueryExpression(
+        Projection Mapping:
+            EmptyProjectionMember -> 0
+        SELECT r.Name
+        FROM user_roles AS u
+        INNER JOIN roles AS r ON u.RoleId == r.Id
+        WHERE u.UserId == @__userId_0), 
+    null, 
+    Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, string>, 
+    App.DAL.Context.MyDbContext, 
+    False, 
+    False, 
+    True
+)'
+2025-08-08 20:25:22.655 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:22.656 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:22.656 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:22.656 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:22.656 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:22.656 +07:00 [DBG] Executing DbCommand [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:25:22.710 +07:00 [INF] Executed DbCommand (55ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:25:22.711 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:22.711 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:22.711 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:22.711 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:22.724 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-08-08 20:25:22.724 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-08-08 20:25:22.724 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-08-08 20:25:22.725 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-08-08 20:25:22.725 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-08-08 20:25:22.737 +07:00 [INF] Executed action CapBot.api.Controllers.AuthController.Login (CapBot.api) in 205.6702ms
+2025-08-08 20:25:22.738 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.AuthController.Login (CapBot.api)'
+2025-08-08 20:25:22.738 +07:00 [DBG] 'MyDbContext' disposed.
+2025-08-08 20:25:22.738 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:22.738 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-08-08 20:25:22.739 +07:00 [INF] Request finished HTTP/2 POST https://localhost:7190/api/auth/login - 200 null application/json; charset=utf-8 246.2792ms
+2025-08-08 20:25:46.299 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/Account/user-roles/1 - null null
+2025-08-08 20:25:46.300 +07:00 [DBG] The request path /api/Account/user-roles/1 does not match a supported file type
+2025-08-08 20:25:46.300 +07:00 [DBG] The request path /api/Account/user-roles/1 does not match a supported file type
+2025-08-08 20:25:46.302 +07:00 [DBG] 1 candidate(s) found for the request path '/api/Account/user-roles/1'
+2025-08-08 20:25:46.302 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)' with route pattern 'api/Account/user-roles/{userId}' is valid for the request path '/api/Account/user-roles/1'
+2025-08-08 20:25:46.302 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:46.334 +07:00 [DBG] Successfully validated the token.
+2025-08-08 20:25:46.334 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-08-08 20:25:46.335 +07:00 [DBG] Authorization was successful.
+2025-08-08 20:25:46.335 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:46.338 +07:00 [INF] Route matched with {action = "GetUserRoles", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetUserRoles(Int64) on controller CapBot.api.Controllers.AccountController (CapBot.api).
+2025-08-08 20:25:46.338 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-08-08 20:25:46.338 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-08-08 20:25:46.338 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-08-08 20:25:46.338 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-08-08 20:25:46.338 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-08-08 20:25:46.338 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:25:46.339 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:25:46.339 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:25:46.339 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' using the name 'userId' in request data ...
+2025-08-08 20:25:46.340 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:46.340 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:46.340 +07:00 [DBG] Attempting to validate the bound parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:25:46.340 +07:00 [DBG] Done attempting to validate the bound parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:46.349 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-08-08 20:25:46.355 +07:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .FirstOrDefault(e => EF.Property<int>(e, "Id") == __p_0)'
+2025-08-08 20:25:46.366 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<User>(
+    asyncEnumerable: new SingleQueryingEnumerable<User>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: User.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: User.AccessFailedCount (int) Required, 1], [Property: User.ConcurrencyStamp (string), 2], [Property: User.CreatedAt (DateTime) Required, 3], [Property: User.DeletedAt (DateTime?), 4], [Property: User.Email (string), 5], [Property: User.EmailConfirmed (bool) Required, 6], [Property: User.LastModifiedAt (DateTime) Required, 7], [Property: User.LastModifiedBy (string), 8], [Property: User.LockoutEnabled (bool) Required, 9], [Property: User.LockoutEnd (DateTimeOffset?), 10], [Property: User.NormalizedEmail (string), 11], [Property: User.NormalizedUserName (string), 12], [Property: User.PasswordHash (string), 13], [Property: User.PhoneNumber (string), 14], [Property: User.PhoneNumberConfirmed (bool) Required, 15], [Property: User.SecurityStamp (string), 16], [Property: User.TwoFactorEnabled (bool) Required, 17], [Property: User.UserName (string), 18] }
+            SELECT TOP(1) u.Id, u.AccessFailedCount, u.ConcurrencyStamp, u.CreatedAt, u.DeletedAt, u.Email, u.EmailConfirmed, u.LastModifiedAt, u.LastModifiedBy, u.LockoutEnabled, u.LockoutEnd, u.NormalizedEmail, u.NormalizedUserName, u.PasswordHash, u.PhoneNumber, u.PhoneNumberConfirmed, u.SecurityStamp, u.TwoFactorEnabled, u.UserName
+            FROM users AS u
+            WHERE u.Id == @__p_0), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, User>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-08-08 20:25:46.367 +07:00 [DBG] Creating DbConnection.
+2025-08-08 20:25:46.367 +07:00 [DBG] Created DbConnection. (0ms).
+2025-08-08 20:25:46.367 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.367 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.367 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:46.367 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:46.367 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:46.367 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:25:46.387 +07:00 [INF] Executed DbCommand (20ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:25:46.387 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:25:46.387 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.387 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:46.387 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.387 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:46.388 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.388 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.388 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:46.388 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:46.388 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:46.388 +07:00 [DBG] Executing DbCommand [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:25:46.389 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:25:46.390 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.390 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:46.390 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.390 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:46.390 +07:00 [DBG] Compiling query expression: 
+'DbSet<Role>()
+    .Where(r => __roleNames_0.Contains(r.Name))'
+2025-08-08 20:25:46.407 +07:00 [DBG] Generated query execution expression: 
+'queryContext => new SingleQueryingEnumerable<Role>(
+    (RelationalQueryContext)queryContext, 
+    RelationalCommandCache.QueryExpression(
+        Projection Mapping:
+            EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: Role.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Role.ConcurrencyStamp (string), 1], [Property: Role.IsAdmin (bool) Required, 2], [Property: Role.Name (string), 3], [Property: Role.NormalizedName (string), 4] }
+        SELECT r.Id, r.ConcurrencyStamp, r.IsAdmin, r.Name, r.NormalizedName
+        FROM roles AS r
+        WHERE r.Name IN (
+            SELECT r0.value
+            FROM OPENJSON(@__roleNames_0) WITH (value nvarchar(max) '') AS r0)), 
+    null, 
+    Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, Role>, 
+    App.DAL.Context.MyDbContext, 
+    False, 
+    False, 
+    True
+)'
+2025-08-08 20:25:46.410 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.411 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.411 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:46.411 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:46.412 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (1ms).
+2025-08-08 20:25:46.412 +07:00 [DBG] Executing DbCommand [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:25:46.463 +07:00 [INF] Executed DbCommand (51ms) [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:25:46.463 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:25:46.463 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.463 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:46.464 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.464 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:46.464 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-08-08 20:25:46.464 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-08-08 20:25:46.464 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-08-08 20:25:46.464 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-08-08 20:25:46.465 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-08-08 20:25:46.467 +07:00 [INF] Executed action CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api) in 128.6516ms
+2025-08-08 20:25:46.467 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:46.467 +07:00 [DBG] 'MyDbContext' disposed.
+2025-08-08 20:25:46.467 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:46.467 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-08-08 20:25:46.467 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/Account/user-roles/1 - 200 null application/json; charset=utf-8 167.7577ms
+2025-08-08 20:25:51.174 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/Account/user-roles/2 - null null
+2025-08-08 20:25:51.174 +07:00 [DBG] The request path /api/Account/user-roles/2 does not match a supported file type
+2025-08-08 20:25:51.174 +07:00 [DBG] The request path /api/Account/user-roles/2 does not match a supported file type
+2025-08-08 20:25:51.174 +07:00 [DBG] 1 candidate(s) found for the request path '/api/Account/user-roles/2'
+2025-08-08 20:25:51.174 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)' with route pattern 'api/Account/user-roles/{userId}' is valid for the request path '/api/Account/user-roles/2'
+2025-08-08 20:25:51.174 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:51.175 +07:00 [DBG] Successfully validated the token.
+2025-08-08 20:25:51.175 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-08-08 20:25:51.177 +07:00 [DBG] Authorization was successful.
+2025-08-08 20:25:51.177 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:51.177 +07:00 [INF] Route matched with {action = "GetUserRoles", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetUserRoles(Int64) on controller CapBot.api.Controllers.AccountController (CapBot.api).
+2025-08-08 20:25:51.177 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-08-08 20:25:51.177 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-08-08 20:25:51.178 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-08-08 20:25:51.178 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-08-08 20:25:51.178 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-08-08 20:25:51.178 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:25:51.178 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:25:51.179 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:25:51.179 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' using the name 'userId' in request data ...
+2025-08-08 20:25:51.179 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:51.179 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:51.179 +07:00 [DBG] Attempting to validate the bound parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:25:51.179 +07:00 [DBG] Done attempting to validate the bound parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:51.180 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-08-08 20:25:51.181 +07:00 [DBG] Creating DbConnection.
+2025-08-08 20:25:51.181 +07:00 [DBG] Created DbConnection. (0ms).
+2025-08-08 20:25:51.182 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.182 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.182 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:51.182 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:51.182 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:51.182 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:25:51.188 +07:00 [INF] Executed DbCommand (6ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:25:51.188 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:25:51.188 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.188 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:51.188 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.188 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:51.189 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.189 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.189 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:51.189 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:51.189 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:51.189 +07:00 [DBG] Executing DbCommand [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:25:51.191 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:25:51.192 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.192 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:51.192 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.192 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:51.193 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.193 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.193 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:51.193 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:51.193 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:51.193 +07:00 [DBG] Executing DbCommand [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:25:51.196 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:25:51.196 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:25:51.196 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.197 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:51.197 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.197 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:51.197 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-08-08 20:25:51.197 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-08-08 20:25:51.197 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-08-08 20:25:51.197 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-08-08 20:25:51.197 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-08-08 20:25:51.197 +07:00 [INF] Executed action CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api) in 19.4097ms
+2025-08-08 20:25:51.197 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:51.197 +07:00 [DBG] 'MyDbContext' disposed.
+2025-08-08 20:25:51.197 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:51.197 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-08-08 20:25:51.197 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/Account/user-roles/2 - 200 null application/json; charset=utf-8 23.3621ms
+2025-08-08 20:25:54.159 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/Account/user-roles/3 - null null
+2025-08-08 20:25:54.159 +07:00 [DBG] The request path /api/Account/user-roles/3 does not match a supported file type
+2025-08-08 20:25:54.159 +07:00 [DBG] The request path /api/Account/user-roles/3 does not match a supported file type
+2025-08-08 20:25:54.159 +07:00 [DBG] 1 candidate(s) found for the request path '/api/Account/user-roles/3'
+2025-08-08 20:25:54.159 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)' with route pattern 'api/Account/user-roles/{userId}' is valid for the request path '/api/Account/user-roles/3'
+2025-08-08 20:25:54.160 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:54.160 +07:00 [DBG] Successfully validated the token.
+2025-08-08 20:25:54.160 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-08-08 20:25:54.160 +07:00 [DBG] Authorization was successful.
+2025-08-08 20:25:54.160 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:54.161 +07:00 [INF] Route matched with {action = "GetUserRoles", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetUserRoles(Int64) on controller CapBot.api.Controllers.AccountController (CapBot.api).
+2025-08-08 20:25:54.161 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-08-08 20:25:54.161 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-08-08 20:25:54.161 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-08-08 20:25:54.161 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-08-08 20:25:54.161 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-08-08 20:25:54.161 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:25:54.177 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:25:54.178 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:25:54.178 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' using the name 'userId' in request data ...
+2025-08-08 20:25:54.178 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:54.178 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:54.178 +07:00 [DBG] Attempting to validate the bound parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:25:54.178 +07:00 [DBG] Done attempting to validate the bound parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:54.178 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-08-08 20:25:54.179 +07:00 [DBG] Creating DbConnection.
+2025-08-08 20:25:54.179 +07:00 [DBG] Created DbConnection. (0ms).
+2025-08-08 20:25:54.179 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.179 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.179 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:54.179 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:54.179 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:54.179 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:25:54.183 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:25:54.183 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:25:54.183 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.183 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:54.183 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.183 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:54.183 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.183 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.183 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:54.184 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:54.184 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:54.184 +07:00 [DBG] Executing DbCommand [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:25:54.187 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:25:54.187 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.187 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:54.187 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.187 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:54.188 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.188 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.188 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:54.188 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:54.188 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:54.188 +07:00 [DBG] Executing DbCommand [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:25:54.190 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:25:54.191 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:25:54.191 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.191 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:54.191 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.191 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:54.191 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-08-08 20:25:54.191 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-08-08 20:25:54.192 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-08-08 20:25:54.192 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-08-08 20:25:54.192 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-08-08 20:25:54.192 +07:00 [INF] Executed action CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api) in 30.7402ms
+2025-08-08 20:25:54.192 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:54.192 +07:00 [DBG] 'MyDbContext' disposed.
+2025-08-08 20:25:54.192 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:54.192 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-08-08 20:25:54.192 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/Account/user-roles/3 - 200 null application/json; charset=utf-8 33.1493ms
+2025-08-08 20:25:56.960 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/Account/user-roles/4 - null null
+2025-08-08 20:25:56.960 +07:00 [DBG] The request path /api/Account/user-roles/4 does not match a supported file type
+2025-08-08 20:25:56.960 +07:00 [DBG] The request path /api/Account/user-roles/4 does not match a supported file type
+2025-08-08 20:25:56.960 +07:00 [DBG] 1 candidate(s) found for the request path '/api/Account/user-roles/4'
+2025-08-08 20:25:56.960 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)' with route pattern 'api/Account/user-roles/{userId}' is valid for the request path '/api/Account/user-roles/4'
+2025-08-08 20:25:56.960 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:56.961 +07:00 [DBG] Successfully validated the token.
+2025-08-08 20:25:56.961 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-08-08 20:25:56.961 +07:00 [DBG] Authorization was successful.
+2025-08-08 20:25:56.961 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:56.961 +07:00 [INF] Route matched with {action = "GetUserRoles", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetUserRoles(Int64) on controller CapBot.api.Controllers.AccountController (CapBot.api).
+2025-08-08 20:25:56.961 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-08-08 20:25:56.961 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-08-08 20:25:56.961 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-08-08 20:25:56.961 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-08-08 20:25:56.961 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-08-08 20:25:56.961 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:25:56.962 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:25:56.962 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:25:56.962 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' using the name 'userId' in request data ...
+2025-08-08 20:25:56.962 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:56.962 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:56.963 +07:00 [DBG] Attempting to validate the bound parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:25:56.963 +07:00 [DBG] Done attempting to validate the bound parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:25:56.964 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-08-08 20:25:56.965 +07:00 [DBG] Creating DbConnection.
+2025-08-08 20:25:56.965 +07:00 [DBG] Created DbConnection. (0ms).
+2025-08-08 20:25:56.965 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.965 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.966 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:56.966 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:56.966 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:56.966 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:25:56.972 +07:00 [INF] Executed DbCommand (6ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:25:56.973 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:25:56.973 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.973 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:56.973 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.973 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:56.973 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.973 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.973 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:56.973 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:56.974 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:56.974 +07:00 [DBG] Executing DbCommand [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:25:56.976 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:25:56.976 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.976 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:56.976 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.977 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:56.977 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.977 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.977 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:25:56.977 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:56.977 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:25:56.977 +07:00 [DBG] Executing DbCommand [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:25:56.980 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:25:56.980 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:25:56.980 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.980 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:25:56.980 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.980 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:25:56.980 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-08-08 20:25:56.980 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-08-08 20:25:56.980 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-08-08 20:25:56.980 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-08-08 20:25:56.980 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-08-08 20:25:56.981 +07:00 [INF] Executed action CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api) in 19.3536ms
+2025-08-08 20:25:56.981 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:25:56.981 +07:00 [DBG] 'MyDbContext' disposed.
+2025-08-08 20:25:56.981 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:25:56.981 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-08-08 20:25:56.981 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/Account/user-roles/4 - 200 null application/json; charset=utf-8 21.4242ms
+2025-08-08 20:26:00.692 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/Account/user-roles/5 - null null
+2025-08-08 20:26:00.692 +07:00 [DBG] The request path /api/Account/user-roles/5 does not match a supported file type
+2025-08-08 20:26:00.692 +07:00 [DBG] The request path /api/Account/user-roles/5 does not match a supported file type
+2025-08-08 20:26:00.692 +07:00 [DBG] 1 candidate(s) found for the request path '/api/Account/user-roles/5'
+2025-08-08 20:26:00.692 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)' with route pattern 'api/Account/user-roles/{userId}' is valid for the request path '/api/Account/user-roles/5'
+2025-08-08 20:26:00.692 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:00.692 +07:00 [DBG] Successfully validated the token.
+2025-08-08 20:26:00.693 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-08-08 20:26:00.693 +07:00 [DBG] Authorization was successful.
+2025-08-08 20:26:00.693 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:00.693 +07:00 [INF] Route matched with {action = "GetUserRoles", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetUserRoles(Int64) on controller CapBot.api.Controllers.AccountController (CapBot.api).
+2025-08-08 20:26:00.693 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-08-08 20:26:00.693 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-08-08 20:26:00.693 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-08-08 20:26:00.693 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-08-08 20:26:00.694 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-08-08 20:26:00.694 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:26:00.694 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:26:00.694 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:26:00.694 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' using the name 'userId' in request data ...
+2025-08-08 20:26:00.694 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:00.695 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:00.695 +07:00 [DBG] Attempting to validate the bound parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:26:00.695 +07:00 [DBG] Done attempting to validate the bound parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:00.696 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-08-08 20:26:00.696 +07:00 [DBG] Creating DbConnection.
+2025-08-08 20:26:00.697 +07:00 [DBG] Created DbConnection. (0ms).
+2025-08-08 20:26:00.697 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.697 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.697 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:26:00.697 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:00.697 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:00.697 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:26:00.704 +07:00 [INF] Executed DbCommand (7ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:26:00.705 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:26:00.705 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.705 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:26:00.705 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.705 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:26:00.706 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.706 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.706 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:26:00.706 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:00.706 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:00.706 +07:00 [DBG] Executing DbCommand [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:26:00.709 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:26:00.709 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.709 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:26:00.709 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.709 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:26:00.710 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.710 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.710 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:26:00.710 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:00.710 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:00.710 +07:00 [DBG] Executing DbCommand [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:26:00.713 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:26:00.713 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:26:00.713 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.713 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:26:00.713 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.713 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:26:00.713 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-08-08 20:26:00.713 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-08-08 20:26:00.713 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-08-08 20:26:00.713 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-08-08 20:26:00.713 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-08-08 20:26:00.714 +07:00 [INF] Executed action CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api) in 20.0027ms
+2025-08-08 20:26:00.714 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:00.714 +07:00 [DBG] 'MyDbContext' disposed.
+2025-08-08 20:26:00.714 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:00.714 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-08-08 20:26:00.714 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/Account/user-roles/5 - 200 null application/json; charset=utf-8 22.3307ms
+2025-08-08 20:26:03.347 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/Account/user-roles/6 - null null
+2025-08-08 20:26:03.348 +07:00 [DBG] The request path /api/Account/user-roles/6 does not match a supported file type
+2025-08-08 20:26:03.348 +07:00 [DBG] The request path /api/Account/user-roles/6 does not match a supported file type
+2025-08-08 20:26:03.348 +07:00 [DBG] 1 candidate(s) found for the request path '/api/Account/user-roles/6'
+2025-08-08 20:26:03.348 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)' with route pattern 'api/Account/user-roles/{userId}' is valid for the request path '/api/Account/user-roles/6'
+2025-08-08 20:26:03.348 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:03.349 +07:00 [DBG] Successfully validated the token.
+2025-08-08 20:26:03.350 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-08-08 20:26:03.350 +07:00 [DBG] Authorization was successful.
+2025-08-08 20:26:03.350 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:03.350 +07:00 [INF] Route matched with {action = "GetUserRoles", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetUserRoles(Int64) on controller CapBot.api.Controllers.AccountController (CapBot.api).
+2025-08-08 20:26:03.350 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-08-08 20:26:03.351 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-08-08 20:26:03.351 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-08-08 20:26:03.351 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-08-08 20:26:03.351 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-08-08 20:26:03.351 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:26:03.351 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:26:03.351 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:26:03.352 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' using the name 'userId' in request data ...
+2025-08-08 20:26:03.352 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:03.352 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:03.352 +07:00 [DBG] Attempting to validate the bound parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:26:03.352 +07:00 [DBG] Done attempting to validate the bound parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:03.353 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-08-08 20:26:03.354 +07:00 [DBG] Creating DbConnection.
+2025-08-08 20:26:03.354 +07:00 [DBG] Created DbConnection. (0ms).
+2025-08-08 20:26:03.354 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.354 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.354 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:26:03.354 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:03.354 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:03.355 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:26:03.359 +07:00 [INF] Executed DbCommand (5ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:26:03.360 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:26:03.360 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.360 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:26:03.360 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.360 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:26:03.361 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.361 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.361 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:26:03.361 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:03.361 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:03.361 +07:00 [DBG] Executing DbCommand [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:26:03.363 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:26:03.364 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.364 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:26:03.364 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.364 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:26:03.364 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.364 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.364 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:26:03.364 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:03.364 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:03.365 +07:00 [DBG] Executing DbCommand [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:26:03.368 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:26:03.368 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:26:03.368 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.368 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:26:03.368 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.368 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:26:03.368 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-08-08 20:26:03.368 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-08-08 20:26:03.368 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-08-08 20:26:03.368 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-08-08 20:26:03.368 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-08-08 20:26:03.369 +07:00 [INF] Executed action CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api) in 17.9244ms
+2025-08-08 20:26:03.369 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:03.369 +07:00 [DBG] 'MyDbContext' disposed.
+2025-08-08 20:26:03.369 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:03.369 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-08-08 20:26:03.369 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/Account/user-roles/6 - 200 null application/json; charset=utf-8 21.5275ms
+2025-08-08 20:26:08.131 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/Account/user-roles/7 - null null
+2025-08-08 20:26:08.132 +07:00 [DBG] The request path /api/Account/user-roles/7 does not match a supported file type
+2025-08-08 20:26:08.132 +07:00 [DBG] The request path /api/Account/user-roles/7 does not match a supported file type
+2025-08-08 20:26:08.132 +07:00 [DBG] 1 candidate(s) found for the request path '/api/Account/user-roles/7'
+2025-08-08 20:26:08.132 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)' with route pattern 'api/Account/user-roles/{userId}' is valid for the request path '/api/Account/user-roles/7'
+2025-08-08 20:26:08.132 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:08.132 +07:00 [DBG] Successfully validated the token.
+2025-08-08 20:26:08.133 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-08-08 20:26:08.133 +07:00 [DBG] Authorization was successful.
+2025-08-08 20:26:08.133 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:08.133 +07:00 [INF] Route matched with {action = "GetUserRoles", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetUserRoles(Int64) on controller CapBot.api.Controllers.AccountController (CapBot.api).
+2025-08-08 20:26:08.133 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-08-08 20:26:08.133 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-08-08 20:26:08.133 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-08-08 20:26:08.133 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-08-08 20:26:08.133 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-08-08 20:26:08.133 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:26:08.134 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:26:08.134 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:26:08.134 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' using the name 'userId' in request data ...
+2025-08-08 20:26:08.134 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:08.134 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:08.134 +07:00 [DBG] Attempting to validate the bound parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:26:08.134 +07:00 [DBG] Done attempting to validate the bound parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:08.135 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-08-08 20:26:08.136 +07:00 [DBG] Creating DbConnection.
+2025-08-08 20:26:08.136 +07:00 [DBG] Created DbConnection. (0ms).
+2025-08-08 20:26:08.136 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:08.137 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:08.137 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:26:08.138 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:08.138 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:08.141 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:26:08.148 +07:00 [INF] Executed DbCommand (8ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:26:08.148 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:08.148 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:26:08.148 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:08.148 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:26:08.148 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-08-08 20:26:08.148 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-08-08 20:26:08.148 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-08-08 20:26:08.148 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-08-08 20:26:08.149 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-08-08 20:26:08.149 +07:00 [INF] Executed action CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api) in 15.6851ms
+2025-08-08 20:26:08.149 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:08.149 +07:00 [DBG] 'MyDbContext' disposed.
+2025-08-08 20:26:08.149 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:08.149 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-08-08 20:26:08.149 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/Account/user-roles/7 - 200 null application/json; charset=utf-8 17.6809ms
+2025-08-08 20:26:09.080 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/Account/user-roles/7 - null null
+2025-08-08 20:26:09.080 +07:00 [DBG] The request path /api/Account/user-roles/7 does not match a supported file type
+2025-08-08 20:26:09.080 +07:00 [DBG] The request path /api/Account/user-roles/7 does not match a supported file type
+2025-08-08 20:26:09.080 +07:00 [DBG] 1 candidate(s) found for the request path '/api/Account/user-roles/7'
+2025-08-08 20:26:09.080 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)' with route pattern 'api/Account/user-roles/{userId}' is valid for the request path '/api/Account/user-roles/7'
+2025-08-08 20:26:09.080 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:09.081 +07:00 [DBG] Successfully validated the token.
+2025-08-08 20:26:09.081 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-08-08 20:26:09.081 +07:00 [DBG] Authorization was successful.
+2025-08-08 20:26:09.081 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:09.081 +07:00 [INF] Route matched with {action = "GetUserRoles", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetUserRoles(Int64) on controller CapBot.api.Controllers.AccountController (CapBot.api).
+2025-08-08 20:26:09.081 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-08-08 20:26:09.082 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-08-08 20:26:09.082 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-08-08 20:26:09.082 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-08-08 20:26:09.082 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-08-08 20:26:09.082 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:26:09.083 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:26:09.083 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:26:09.083 +07:00 [DBG] Attempting to bind parameter 'userId' of type 'System.Int64' using the name 'userId' in request data ...
+2025-08-08 20:26:09.083 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:09.083 +07:00 [DBG] Done attempting to bind parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:09.083 +07:00 [DBG] Attempting to validate the bound parameter 'userId' of type 'System.Int64' ...
+2025-08-08 20:26:09.083 +07:00 [DBG] Done attempting to validate the bound parameter 'userId' of type 'System.Int64'.
+2025-08-08 20:26:09.084 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-08-08 20:26:09.084 +07:00 [DBG] Creating DbConnection.
+2025-08-08 20:26:09.085 +07:00 [DBG] Created DbConnection. (0ms).
+2025-08-08 20:26:09.085 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:09.085 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:09.085 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:26:09.085 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:09.085 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:09.085 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:26:09.088 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:26:09.089 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:09.089 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:26:09.089 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:09.089 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:26:09.089 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-08-08 20:26:09.090 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-08-08 20:26:09.090 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-08-08 20:26:09.090 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-08-08 20:26:09.090 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-08-08 20:26:09.090 +07:00 [INF] Executed action CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api) in 7.8386ms
+2025-08-08 20:26:09.090 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.AccountController.GetUserRoles (CapBot.api)'
+2025-08-08 20:26:09.090 +07:00 [DBG] 'MyDbContext' disposed.
+2025-08-08 20:26:09.090 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:09.090 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-08-08 20:26:09.091 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/Account/user-roles/7 - 200 null application/json; charset=utf-8 10.9086ms
+2025-08-08 20:26:13.829 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/api/Account/my-user-roles - null null
+2025-08-08 20:26:13.829 +07:00 [DBG] The request path /api/Account/my-user-roles does not match a supported file type
+2025-08-08 20:26:13.829 +07:00 [DBG] The request path /api/Account/my-user-roles does not match a supported file type
+2025-08-08 20:26:13.829 +07:00 [DBG] 1 candidate(s) found for the request path '/api/Account/my-user-roles'
+2025-08-08 20:26:13.829 +07:00 [DBG] Endpoint 'CapBot.api.Controllers.AccountController.GetMyUserRoles (CapBot.api)' with route pattern 'api/Account/my-user-roles' is valid for the request path '/api/Account/my-user-roles'
+2025-08-08 20:26:13.829 +07:00 [DBG] Request matched endpoint 'CapBot.api.Controllers.AccountController.GetMyUserRoles (CapBot.api)'
+2025-08-08 20:26:13.830 +07:00 [DBG] Successfully validated the token.
+2025-08-08 20:26:13.830 +07:00 [DBG] AuthenticationScheme: Bearer was successfully authenticated.
+2025-08-08 20:26:13.831 +07:00 [DBG] Authorization was successful.
+2025-08-08 20:26:13.831 +07:00 [INF] Executing endpoint 'CapBot.api.Controllers.AccountController.GetMyUserRoles (CapBot.api)'
+2025-08-08 20:26:13.835 +07:00 [INF] Route matched with {action = "GetMyUserRoles", controller = "Account"}. Executing controller action with signature System.Threading.Tasks.Task`1[Microsoft.AspNetCore.Mvc.IActionResult] GetMyUserRoles() on controller CapBot.api.Controllers.AccountController (CapBot.api).
+2025-08-08 20:26:13.835 +07:00 [DBG] Execution plan of authorization filters (in the following order): ["None"]
+2025-08-08 20:26:13.835 +07:00 [DBG] Execution plan of resource filters (in the following order): ["Microsoft.AspNetCore.Mvc.ConsumesAttribute"]
+2025-08-08 20:26:13.835 +07:00 [DBG] Execution plan of action filters (in the following order): ["Microsoft.AspNetCore.Mvc.ModelBinding.UnsupportedContentTypeFilter (Order: -3000)"]
+2025-08-08 20:26:13.835 +07:00 [DBG] Execution plan of exception filters (in the following order): ["None"]
+2025-08-08 20:26:13.836 +07:00 [DBG] Execution plan of result filters (in the following order): ["Microsoft.AspNetCore.Mvc.Infrastructure.ClientErrorResultFilter (Order: -2000)","Microsoft.AspNetCore.Mvc.ProducesAttribute (Order: 0)"]
+2025-08-08 20:26:13.836 +07:00 [DBG] Executing controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:26:13.837 +07:00 [DBG] Executed controller factory for controller CapBot.api.Controllers.AccountController (CapBot.api)
+2025-08-08 20:26:13.840 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-08-08 20:26:13.841 +07:00 [DBG] Creating DbConnection.
+2025-08-08 20:26:13.841 +07:00 [DBG] Created DbConnection. (0ms).
+2025-08-08 20:26:13.842 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.842 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.842 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:26:13.842 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:13.842 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:13.842 +07:00 [DBG] Executing DbCommand [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:26:13.845 +07:00 [INF] Executed DbCommand (3ms) [Parameters=[@__p_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[Id] = @__p_0
+2025-08-08 20:26:13.846 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:26:13.846 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.846 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:26:13.846 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.846 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:26:13.847 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.847 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.847 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:26:13.847 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:13.847 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:13.847 +07:00 [DBG] Executing DbCommand [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:26:13.851 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@__userId_0='?' (DbType = Int32)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Name]
+FROM [user_roles] AS [u]
+INNER JOIN [roles] AS [r] ON [u].[RoleId] = [r].[Id]
+WHERE [u].[UserId] = @__userId_0
+2025-08-08 20:26:13.851 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.851 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:26:13.851 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.851 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:26:13.851 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.851 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.851 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-08-08 20:26:13.851 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:13.851 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-08-08 20:26:13.852 +07:00 [DBG] Executing DbCommand [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:26:13.856 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@__roleNames_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[Name] IN (
+    SELECT [r0].[value]
+    FROM OPENJSON(@__roleNames_0) WITH ([value] nvarchar(max) '$') AS [r0]
+)
+2025-08-08 20:26:13.856 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-08-08 20:26:13.856 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.856 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-08-08 20:26:13.856 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.857 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-08-08 20:26:13.857 +07:00 [DBG] List of registered output formatters, in the following order: ["Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.OData.Formatter.ODataOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.HttpNoContentOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StringOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.StreamOutputFormatter","Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter"]
+2025-08-08 20:26:13.857 +07:00 [DBG] No information found on request to perform content negotiation.
+2025-08-08 20:26:13.857 +07:00 [DBG] Attempting to select the first output formatter in the output formatters list which supports a content type from the explicitly specified content types '["application/json"]'.
+2025-08-08 20:26:13.857 +07:00 [DBG] Selected output formatter 'Microsoft.AspNetCore.Mvc.Formatters.SystemTextJsonOutputFormatter' and content type 'application/json' to write the response.
+2025-08-08 20:26:13.857 +07:00 [INF] Executing ObjectResult, writing value of type 'FS.Commons.FSResponse'.
+2025-08-08 20:26:13.857 +07:00 [INF] Executed action CapBot.api.Controllers.AccountController.GetMyUserRoles (CapBot.api) in 21.3732ms
+2025-08-08 20:26:13.857 +07:00 [INF] Executed endpoint 'CapBot.api.Controllers.AccountController.GetMyUserRoles (CapBot.api)'
+2025-08-08 20:26:13.858 +07:00 [DBG] 'MyDbContext' disposed.
+2025-08-08 20:26:13.858 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-08-08 20:26:13.858 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-08-08 20:26:13.858 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/Account/my-user-roles - 200 null application/json; charset=utf-8 29.4601ms
