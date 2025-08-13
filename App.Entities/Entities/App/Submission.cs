@@ -29,7 +29,7 @@ public partial class Submission
 
     public SubmissionStatus Status { get; set; } = SubmissionStatus.Pending;
 
-    public DateTime SubmittedAt { get; set; }
+    public DateTime? SubmittedAt { get; set; }
 
     public virtual TopicVersion TopicVersion { get; set; } = null!;
     public virtual Phase Phase { get; set; } = null!;

@@ -28,18 +28,18 @@ namespace CapBot.api.Controllers
         [Authorize(Roles = SystemRoleConstants.Supervisor)]
         [HttpPost("create")]
         [SwaggerOperation(
-            Summary = "Tạo submission mới",
-            Description = "Tạo submission cho một topic version đã được phê duyệt, thuộc phase hợp lệ")]
+        Summary = "Tạo submission mới",
+        Description = "Supervisor tạo submission trực tiếp từ một topic version (không cần topic version Approved) thuộc phase hợp lệ")]
         [SwaggerResponse(201, "Tạo submission thành công")]
         [SwaggerResponse(401, "Lỗi xác thực")]
         [SwaggerResponse(403, "Quyền truy cập bị từ chối")]
         [SwaggerResponse(404, "Phiên bản chủ đề hoặc giai đoạn không tồn tại")]
-        [SwaggerResponse(409, "Giai đoạn không cùng học kỳ hoặc trạng thái không hợp lệ")]
+        [SwaggerResponse(409, "Giai đoạn không cùng học kỳ với chủ đề")]
         [SwaggerResponse(422, "Model không hợp lệ")]
         [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public async Task<IActionResult> Create([FromBody] CreateSubmissionDTO dto)
+        public async Task<IActionResult> Create([FromBody] CreateSubmissionDTO dto) // giữ nguyên phần thân
         {
             if (!ModelState.IsValid)
                 return ModelInvalid();

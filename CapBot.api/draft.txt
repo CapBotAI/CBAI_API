@@ -1,0 +1,11 @@
+Topic status:
+draft, submission pending, submitted
+
+Submission status:
+pending, UnderReview, Complete, RevisionRequired
+
+Tạo 1 topic (IsApprove = false) => TopicVersion (draft)
+Tạo 1 topic version => TopicVersion (draft)
+
+
+Khi tạo submission => Submission (pending) + update TopicVersion (SubmissionPending)
