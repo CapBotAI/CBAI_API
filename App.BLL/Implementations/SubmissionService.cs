@@ -142,7 +142,7 @@ public class SubmissionService : ISubmissionService
 
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
             var submission = await submissionRepo.GetSingleAsync(new QueryBuilder<Submission>()
-                .WithPredicate(x => x.Id == dto.Id)
+                .WithPredicate(x => x.Id == dto.Id && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.Phase)
                 .WithTracking(true)
                 .Build());
@@ -322,7 +322,7 @@ public class SubmissionService : ISubmissionService
 
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
             var submission = await submissionRepo.GetSingleAsync(new QueryBuilder<Submission>()
-                .WithPredicate(x => x.Id == dto.Id)
+                .WithPredicate(x => x.Id == dto.Id && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.Phase)
                 .WithInclude(x => x.TopicVersion)
                 .WithTracking(true)
@@ -426,7 +426,7 @@ public class SubmissionService : ISubmissionService
 
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
             var submission = await submissionRepo.GetSingleAsync(new QueryBuilder<Submission>()
-                .WithPredicate(x => x.Id == dto.Id)
+                .WithPredicate(x => x.Id == dto.Id && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.Phase)
                 .WithTracking(true)
                 .Build());
@@ -532,7 +532,7 @@ public class SubmissionService : ISubmissionService
         {
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
             var submission = await submissionRepo.GetSingleAsync(new QueryBuilder<Submission>()
-                .WithPredicate(x => x.Id == id)
+                .WithPredicate(x => x.Id == id && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.TopicVersion)
                 .WithInclude(x => x.Phase)
                 .WithInclude(x => x.SubmittedByUser)
@@ -624,6 +624,98 @@ public class SubmissionService : ISubmissionService
         }
         catch (Exception)
         {
+            throw;
+        }
+    }
+
+    public async Task<BaseResponseModel> DeleteSubmission(int id, int userId, bool isAdmin)
+    {
+        try
+        {
+            var user = await _identityRepository.GetByIdAsync((long)userId);
+            if (user == null)
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Người dùng không tồn tại"
+                };
+            }
+
+            var submissionRepo = _unitOfWork.GetRepo<Submission>();
+            var submission = await submissionRepo.GetSingleAsync(new QueryBuilder<Submission>()
+                .WithPredicate(x => x.Id == id && x.IsActive && x.DeletedAt == null)
+                .WithInclude(x => x.TopicVersion)
+                .WithTracking(true)
+                .Build());
+
+            if (submission == null)
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Submission không tồn tại"
+                };
+            }
+
+            if (submission.SubmittedBy != userId && !isAdmin)
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status403Forbidden,
+                    Message = "Bạn không có quyền hủy/xóa submission này"
+                };
+            }
+
+            if (submission.Status == SubmissionStatus.UnderReview || submission.Status == SubmissionStatus.Completed)
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Chỉ được hủy/xóa khi submission ở trạng thái Pending hoặc RevisionRequired"
+                };
+            }
+
+            await _unitOfWork.BeginTransactionAsync();
+
+            var versionRepo = _unitOfWork.GetRepo<TopicVersion>();
+            var topicVersion = submission.TopicVersion;
+
+            if (topicVersion != null)
+            {
+                if (topicVersion.Status == TopicStatus.SubmissionPending)
+                {
+                    topicVersion.Status = TopicStatus.Draft;
+                    await versionRepo.UpdateAsync(topicVersion);
+                }
+                else if (topicVersion.Status == TopicStatus.Submitted)
+                {
+                    topicVersion.Status = TopicStatus.Archived;
+                    await versionRepo.UpdateAsync(topicVersion);
+                }
+            }
+
+            submission.IsActive = false;
+            submission.DeletedAt = DateTime.Now;
+            await submissionRepo.UpdateAsync(submission);
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+
+            return new BaseResponseModel
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Hủy/Xóa submission thành công"
+            };
+        }
+        catch (Exception)
+        {
+            await _unitOfWork.RollBackAsync();
             throw;
         }
     }

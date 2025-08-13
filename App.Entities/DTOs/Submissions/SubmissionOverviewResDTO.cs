@@ -12,7 +12,7 @@ public class SubmissionOverviewResDTO
 
     public int SubmissionRound { get; set; }
 
-    public DateTime SubmittedAt { get; set; }
+    public DateTime? SubmittedAt { get; set; }
 
     public SubmissionOverviewResDTO(Submission submission)
     {
