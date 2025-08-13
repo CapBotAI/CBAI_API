@@ -57,15 +57,16 @@ public class ServiceConfig
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 
+        // Reviewer Suggestion Service
+        services.AddScoped<IReviewerSuggestionService, ReviewerSuggestionService>();
+
         services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
 
         services.AddScoped<ISkillMatchingService, SkillMatchingService>();
 
-        //Gemni Ai Service
-
-        services.AddSingleton < GeminiAIService>();
-
         services.AddScoped<IPerformanceMatchingService, PerformanceMatchingService>();
 
+        //Gemini AI Service 
+        services.AddSingleton<GeminiAIService>();
     }
 }
