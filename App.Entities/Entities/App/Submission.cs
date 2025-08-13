@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
+using App.Commons;
 using App.Entities.Entities.Core;
 using App.Entities.Enums;
 
 namespace App.Entities.Entities.App;
 
-public partial class Submission
+public partial class Submission : CommonDataModel
 {
     public int Id { get; set; }
 
@@ -29,7 +30,7 @@ public partial class Submission
 
     public SubmissionStatus Status { get; set; } = SubmissionStatus.Pending;
 
-    public DateTime SubmittedAt { get; set; }
+    public DateTime? SubmittedAt { get; set; }
 
     public virtual TopicVersion TopicVersion { get; set; } = null!;
     public virtual Phase Phase { get; set; } = null!;

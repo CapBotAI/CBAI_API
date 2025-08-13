@@ -49,7 +49,7 @@ public class ServiceConfig
         services.AddScoped<IPhaseTypeService, PhaseTypeService>();
 
         //Phase Service
-        services.AddScoped<ISubmissionService, SubmissionService>();
+        services.AddScoped<IPhaseService, PhaseService>();
 
         //Submission Service
         services.AddScoped<ISubmissionService, SubmissionService>();
@@ -63,6 +63,7 @@ public class ServiceConfig
         services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
 
         services.AddScoped<ISkillMatchingService, SkillMatchingService>();
+
 
         services.AddScoped<IPerformanceMatchingService, PerformanceMatchingService>();
 

@@ -13,4 +13,5 @@ public interface ISubmissionService
     Task<BaseResponseModel> ResubmitSubmission(ResubmitSubmissionDTO dto, int userId);
     Task<BaseResponseModel<SubmissionDetailDTO>> GetSubmissionDetail(int id);
     Task<BaseResponseModel<PagingDataModel<SubmissionOverviewResDTO, GetSubmissionsQueryDTO>>> GetSubmissions(GetSubmissionsQueryDTO query);
+    Task<BaseResponseModel> DeleteSubmission(int id, int userId, bool isAdmin);
 }

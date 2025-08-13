@@ -31,7 +31,7 @@ public class SubmissionDetailDTO
 
     public SubmissionStatus Status { get; set; } = SubmissionStatus.Pending;
 
-    public DateTime SubmittedAt { get; set; }
+    public DateTime? SubmittedAt { get; set; }
 
     public SubmissionDetailDTO(Submission submission)
     {
