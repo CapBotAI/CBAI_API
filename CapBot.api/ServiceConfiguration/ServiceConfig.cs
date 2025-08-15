@@ -59,13 +59,15 @@ public class ServiceConfig
 
         // Reviewer Suggestion Service
         services.AddScoped<IReviewerSuggestionService, ReviewerSuggestionService>();
-
         services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
-
         services.AddScoped<ISkillMatchingService, SkillMatchingService>();
-
-
         services.AddScoped<IPerformanceMatchingService, PerformanceMatchingService>();
+
+        // EvaluationCriteria Service
+        services.AddScoped<IEvaluationCriteriaService, EvaluationCriteriaService>();
+
+        // Review Service  
+        services.AddScoped<IReviewService, ReviewService>();
 
         //Gemini AI Service 
         services.AddSingleton<GeminiAIService>();
