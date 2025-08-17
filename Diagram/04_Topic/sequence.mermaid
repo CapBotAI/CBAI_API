@@ -1,0 +1,43 @@
+sequenceDiagram
+    actor Supervisor
+    actor Admin
+    participant TopicController
+    participant ITopicService
+    participant TopicService
+    participant Topic
+    participant TopicCategory
+    participant Semester
+
+    Supervisor->>TopicController: POST /api/topic (data)
+    activate TopicController
+    TopicController->>ITopicService: CreateTopic(data)
+    activate ITopicService
+    ITopicService->>TopicService: Create(data)
+    activate TopicService
+    TopicService->>Topic: Add()
+    activate Topic
+    Topic-->>TopicService: TopicId
+    deactivate Topic
+    TopicService-->>ITopicService: Result
+    deactivate TopicService
+    ITopicService-->>TopicController: Result
+    deactivate ITopicService
+    TopicController-->>Supervisor: Response
+    deactivate TopicController
+
+    alt Approval
+        Admin->>TopicController: PUT /api/topic/approve (id)
+        activate TopicController
+        TopicController->>ITopicService: ApproveTopic(id)
+        activate ITopicService
+        ITopicService->>TopicService: Approve(id)
+        activate TopicService
+        TopicService->>Topic: UpdateStatus()
+        deactivate Topic
+        TopicService-->>ITopicService: Result
+        deactivate TopicService
+        ITopicService-->>TopicController: Result
+        deactivate ITopicService
+        TopicController-->>Admin: Response
+        deactivate TopicController
+    end

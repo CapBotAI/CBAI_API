@@ -1,0 +1,9 @@
+classDiagram
+    class EvaluationCriteriaController
+    class IEvaluationCriteriaService
+    class EvaluationCriteriaService
+    class EvaluationCriteria
+
+    EvaluationCriteriaController --> IEvaluationCriteriaService
+    IEvaluationCriteriaService <|.. EvaluationCriteriaService
+    EvaluationCriteriaService --> EvaluationCriteria

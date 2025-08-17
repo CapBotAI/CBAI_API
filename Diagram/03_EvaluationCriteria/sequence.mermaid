@@ -1,0 +1,21 @@
+sequenceDiagram
+    actor Admin
+    participant EvaluationCriteriaController
+    participant IEvaluationCriteriaService
+    participant EvaluationCriteriaService
+    participant EvaluationCriteria
+
+    Admin->>EvaluationCriteriaController: POST /api/evaluation-criteria (data)
+    activate EvaluationCriteriaController
+    EvaluationCriteriaController->>IEvaluationCriteriaService: CreateCriteria(data)
+    activate IEvaluationCriteriaService
+    IEvaluationCriteriaService->>EvaluationCriteriaService: Create(data)
+    activate EvaluationCriteriaService
+    EvaluationCriteriaService->>EvaluationCriteria: Add()
+    deactivate EvaluationCriteria
+    EvaluationCriteriaService-->>IEvaluationCriteriaService: Result
+    deactivate EvaluationCriteriaService
+    IEvaluationCriteriaService-->>EvaluationCriteriaController: Result
+    deactivate IEvaluationCriteriaService
+    EvaluationCriteriaController-->>Admin: Response
+    deactivate EvaluationCriteriaController

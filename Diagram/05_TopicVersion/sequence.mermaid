@@ -1,0 +1,42 @@
+sequenceDiagram
+    actor Supervisor
+    actor Admin
+    participant TopicVersionController
+    participant ITopicVersionService
+    participant TopicVersionService
+    participant TopicVersion
+    participant Topic
+
+    Supervisor->>TopicVersionController: POST /api/topic-version (data)
+    activate TopicVersionController
+    TopicVersionController->>ITopicVersionService: CreateTopicVersion(data)
+    activate ITopicVersionService
+    ITopicVersionService->>TopicVersionService: Create(data)
+    activate TopicVersionService
+    TopicVersionService->>TopicVersion: Add()
+    activate TopicVersion
+    TopicVersion-->>TopicVersionService: VersionId
+    deactivate TopicVersion
+    TopicVersionService-->>ITopicVersionService: Result
+    deactivate TopicVersionService
+    ITopicVersionService-->>TopicVersionController: Result
+    deactivate ITopicVersionService
+    TopicVersionController-->>Supervisor: Response
+    deactivate TopicVersionController
+
+    alt Approval
+        Admin->>TopicVersionController: PUT /api/topic-version/approve (id)
+        activate TopicVersionController
+        TopicVersionController->>ITopicVersionService: ApproveTopicVersion(id)
+        activate ITopicVersionService
+        ITopicVersionService->>TopicVersionService: Approve(id)
+        activate TopicVersionService
+        TopicVersionService->>TopicVersion: UpdateStatus()
+        deactivate TopicVersion
+        TopicVersionService-->>ITopicVersionService: Result
+        deactivate TopicVersionService
+        ITopicVersionService-->>TopicVersionController: Result
+        deactivate ITopicVersionService
+        TopicVersionController-->>Admin: Response
+        deactivate TopicVersionController
+    end

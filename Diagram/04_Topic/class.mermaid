@@ -1,0 +1,13 @@
+classDiagram
+    class TopicController
+    class ITopicService
+    class TopicService
+    class Topic
+    class TopicCategory
+    class Semester
+
+    TopicController --> ITopicService
+    ITopicService <|.. TopicService
+    TopicService --> Topic
+    Topic --> TopicCategory
+    Topic --> Semester

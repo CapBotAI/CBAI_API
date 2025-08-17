@@ -1,0 +1,11 @@
+classDiagram
+    class AuthController
+    class IAuthService
+    class AuthService
+    class User
+    class JwtService
+
+    AuthController --> IAuthService
+    IAuthService <|.. AuthService
+    AuthService --> User
+    AuthService --> JwtService

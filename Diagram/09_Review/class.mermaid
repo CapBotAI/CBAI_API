@@ -1,0 +1,15 @@
+classDiagram
+    class ReviewController
+    class IReviewService
+    class ReviewService
+    class Review
+    class ReviewerAssignment
+    class ReviewCriteriaScore
+    class EvaluationCriteria
+
+    ReviewController --> IReviewService
+    IReviewService <|.. ReviewService
+    ReviewService --> Review
+    Review --> ReviewerAssignment
+    Review --> ReviewCriteriaScore
+    ReviewCriteriaScore --> EvaluationCriteria

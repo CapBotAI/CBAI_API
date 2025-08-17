@@ -1,0 +1,9 @@
+classDiagram
+    class ReviewerSuggestionController
+    class IReviewerSuggestionService
+    class ReviewerSuggestionService
+    class LecturerSkill
+
+    ReviewerSuggestionController --> IReviewerSuggestionService
+    IReviewerSuggestionService <|.. ReviewerSuggestionService
+    ReviewerSuggestionService --> LecturerSkill

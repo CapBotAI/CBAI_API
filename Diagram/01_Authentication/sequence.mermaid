@@ -1,0 +1,32 @@
+sequenceDiagram
+    actor User
+    participant AuthController
+    participant IAuthService
+    participant AuthService
+    participant User
+    participant JwtService
+
+    User->>AuthController: POST /api/auth/login (credentials)
+    activate AuthController
+    AuthController->>IAuthService: Login(credentials)
+    activate IAuthService
+    IAuthService->>AuthService: ValidateUser(credentials)
+    activate AuthService
+    AuthService->>User: GetByUsername()
+    activate User
+    User-->>AuthService: UserData
+    deactivate User
+    alt Valid credentials
+        AuthService->>JwtService: GenerateToken(UserData)
+        activate JwtService
+        JwtService-->>AuthService: JWT
+        deactivate JwtService
+        AuthService-->>IAuthService: AuthResult (JWT)
+    else Invalid credentials
+        AuthService-->>IAuthService: Error
+    end
+    deactivate AuthService
+    IAuthService-->>AuthController: Result
+    deactivate IAuthService
+    AuthController-->>User: Token/Result
+    deactivate AuthController

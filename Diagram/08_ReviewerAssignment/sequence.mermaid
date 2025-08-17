@@ -1,0 +1,23 @@
+sequenceDiagram
+    actor Moderator
+    participant ReviewerAssignmentController
+    participant IReviewerAssignmentService
+    participant ReviewerAssignmentService
+    participant ReviewerAssignment
+
+    Moderator->>ReviewerAssignmentController: POST /api/reviewer-assignments (data)
+    activate ReviewerAssignmentController
+    ReviewerAssignmentController->>IReviewerAssignmentService: AssignReviewer(data)
+    activate IReviewerAssignmentService
+    IReviewerAssignmentService->>ReviewerAssignmentService: Assign(data)
+    activate ReviewerAssignmentService
+    ReviewerAssignmentService->>ReviewerAssignment: Add()
+    activate ReviewerAssignment
+    ReviewerAssignment-->>ReviewerAssignmentService: AssignmentId
+    deactivate ReviewerAssignment
+    ReviewerAssignmentService-->>IReviewerAssignmentService: Result
+    deactivate ReviewerAssignmentService
+    IReviewerAssignmentService-->>ReviewerAssignmentController: Result
+    deactivate IReviewerAssignmentService
+    ReviewerAssignmentController-->>Moderator: Response
+    deactivate ReviewerAssignmentController
