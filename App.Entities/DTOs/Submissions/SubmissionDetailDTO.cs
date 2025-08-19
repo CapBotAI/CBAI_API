@@ -32,11 +32,17 @@ public class SubmissionDetailDTO
     public SubmissionStatus Status { get; set; } = SubmissionStatus.Pending;
 
     public DateTime? SubmittedAt { get; set; }
+    public DateTime? CreatedAt { get; set; }
+    public string? CreatedBy { get; set; }
+    public DateTime? LastModifiedAt { get; set; }
+    public string? LastModifiedBy { get; set; }
+    public DateTime? DeletedAt { get; set; }
+    public string? DeletedBy { get; set; }
 
     public SubmissionDetailDTO(Submission submission)
     {
         Id = submission.Id;
-        TopicVersionId = submission.TopicVersionId;
+        TopicVersionId = submission.TopicVersionId ?? 0;
         PhaseId = submission.PhaseId;
         SubmittedBy = submission.SubmittedBy;
         SubmissionRound = submission.SubmissionRound;
@@ -47,5 +53,10 @@ public class SubmissionDetailDTO
         AiCheckDetails = submission.AiCheckDetails;
         Status = submission.Status;
         SubmittedAt = submission.SubmittedAt;
+        CreatedAt = submission.CreatedAt;
+        CreatedBy = submission.CreatedBy;
+        LastModifiedAt = submission.LastModifiedAt;
+        LastModifiedBy = submission.LastModifiedBy;
+        DeletedAt = submission.DeletedAt;
     }
 }

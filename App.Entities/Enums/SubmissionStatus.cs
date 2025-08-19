@@ -5,5 +5,6 @@ public enum SubmissionStatus
     Pending = 1,
     UnderReview = 2,
     Completed = 3,
-    RevisionRequired = 4
+    RevisionRequired = 4,
+    EscalatedToModerator = 5
 }

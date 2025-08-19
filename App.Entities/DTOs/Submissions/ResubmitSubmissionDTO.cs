@@ -8,5 +8,6 @@ namespace App.Entities.DTOs.Submissions;
 public class ResubmitSubmissionDTO : IValidationPipeline
 {
     [Required] public int Id { get; set; }
+    [Required] public int TopicVersionId { get; set; }
     public BaseResponseModel Validate() => new BaseResponseModel { IsSuccess = true };
 }
