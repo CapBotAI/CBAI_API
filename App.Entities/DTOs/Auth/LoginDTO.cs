@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 using App.Commons;
+using App.Entities.Entities.Core;
+using App.Entities.Enums;
 
 namespace App.Entities.DTOs.Auth;
 
@@ -10,4 +12,7 @@ public class LoginDTO
 
     [Required(ErrorMessage = "Password is required")]
     public string Password { get; set; } = null!;
+
+    [Required(ErrorMessage = "Role is required")]
+    public SystemRoles Role { get; set; }
 }
