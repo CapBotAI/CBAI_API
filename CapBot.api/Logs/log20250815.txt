@@ -1,3 +1,4 @@
+
 2025-08-15 10:39:10.146 +07:00 [DBG] An 'IServiceProvider' was created for internal use by Entity Framework.
 2025-08-15 10:39:10.358 +07:00 [DBG] No relationship from 'ReviewerAssignment' to 'User' has been configured by convention because there are multiple properties on one entity type - {'AssignedByUser', 'Reviewer'} that could be matched with the properties on the other entity type - {'ReviewerAssignments'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
 2025-08-15 10:39:10.372 +07:00 [DBG] No relationship from 'SubmissionWorkflowLog' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromStateLogs', 'ToStateLogs'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
@@ -719,6 +720,7 @@ ORDER BY [MigrationId];
 'DbSet<Role>()
     .FirstOrDefault(r => r.NormalizedName == __normalizedName_0)'
 2025-08-15 10:42:36.452 +07:00 [DBG] Generated query execution expression: 
+
 'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<Role>(
     asyncEnumerable: new SingleQueryingEnumerable<Role>(
         (RelationalQueryContext)queryContext, 
@@ -736,6 +738,7 @@ ORDER BY [MigrationId];
         True
     ), 
     cancellationToken: queryContext.CancellationToken)'
+
 2025-08-15 10:42:36.479 +07:00 [DBG] Creating DbConnection.
 2025-08-15 10:42:36.491 +07:00 [DBG] Created DbConnection. (11ms).
 2025-08-15 10:42:36.495 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
@@ -814,6 +817,7 @@ WHERE [r].[NormalizedName] = @__normalizedName_0
 'DbSet<User>()
     .SingleOrDefault(u => u.NormalizedEmail == __normalizedEmail_0)'
 2025-08-15 10:42:36.930 +07:00 [DBG] Generated query execution expression: 
+
 'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<User>(
     asyncEnumerable: new SingleQueryingEnumerable<User>(
         (RelationalQueryContext)queryContext, 
@@ -831,6 +835,7 @@ WHERE [r].[NormalizedName] = @__normalizedName_0
         True
     ), 
     cancellationToken: queryContext.CancellationToken)'
+
 2025-08-15 10:42:36.932 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
 2025-08-15 10:42:36.932 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
 2025-08-15 10:42:36.932 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
@@ -6242,12 +6247,14 @@ System.IO.IOException: Received an unexpected EOF or 0 bytes from the transport 
             WHERE r.NormalizedName == @__normalizedName_0), 
         null, 
         Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, Role>, 
+
         App.DAL.Context.MyDbContext, 
         False, 
         False, 
         True
     ), 
     cancellationToken: queryContext.CancellationToken)'
+
 2025-08-15 12:22:50.579 +07:00 [DBG] Creating DbConnection.
 2025-08-15 12:22:50.591 +07:00 [DBG] Created DbConnection. (10ms).
 2025-08-15 12:22:50.594 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
@@ -6337,12 +6344,14 @@ WHERE [r].[NormalizedName] = @__normalizedName_0
             WHERE u.NormalizedEmail == @__normalizedEmail_0), 
         null, 
         Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, User>, 
+
         App.DAL.Context.MyDbContext, 
         False, 
         False, 
         True
     ), 
     cancellationToken: queryContext.CancellationToken)'
+
 2025-08-15 12:22:50.961 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
 2025-08-15 12:22:50.962 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
 2025-08-15 12:22:50.962 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
@@ -6533,6 +6542,7 @@ System.IO.IOException: Received an unexpected EOF or 0 bytes from the transport 
 'DbSet<Role>()
     .FirstOrDefault(r => r.NormalizedName == __normalizedName_0)'
 2025-08-15 12:24:55.340 +07:00 [DBG] Generated query execution expression: 
+
 'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<Role>(
     asyncEnumerable: new SingleQueryingEnumerable<Role>(
         (RelationalQueryContext)queryContext, 
@@ -6550,6 +6560,7 @@ System.IO.IOException: Received an unexpected EOF or 0 bytes from the transport 
         True
     ), 
     cancellationToken: queryContext.CancellationToken)'
+
 2025-08-15 12:24:55.366 +07:00 [DBG] Creating DbConnection.
 2025-08-15 12:24:55.378 +07:00 [DBG] Created DbConnection. (10ms).
 2025-08-15 12:24:55.381 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
@@ -6628,6 +6639,7 @@ WHERE [r].[NormalizedName] = @__normalizedName_0
 'DbSet<User>()
     .SingleOrDefault(u => u.NormalizedEmail == __normalizedEmail_0)'
 2025-08-15 12:24:55.746 +07:00 [DBG] Generated query execution expression: 
+
 'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<User>(
     asyncEnumerable: new SingleQueryingEnumerable<User>(
         (RelationalQueryContext)queryContext, 
@@ -6645,6 +6657,7 @@ WHERE [r].[NormalizedName] = @__normalizedName_0
         True
     ), 
     cancellationToken: queryContext.CancellationToken)'
+
 2025-08-15 12:24:55.749 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
 2025-08-15 12:24:55.749 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
 2025-08-15 12:24:55.749 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
@@ -6795,3 +6808,4 @@ System.IO.IOException: Received an unexpected EOF or 0 bytes from the transport 
 2025-08-15 12:25:49.783 +07:00 [DBG] The connection queue processing loop for 0HNERNG93SMDG completed.
 2025-08-15 12:25:49.785 +07:00 [DBG] Connection id "0HNERNG93SMDG" stopped.
 2025-08-15 12:25:49.789 +07:00 [DBG] Hosting stopped
+

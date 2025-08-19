@@ -11,13 +11,13 @@ namespace App.Entities.DTOs.Submissions;
 
 public class CreateSubmissionDTO : IValidationPipeline, IEntity<Submission>
 {
-    [Required] public int TopicVersionId { get; set; }
+    [Required] public int TopicId { get; set; }
     [Required] public int PhaseId { get; set; }
     public string? DocumentUrl { get; set; }
     public string? AdditionalNotes { get; set; }
     public Submission GetEntity() => new Submission
     {
-        TopicVersionId = TopicVersionId,
+        TopicId = TopicId,
         PhaseId = PhaseId,
         DocumentUrl = DocumentUrl?.Trim(),
         AdditionalNotes = AdditionalNotes?.Trim(),

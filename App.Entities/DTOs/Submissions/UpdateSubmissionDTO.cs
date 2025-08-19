@@ -10,14 +10,12 @@ namespace App.Entities.DTOs.Submissions;
 public class UpdateSubmissionDTO : IValidationPipeline, IEntity<Submission>
 {
     [Required] public int Id { get; set; }
-    [Required] public int TopicVersionId { get; set; }
     [Required] public int PhaseId { get; set; }
     public string? DocumentUrl { get; set; }
     public string? AdditionalNotes { get; set; }
     public Submission GetEntity() => new Submission
     {
         Id = Id,
-        TopicVersionId = TopicVersionId,
         PhaseId = PhaseId,
         DocumentUrl = DocumentUrl?.Trim(),
         AdditionalNotes = AdditionalNotes?.Trim(),

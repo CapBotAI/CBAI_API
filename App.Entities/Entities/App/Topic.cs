@@ -31,4 +31,5 @@ public partial class Topic : CommonDataModel
     public virtual TopicCategory? Category { get; set; }
     public virtual Semester Semester { get; set; } = null!;
     public virtual ICollection<TopicVersion> TopicVersions { get; set; } = new List<TopicVersion>();
+    public virtual ICollection<Submission> Submissions { get; set; } = new List<Submission>();
 }

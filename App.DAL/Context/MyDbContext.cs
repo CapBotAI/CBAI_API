@@ -312,11 +312,17 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.Status).HasDefaultValue(App.Entities.Enums.SubmissionStatus.Pending);
             entity.Property(e => e.SubmittedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+            entity.HasOne(d => d.Topic)
+                .WithMany(p => p.Submissions)
+                .HasForeignKey(d => d.TopicId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasOne(d => d.TopicVersion)
                 .WithMany(p => p.Submissions)
                 .HasForeignKey(d => d.TopicVersionId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(d => d.Phase)
                 .WithMany(p => p.Submissions)
@@ -330,7 +336,7 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasIndex(e => new { e.TopicVersionId, e.PhaseId, e.SubmissionRound }).IsUnique();
+            entity.HasIndex(e => new { e.TopicId, e.PhaseId, e.SubmissionRound }).IsUnique();
             entity.HasIndex(e => new { e.PhaseId, e.Status });
             entity.HasIndex(e => new { e.PhaseId, e.Status, e.SubmittedAt });
         });

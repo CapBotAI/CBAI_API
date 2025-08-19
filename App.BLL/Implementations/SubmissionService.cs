@@ -41,28 +41,27 @@ public class SubmissionService : ISubmissionService
                 };
             }
 
-            var versionRepo = _unitOfWork.GetRepo<TopicVersion>();
-            var topicVersion = await versionRepo.GetSingleAsync(new QueryBuilder<TopicVersion>()
-                .WithPredicate(x => x.Id == dto.TopicVersionId && x.IsActive && x.DeletedAt == null)
-                .WithInclude(x => x.Topic)
-                .WithTracking(false)
+            var topicRepo = _unitOfWork.GetRepo<Topic>();
+            var topic = await topicRepo.GetSingleAsync(new QueryBuilder<Topic>()
+                .WithPredicate(x => x.Id == dto.TopicId && x.IsActive && x.DeletedAt == null)
+                .WithTracking(true)
                 .Build());
 
-            if (topicVersion == null)
+
+            if (topic == null)
             {
                 return new BaseResponseModel<SubmissionDetailDTO>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Phiên bản chủ đề không tồn tại"
+                    Message = "Chủ đề không tồn tại"
                 };
             }
 
             var phaseRepo = _unitOfWork.GetRepo<Phase>();
             var phase = await phaseRepo.GetSingleAsync(new QueryBuilder<Phase>()
                 .WithPredicate(x => x.Id == dto.PhaseId && x.IsActive && x.DeletedAt == null)
-                .WithInclude(x => x.Semester)
-                .WithTracking(false)
+                .WithTracking(true)
                 .Build());
 
             if (phase == null)
@@ -75,18 +74,10 @@ public class SubmissionService : ISubmissionService
                 };
             }
 
-            if (topicVersion.Status != TopicStatus.Draft)
-            {
-                return new BaseResponseModel<SubmissionDetailDTO>
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Chỉ có thể tạo submission cho phiên bản ở trạng thái Draft"
-                };
-            }
+
 
             // Ràng buộc semester của phase và topic
-            if (topicVersion.Topic.SemesterId != phase.SemesterId)
+            if (topic.SemesterId != phase.SemesterId)
             {
                 return new BaseResponseModel<SubmissionDetailDTO>
                 {
@@ -103,9 +94,6 @@ public class SubmissionService : ISubmissionService
             submission.SubmittedBy = userId;
 
             await submissionRepo.CreateAsync(submission);
-
-            topicVersion.Status = TopicStatus.SubmissionPending;
-            await versionRepo.UpdateAsync(topicVersion);
 
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
@@ -124,7 +112,6 @@ public class SubmissionService : ISubmissionService
             throw;
         }
     }
-
     public async Task<BaseResponseModel<SubmissionDetailDTO>> UpdateSubmission(UpdateSubmissionDTO dto, int userId)
     {
         try
@@ -144,6 +131,8 @@ public class SubmissionService : ISubmissionService
             var submission = await submissionRepo.GetSingleAsync(new QueryBuilder<Submission>()
                 .WithPredicate(x => x.Id == dto.Id && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.Phase)
+                .WithInclude(x => x.Topic)
+                .WithInclude(x => x.TopicVersion)
                 .WithTracking(true)
                 .Build());
 
@@ -179,61 +168,6 @@ public class SubmissionService : ISubmissionService
 
             await _unitOfWork.BeginTransactionAsync();
 
-            if (submission.TopicVersionId != dto.TopicVersionId)
-            {
-                var versionRepo = _unitOfWork.GetRepo<TopicVersion>();
-
-                // old version (hiện đang gắn với submission)
-                var oldVersion = await versionRepo.GetSingleAsync(new QueryBuilder<TopicVersion>()
-                    .WithPredicate(x => x.Id == submission.TopicVersionId)
-                    .WithTracking(true)
-                    .Build());
-
-                // new version (chuẩn bị gắn)
-                var topicVersion = await versionRepo.GetSingleAsync(new QueryBuilder<TopicVersion>()
-                    .WithPredicate(x => x.Id == dto.TopicVersionId && x.IsActive && x.DeletedAt == null)
-                    .WithInclude(x => x.Topic)
-                    .WithTracking(true)
-                    .Build());
-
-                if (topicVersion == null)
-                {
-                    await _unitOfWork.RollBackAsync();
-                    return new BaseResponseModel<SubmissionDetailDTO>
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status404NotFound,
-                        Message = "Phiên bản chủ đề không tồn tại"
-                    };
-                }
-
-                if (topicVersion.Status != TopicStatus.Draft)
-                {
-                    await _unitOfWork.RollBackAsync();
-                    return new BaseResponseModel<SubmissionDetailDTO>
-                    {
-                        IsSuccess = false,
-                        StatusCode = StatusCodes.Status400BadRequest,
-                        Message = "Chỉ có thể đổi phiên bản ở trạng thái Draft"
-                    };
-                }
-
-                topicVersion.Status = TopicStatus.SubmissionPending;
-                await versionRepo.UpdateAsync(topicVersion);
-
-                if (oldVersion != null)
-                {
-                    if (oldVersion.Status == TopicStatus.SubmissionPending)
-                        oldVersion.Status = TopicStatus.Draft;
-                    else if (oldVersion.Status == TopicStatus.Submitted)
-                        oldVersion.Status = TopicStatus.Archived;
-
-                    await versionRepo.UpdateAsync(oldVersion);
-                }
-
-                submission.TopicVersionId = dto.TopicVersionId;
-            }
-
             if (submission.PhaseId != dto.PhaseId)
             {
                 var phaseRepo = _unitOfWork.GetRepo<Phase>();
@@ -254,16 +188,9 @@ public class SubmissionService : ISubmissionService
                     };
                 }
 
-                // Ensure semester consistency
-                // Lấy topicVersion hiện tại để đối chiếu
-                var versionRepo = _unitOfWork.GetRepo<TopicVersion>();
-                var currentVersion = await versionRepo.GetSingleAsync(new QueryBuilder<TopicVersion>()
-                    .WithPredicate(x => x.Id == submission.TopicVersionId)
-                    .WithInclude(x => x.Topic)
-                    .WithTracking(false)
-                    .Build());
-
-                if (currentVersion == null || currentVersion.Topic.SemesterId != phase.SemesterId)
+                // So khớp học kỳ dựa trên Topic nếu không có TopicVersion; nếu có TopicVersion thì Topic vẫn cùng học kỳ
+                var topicSemesterId = submission.Topic?.SemesterId;
+                if (!topicSemesterId.HasValue || topicSemesterId.Value != phase.SemesterId)
                 {
                     await _unitOfWork.RollBackAsync();
                     return new BaseResponseModel<SubmissionDetailDTO>
@@ -325,6 +252,7 @@ public class SubmissionService : ISubmissionService
                 .WithPredicate(x => x.Id == dto.Id && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.Phase)
                 .WithInclude(x => x.TopicVersion)
+                .WithInclude(x => x.Topic)
                 .WithTracking(true)
                 .Build());
 
@@ -358,18 +286,6 @@ public class SubmissionService : ISubmissionService
                 };
             }
 
-            //check status topic version
-            if (submission.TopicVersion.Status != TopicStatus.SubmissionPending)
-            {
-                return new BaseResponseModel
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Chỉ được submit khi topic version đang ở trạng thái SubmissionPending"
-                };
-            }
-
-
             // Check deadline
             if (submission.Phase.SubmissionDeadline.HasValue &&
                 DateTime.Now > submission.Phase.SubmissionDeadline.Value)
@@ -388,9 +304,12 @@ public class SubmissionService : ISubmissionService
             submission.SubmittedAt = DateTime.Now;
             await submissionRepo.UpdateAsync(submission);
 
-            var versionRepo = _unitOfWork.GetRepo<TopicVersion>();
-            submission.TopicVersion.Status = TopicStatus.Submitted;
-            await versionRepo.UpdateAsync(submission.TopicVersion);
+            if (submission.TopicVersionId.HasValue && submission.TopicVersion != null)
+            {
+                var versionRepo = _unitOfWork.GetRepo<TopicVersion>();
+                submission.TopicVersion.Status = TopicStatus.Submitted;
+                await versionRepo.UpdateAsync(submission.TopicVersion);
+            }
 
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
@@ -473,10 +392,10 @@ public class SubmissionService : ISubmissionService
                 };
             }
 
-            // Ensure TopicVersion is prepared (SubmissionPending)
             var versionRepo = _unitOfWork.GetRepo<TopicVersion>();
             var topicVersion = await versionRepo.GetSingleAsync(new QueryBuilder<TopicVersion>()
-                .WithPredicate(x => x.Id == submission.TopicVersionId)
+                .WithPredicate(x => x.Id == dto.TopicVersionId && x.IsActive && x.DeletedAt == null)
+                .WithInclude(x => x.Topic)
                 .WithTracking(true)
                 .Build());
 
@@ -490,13 +409,23 @@ public class SubmissionService : ISubmissionService
                 };
             }
 
-            if (topicVersion.Status != TopicStatus.SubmissionPending)
+            if (topicVersion.Status != TopicStatus.Draft)
             {
                 return new BaseResponseModel
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "TopicVersion phải ở trạng thái SubmissionPending trước khi resubmit"
+                    Message = "TopicVersion phải ở trạng thái Draft trước khi resubmit"
+                };
+            }
+
+            if (topicVersion.TopicId != submission.TopicId)
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status409Conflict,
+                    Message = "TopicVersion không thuộc cùng Topic với Submission."
                 };
             }
 
@@ -505,6 +434,7 @@ public class SubmissionService : ISubmissionService
             submission.Status = SubmissionStatus.UnderReview;
             submission.SubmittedAt = DateTime.Now;
             submission.SubmissionRound += 1;
+            submission.TopicVersionId = topicVersion.Id;
             await submissionRepo.UpdateAsync(submission);
 
             topicVersion.Status = TopicStatus.Submitted;
@@ -701,6 +631,7 @@ public class SubmissionService : ISubmissionService
 
             submission.IsActive = false;
             submission.DeletedAt = DateTime.Now;
+            submission.LastModifiedBy = user.UserName;
             await submissionRepo.UpdateAsync(submission);
 
             await _unitOfWork.SaveChangesAsync();
