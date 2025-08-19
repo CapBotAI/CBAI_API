@@ -89,33 +89,11 @@ public class TopicService : ITopicService
             await topicRepo.CreateAsync(topic);
             await _unitOfWork.SaveChangesAsync();
 
-            // Create initial TopicVersion
-            var topicVersion = new TopicVersion
-            {
-                TopicId = topic.Id,
-                VersionNumber = 1,
-                Title = createTopicDTO.Title.Trim(),
-                Description = createTopicDTO.Description?.Trim(),
-                Objectives = createTopicDTO.Objectives?.Trim(),
-                Methodology = createTopicDTO.Methodology?.Trim(),
-                ExpectedOutcomes = createTopicDTO.ExpectedOutcomes?.Trim(),
-                Requirements = createTopicDTO.Requirements?.Trim(),
-                DocumentUrl = createTopicDTO.DocumentUrl?.Trim(),
-                Status = TopicStatus.Draft,
-                IsActive = true,
-                CreatedBy = user.UserName,
-                CreatedAt = DateTime.Now
-            };
-
-            await versionRepo.CreateAsync(topicVersion);
-
-            await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
 
             topic.Supervisor = user;
             topic.Category = category;
             topic.Semester = semester;
-            topic.TopicVersions = new List<TopicVersion> { topicVersion };
 
             return new BaseResponseModel<CreateTopicResDTO>
             {

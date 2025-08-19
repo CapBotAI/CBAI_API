@@ -1,5 +1,6 @@
 using System;
 using App.Entities.Entities.App;
+using Azure.Core.Pipeline;
 
 namespace App.Entities.DTOs.Phases;
 
@@ -17,6 +18,11 @@ public class PhaseDetailDTO
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public DateTime? SubmissionDeadline { get; set; }
+    public DateTime? CreatedDate { get; set; }
+    public string? CreatedBy { get; set; }
+    public DateTime? LastModifiedAt { get; set; }
+    public string? LastModifiedBy { get; set; }
+    public DateTime? DeletedAt { get; set; }
 
     public PhaseDetailDTO(Phase phase)
     {
@@ -29,5 +35,10 @@ public class PhaseDetailDTO
         StartDate = phase.StartDate;
         EndDate = phase.EndDate;
         SubmissionDeadline = phase.SubmissionDeadline;
+        CreatedDate = phase.CreatedAt;
+        CreatedBy = phase.CreatedBy;
+        LastModifiedAt = phase.LastModifiedAt;
+        LastModifiedBy = phase.LastModifiedBy;
+        DeletedAt = phase.DeletedAt;
     }
 }
