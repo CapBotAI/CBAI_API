@@ -1,3 +1,5 @@
+using App.Entities.DTOs.EvaluationCriteria;
+using App.Entities.DTOs.Review;
 using App.Entities.DTOs.ReviewerAssignment;
 using App.Entities.Entities.App;
 using App.Entities.Entities.Core;
@@ -12,16 +14,34 @@ public class MapperProfile : Profile
         CreateMap<ReviewerAssignment, ReviewerAssignmentResponseDTO>()
             .ForMember(dest => dest.Reviewer, opt => opt.MapFrom(src => src.Reviewer))
             .ForMember(dest => dest.AssignedByUser, opt => opt.MapFrom(src => src.AssignedByUser))
-            .ForMember(dest => dest.SubmissionTitle, opt => opt.MapFrom(src => 
+            .ForMember(dest => dest.SubmissionTitle, opt => opt.MapFrom(src =>
                 src.Submission.TopicVersion.Topic.Title))
-            .ForMember(dest => dest.TopicTitle, opt => opt.MapFrom(src => 
+            .ForMember(dest => dest.TopicTitle, opt => opt.MapFrom(src =>
                 src.Submission.TopicVersion.Topic.Title));
 
         CreateMap<User, AvailableReviewerDTO>()
-            .ForMember(dest => dest.Skills, opt => opt.MapFrom(src => 
+            .ForMember(dest => dest.Skills, opt => opt.MapFrom(src =>
                 src.LecturerSkills.Select(ls => ls.SkillTag).ToList()))
             .ForMember(dest => dest.CurrentAssignments, opt => opt.Ignore())
             .ForMember(dest => dest.CompletedAssignments, opt => opt.Ignore())
             .ForMember(dest => dest.IsAvailable, opt => opt.Ignore());
+
+        // EvaluationCriteria mappings
+        CreateMap<CreateEvaluationCriteriaDTO, EvaluationCriteria>();
+        CreateMap<UpdateEvaluationCriteriaDTO, EvaluationCriteria>();
+        CreateMap<EvaluationCriteria, EvaluationCriteriaResponseDTO>();
+
+        // Review mappings
+        CreateMap<CreateReviewDTO, Review>()
+            .ForMember(dest => dest.ReviewCriteriaScores, opt => opt.Ignore());
+        CreateMap<UpdateReviewDTO, Review>()
+            .ForMember(dest => dest.ReviewCriteriaScores, opt => opt.Ignore());
+        CreateMap<Review, ReviewResponseDTO>()
+            .ForMember(dest => dest.CriteriaScores, opt => opt.MapFrom(src =>
+                src.ReviewCriteriaScores.Where(x => x.IsActive)));
+
+        // ReviewCriteriaScore mappings
+        CreateMap<CriteriaScoreDTO, ReviewCriteriaScore>();
+        CreateMap<ReviewCriteriaScore, CriteriaScoreResponseDTO>();
     }
 }
