@@ -1,0 +1,13 @@
+classDiagram
+    class SubmissionController
+    class ISubmissionService
+    class SubmissionService
+    class Submission
+    class Phase
+    class TopicVersion
+
+    SubmissionController --> ISubmissionService
+    ISubmissionService <|.. SubmissionService
+    SubmissionService --> Submission
+    Submission --> Phase
+    Submission --> TopicVersion

@@ -1,0 +1,9 @@
+classDiagram
+    class ReviewerAssignmentController
+    class IReviewerAssignmentService
+    class ReviewerAssignmentService
+    class ReviewerAssignment
+
+    ReviewerAssignmentController --> IReviewerAssignmentService
+    IReviewerAssignmentService <|.. ReviewerAssignmentService
+    ReviewerAssignmentService --> ReviewerAssignment

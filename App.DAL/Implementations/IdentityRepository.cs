@@ -230,6 +230,16 @@ public class IdentityRepository : IIdentityRepository
         return false;
     }
 
+    /// <summary>
+    ///kKiểm tra role tồn tại
+    /// </summary>
+    /// <param name="roleName"></param>
+    /// <returns></returns>
+    public async Task<bool> IsRoleExist(string roleName)
+    {
+        return await _roleManager.RoleExistsAsync(roleName);
+    }
+
     public async Task<bool> AddRoleByNameAsync(string userId, string roleName)
     {
         var user = await _userManager.FindByIdAsync(userId);
@@ -245,6 +255,19 @@ public class IdentityRepository : IIdentityRepository
         }
 
         return false;
+    }
+
+
+    /// <summary>
+    /// Adds a list of roles to a user.
+    /// </summary>
+    /// <param name="userId"></param>
+    /// <param name="roles"></param>
+    /// <returns></returns>
+    public async Task<bool> AddRolesToUserAsync(User user, List<string> roles)
+    {
+        var result = await _userManager.AddToRolesAsync(user, roles);
+        return result.Succeeded;
     }
 
     public async Task<string> GenerateEmailConfirmationTokenAsync(User user)

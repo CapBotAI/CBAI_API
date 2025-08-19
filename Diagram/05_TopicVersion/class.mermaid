@@ -1,0 +1,11 @@
+classDiagram
+    class TopicVersionController
+    class ITopicVersionService
+    class TopicVersionService
+    class TopicVersion
+    class Topic
+
+    TopicVersionController --> ITopicVersionService
+    ITopicVersionService <|.. TopicVersionService
+    TopicVersionService --> TopicVersion
+    TopicVersion --> Topic

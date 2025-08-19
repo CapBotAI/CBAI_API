@@ -1,0 +1,21 @@
+classDiagram
+    class SemesterController
+    class ISemesterService
+    class SemesterService
+    class Semester
+    class IPhaseTypeService
+    class PhaseTypeService
+    class PhaseType
+    class IPhaseService
+    class PhaseService
+    class Phase
+
+    SemesterController --> ISemesterService
+    ISemesterService <|.. SemesterService
+    SemesterService --> Semester
+    SemesterController --> IPhaseTypeService
+    IPhaseTypeService <|.. PhaseTypeService
+    PhaseTypeService --> PhaseType
+    SemesterController --> IPhaseService
+    IPhaseService <|.. PhaseService
+    PhaseService --> Phase

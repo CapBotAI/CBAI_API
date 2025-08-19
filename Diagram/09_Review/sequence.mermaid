@@ -1,0 +1,38 @@
+sequenceDiagram
+    actor Reviewer
+    participant ReviewController
+    participant IReviewService
+    participant ReviewService
+    participant Review
+    participant ReviewerAssignment
+    participant ReviewCriteriaScore
+    participant EvaluationCriteria
+
+    Reviewer->>ReviewController: POST /api/review (data)
+    activate ReviewController
+    ReviewController->>IReviewService: SubmitReview(data)
+    activate IReviewService
+    IReviewService->>ReviewService: Create(data)
+    activate ReviewService
+    ReviewService->>Review: Add()
+    activate Review
+    Review-->>ReviewService: ReviewId
+    deactivate Review
+    ReviewService->>ReviewerAssignment: GetAssignment()
+    activate ReviewerAssignment
+    ReviewerAssignment-->>ReviewService: AssignmentData
+    deactivate ReviewerAssignment
+    ReviewService->>ReviewCriteriaScore: AddScores()
+    activate ReviewCriteriaScore
+    ReviewCriteriaScore->>EvaluationCriteria: GetCriteria()
+    activate EvaluationCriteria
+    EvaluationCriteria-->>ReviewCriteriaScore: CriteriaData
+    deactivate EvaluationCriteria
+    ReviewCriteriaScore-->>ReviewService: ScoresAdded
+    deactivate ReviewCriteriaScore
+    ReviewService-->>IReviewService: Result
+    deactivate ReviewService
+    IReviewService-->>ReviewController: Result
+    deactivate IReviewService
+    ReviewController-->>Reviewer: Response
+    deactivate ReviewController

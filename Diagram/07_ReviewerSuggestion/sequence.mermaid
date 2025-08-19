@@ -1,0 +1,23 @@
+sequenceDiagram
+    actor Moderator
+    participant ReviewerSuggestionController
+    participant IReviewerSuggestionService
+    participant ReviewerSuggestionService
+    participant LecturerSkill
+
+    Moderator->>ReviewerSuggestionController: GET /api/reviewer-suggestion (params)
+    activate ReviewerSuggestionController
+    ReviewerSuggestionController->>IReviewerSuggestionService: SuggestReviewers(params)
+    activate IReviewerSuggestionService
+    IReviewerSuggestionService->>ReviewerSuggestionService: GetSuggestions(params)
+    activate ReviewerSuggestionService
+    ReviewerSuggestionService->>LecturerSkill: AnalyzeSkills()
+    activate LecturerSkill
+    LecturerSkill-->>ReviewerSuggestionService: SkillMatch
+    deactivate LecturerSkill
+    ReviewerSuggestionService-->>IReviewerSuggestionService: Suggestions
+    deactivate ReviewerSuggestionService
+    IReviewerSuggestionService-->>ReviewerSuggestionController: ReviewerList
+    deactivate IReviewerSuggestionService
+    ReviewerSuggestionController-->>Moderator: ReviewerList
+    deactivate ReviewerSuggestionController

@@ -1,0 +1,43 @@
+sequenceDiagram
+    actor Supervisor
+    actor Reviewer
+    participant SubmissionController
+    participant ISubmissionService
+    participant SubmissionService
+    participant Submission
+    participant Phase
+    participant TopicVersion
+
+    Supervisor->>SubmissionController: POST /api/submission (data)
+    activate SubmissionController
+    SubmissionController->>ISubmissionService: SubmitWork(data)
+    activate ISubmissionService
+    ISubmissionService->>SubmissionService: Create(data)
+    activate SubmissionService
+    SubmissionService->>Submission: Add()
+    activate Submission
+    Submission-->>SubmissionService: SubmissionId
+    deactivate Submission
+    SubmissionService-->>ISubmissionService: Result
+    deactivate SubmissionService
+    ISubmissionService-->>SubmissionController: Result
+    deactivate ISubmissionService
+    SubmissionController-->>Supervisor: Response
+    deactivate SubmissionController
+
+    alt Resubmission
+        Reviewer->>SubmissionController: PUT /api/submission/resubmit (id)
+        activate SubmissionController
+        SubmissionController->>ISubmissionService: RequestResubmission(id)
+        activate ISubmissionService
+        ISubmissionService->>SubmissionService: UpdateStatus(id)
+        activate SubmissionService
+        SubmissionService->>Submission: Update()
+        deactivate Submission
+        SubmissionService-->>ISubmissionService: Result
+        deactivate SubmissionService
+        ISubmissionService-->>SubmissionController: Result
+        deactivate ISubmissionService
+        SubmissionController-->>Reviewer: Response
+        deactivate SubmissionController
+    end

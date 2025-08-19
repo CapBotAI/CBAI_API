@@ -1,0 +1,57 @@
+sequenceDiagram
+    actor Admin
+    participant SemesterController
+    participant ISemesterService
+    participant SemesterService
+    participant Semester
+    participant IPhaseTypeService
+    participant PhaseTypeService
+    participant PhaseType
+    participant IPhaseService
+    participant PhaseService
+    participant Phase
+
+    Admin->>SemesterController: POST /api/semester (data)
+    activate SemesterController
+    SemesterController->>ISemesterService: CreateSemester(data)
+    activate ISemesterService
+    ISemesterService->>SemesterService: Create(data)
+    activate SemesterService
+    SemesterService->>Semester: Add()
+    deactivate Semester
+    SemesterService-->>ISemesterService: Result
+    deactivate SemesterService
+    ISemesterService-->>SemesterController: Result
+    deactivate ISemesterService
+    SemesterController-->>Admin: Response
+    deactivate SemesterController
+
+    Admin->>SemesterController: POST /api/phase-type (data)
+    activate SemesterController
+    SemesterController->>IPhaseTypeService: CreatePhaseType(data)
+    activate IPhaseTypeService
+    IPhaseTypeService->>PhaseTypeService: Create(data)
+    activate PhaseTypeService
+    PhaseTypeService->>PhaseType: Add()
+    deactivate PhaseType
+    PhaseTypeService-->>IPhaseTypeService: Result
+    deactivate PhaseTypeService
+    IPhaseTypeService-->>SemesterController: Result
+    deactivate IPhaseTypeService
+    SemesterController-->>Admin: Response
+    deactivate SemesterController
+
+    Admin->>SemesterController: POST /api/phase (data)
+    activate SemesterController
+    SemesterController->>IPhaseService: CreatePhase(data)
+    activate IPhaseService
+    IPhaseService->>PhaseService: Create(data)
+    activate PhaseService
+    PhaseService->>Phase: Add()
+    deactivate Phase
+    PhaseService-->>IPhaseService: Result
+    deactivate PhaseService
+    IPhaseService-->>SemesterController: Result
+    deactivate IPhaseService
+    SemesterController-->>Admin: Response
+    deactivate SemesterController

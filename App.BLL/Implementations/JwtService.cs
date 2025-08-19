@@ -80,6 +80,44 @@ public class JwtService : IJwtService
         };
     }
 
+    public async Task<JwtTokenDTO> GenerateJwtTokenWithSpecificRole(User user, string role)
+    {
+        var email = user.Email ?? string.Empty;
+        var userId = user.Id.ToString();
+        var userName = user.UserName ?? string.Empty;
+
+        var claims = new List<Claim>
+    {
+        new(ClaimTypes.Email, email),
+        new(ClaimTypes.NameIdentifier, userId),
+        new(ClaimTypes.Name, userName),
+        new(ClaimTypes.Role, role.ToString()),
+        new(ConstantModel.CLAIM_EMAIL, email),
+        new(ConstantModel.POLICY_VERIFY_EMAIL, user.EmailConfirmed.ToString()),
+        new(ConstantModel.CLAIM_ID, userId),
+    };
+
+        var key = Encoding.ASCII.GetBytes(_configuration["JwtSettings:SecretKey"]);
+        var tokenDescriptor = new SecurityTokenDescriptor
+        {
+            Subject = new ClaimsIdentity(claims),
+            Expires = DateTime.Now.AddHours(24),
+            SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature),
+            Issuer = ConstantModel.JWT_ISSUER,
+            Audience = ConstantModel.JWT_AUDIENCE
+        };
+
+        var tokenHandler = new JwtSecurityTokenHandler();
+        var token = tokenHandler.CreateToken(tokenDescriptor);
+
+        return new JwtTokenDTO
+        {
+            AccessToken = tokenHandler.WriteToken(token),
+            RefreshToken = "Tạm thời chưa implement",
+            ExpiryTime = tokenDescriptor.Expires.Value
+        };
+    }
+
 
     public async Task<bool> ValidateTokenAsync(string token)
     {
@@ -116,6 +154,11 @@ public class JwtService : IJwtService
     }
 
     #region Private Methods
+
+    private static Claim GetRoleClaim(SystemRoles role)
+    {
+        return new Claim(ClaimTypes.Role, role.ToString());
+    }
 
     private static IEnumerable<Claim> GetRoleClaims(IEnumerable<string> roles)
     {
