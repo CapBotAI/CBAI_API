@@ -1,0 +1,60 @@
+classDiagram
+    class AuthController {
+        -IAuthService _authService
+        -ILogger~AuthController~ _logger
+        +Register(RegisterDTO) IActionResult
+        +Login(LoginDTO) IActionResult
+    }
+    
+    class IAuthService {
+        <<interface>>
+        +SignUpAsync(RegisterDTO) Task~BaseResponseModel~RegisterResDTO~~
+        +SignInAsync(LoginDTO) Task~BaseResponseModel~LoginResponseDTO~~
+    }
+    
+    class AuthService {
+        +SignUpAsync(RegisterDTO) Task~BaseResponseModel~RegisterResDTO~~
+        +SignInAsync(LoginDTO) Task~BaseResponseModel~LoginResponseDTO~~
+    }
+    
+    class User {
+        +int Id
+        +string UserName
+        +string Email
+        +string PasswordHash
+        +DateTime CreatedAt
+        +DateTime LastModifiedAt
+        +ICollection~UserRole~ UserRoles
+    }
+    
+    class JwtService {
+        +GenerateToken(User) string
+        +ValidateToken(string) ClaimsPrincipal
+    }
+    
+    class RegisterDTO {
+        +string Email
+        +string Password
+        +string FullName
+        +string PhoneNumber
+    }
+    
+    class LoginDTO {
+        +string EmailOrUsername
+        +string Password
+    }
+    
+    class LoginResponseDTO {
+        +string Token
+        +string RefreshToken
+        +DateTime ExpiresAt
+        +UserInfo User
+    }
+
+    AuthController --> IAuthService
+    IAuthService <|.. AuthService
+    AuthService --> User
+    AuthService --> JwtService
+    AuthController ..> RegisterDTO
+    AuthController ..> LoginDTO
+    AuthService ..> LoginResponseDTO

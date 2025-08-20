@@ -1,0 +1,78 @@
+sequenceDiagram
+    actor Admin
+    participant EvaluationCriteriaController
+    participant IEvaluationCriteriaService
+    participant EvaluationCriteriaService
+    participant EvaluationCriteria
+
+    Note over Admin, EvaluationCriteria: Create Evaluation Criteria Flow
+    Admin->>EvaluationCriteriaController: POST /api/evaluation-criteria (CreateEvaluationCriteriaDTO)
+    activate EvaluationCriteriaController
+    EvaluationCriteriaController->>IEvaluationCriteriaService: CreateAsync(createDTO)
+    activate IEvaluationCriteriaService
+    IEvaluationCriteriaService->>EvaluationCriteriaService: CreateAsync(createDTO)
+    activate EvaluationCriteriaService
+    EvaluationCriteriaService->>EvaluationCriteria: Create New Criteria
+    activate EvaluationCriteria
+    EvaluationCriteria-->>EvaluationCriteriaService: Criteria Created
+    deactivate EvaluationCriteria
+    EvaluationCriteriaService-->>IEvaluationCriteriaService: Creation Result
+    deactivate EvaluationCriteriaService
+    IEvaluationCriteriaService-->>EvaluationCriteriaController: Creation Result
+    deactivate IEvaluationCriteriaService
+    EvaluationCriteriaController-->>Admin: Criteria Response
+    deactivate EvaluationCriteriaController
+
+    Note over Admin, EvaluationCriteria: Update Evaluation Criteria Flow
+    Admin->>EvaluationCriteriaController: PUT /api/evaluation-criteria (UpdateEvaluationCriteriaDTO)
+    activate EvaluationCriteriaController
+    EvaluationCriteriaController->>IEvaluationCriteriaService: UpdateAsync(updateDTO)
+    activate IEvaluationCriteriaService
+    IEvaluationCriteriaService->>EvaluationCriteriaService: UpdateAsync(updateDTO)
+    activate EvaluationCriteriaService
+    EvaluationCriteriaService->>EvaluationCriteria: Update Criteria
+    activate EvaluationCriteria
+    EvaluationCriteria-->>EvaluationCriteriaService: Criteria Updated
+    deactivate EvaluationCriteria
+    EvaluationCriteriaService-->>IEvaluationCriteriaService: Update Result
+    deactivate EvaluationCriteriaService
+    IEvaluationCriteriaService-->>EvaluationCriteriaController: Update Result
+    deactivate IEvaluationCriteriaService
+    EvaluationCriteriaController-->>Admin: Update Response
+    deactivate EvaluationCriteriaController
+
+    Note over Admin, EvaluationCriteria: Get All Active Criteria Flow
+    Admin->>EvaluationCriteriaController: GET /api/evaluation-criteria/active
+    activate EvaluationCriteriaController
+    EvaluationCriteriaController->>IEvaluationCriteriaService: GetAllActiveAsync()
+    activate IEvaluationCriteriaService
+    IEvaluationCriteriaService->>EvaluationCriteriaService: GetAllActiveAsync()
+    activate EvaluationCriteriaService
+    EvaluationCriteriaService->>EvaluationCriteria: Query Active Criteria
+    activate EvaluationCriteria
+    EvaluationCriteria-->>EvaluationCriteriaService: Active Criteria List
+    deactivate EvaluationCriteria
+    EvaluationCriteriaService-->>IEvaluationCriteriaService: Criteria List
+    deactivate EvaluationCriteriaService
+    IEvaluationCriteriaService-->>EvaluationCriteriaController: Criteria List
+    deactivate IEvaluationCriteriaService
+    EvaluationCriteriaController-->>Admin: Criteria List Response
+    deactivate EvaluationCriteriaController
+
+    Note over Admin, EvaluationCriteria: Delete Evaluation Criteria Flow
+    Admin->>EvaluationCriteriaController: DELETE /api/evaluation-criteria/{id}
+    activate EvaluationCriteriaController
+    EvaluationCriteriaController->>IEvaluationCriteriaService: DeleteAsync(id)
+    activate IEvaluationCriteriaService
+    IEvaluationCriteriaService->>EvaluationCriteriaService: DeleteAsync(id)
+    activate EvaluationCriteriaService
+    EvaluationCriteriaService->>EvaluationCriteria: Soft Delete Criteria
+    activate EvaluationCriteria
+    EvaluationCriteria-->>EvaluationCriteriaService: Criteria Deleted
+    deactivate EvaluationCriteria
+    EvaluationCriteriaService-->>IEvaluationCriteriaService: Deletion Result
+    deactivate EvaluationCriteriaService
+    IEvaluationCriteriaService-->>EvaluationCriteriaController: Deletion Result
+    deactivate IEvaluationCriteriaService
+    EvaluationCriteriaController-->>Admin: Deletion Response
+    deactivate EvaluationCriteriaController

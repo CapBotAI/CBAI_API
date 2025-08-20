@@ -1,0 +1,87 @@
+classDiagram
+    class EvaluationCriteriaController {
+        -IEvaluationCriteriaService _evaluationCriteriaService
+        -ILogger~EvaluationCriteriaController~ _logger
+        +Create(CreateEvaluationCriteriaDTO) IActionResult
+        +Update(UpdateEvaluationCriteriaDTO) IActionResult
+        +Delete(int) IActionResult
+        +GetById(int) IActionResult
+        +GetAll(PagingModel) IActionResult
+        +GetAllActive() IActionResult
+    }
+    
+    class IEvaluationCriteriaService {
+        <<interface>>
+        +CreateAsync(CreateEvaluationCriteriaDTO) Task~BaseResponseModel~~
+        +UpdateAsync(UpdateEvaluationCriteriaDTO) Task~BaseResponseModel~~
+        +DeleteAsync(int) Task~BaseResponseModel~~
+        +GetByIdAsync(int) Task~BaseResponseModel~~
+        +GetAllAsync(PagingModel) Task~BaseResponseModel~~
+        +GetAllActiveAsync() Task~BaseResponseModel~~
+    }
+    
+    class EvaluationCriteriaService {
+        +CreateAsync(CreateEvaluationCriteriaDTO) Task~BaseResponseModel~~
+        +UpdateAsync(UpdateEvaluationCriteriaDTO) Task~BaseResponseModel~~
+        +DeleteAsync(int) Task~BaseResponseModel~~
+        +GetByIdAsync(int) Task~BaseResponseModel~~
+        +GetAllAsync(PagingModel) Task~BaseResponseModel~~
+        +GetAllActiveAsync() Task~BaseResponseModel~~
+    }
+    
+    class EvaluationCriteria {
+        +int Id
+        +string Name
+        +string Description
+        +int MaxScore
+        +decimal Weight
+        +DateTime CreatedAt
+        +string CreatedBy
+        +DateTime LastModifiedAt
+        +string LastModifiedBy
+        +DateTime DeletedAt
+        +ICollection~ReviewCriteriaScore~ ReviewCriteriaScores
+    }
+    
+    class CreateEvaluationCriteriaDTO {
+        +string Name
+        +string Description
+        +int MaxScore
+        +decimal Weight
+    }
+    
+    class UpdateEvaluationCriteriaDTO {
+        +int Id
+        +string Name
+        +string Description
+        +int MaxScore
+        +decimal Weight
+    }
+    
+    class EvaluationCriteriaDetailDTO {
+        +int Id
+        +string Name
+        +string Description
+        +int MaxScore
+        +decimal Weight
+        +DateTime CreatedAt
+        +string CreatedBy
+    }
+    
+    class ReviewCriteriaScore {
+        +int Id
+        +int ReviewId
+        +int EvaluationCriteriaId
+        +decimal Score
+        +string Comments
+    }
+
+    EvaluationCriteriaController --> IEvaluationCriteriaService
+    IEvaluationCriteriaService <|.. EvaluationCriteriaService
+    EvaluationCriteriaService --> EvaluationCriteria
+    
+    EvaluationCriteriaController ..> CreateEvaluationCriteriaDTO
+    EvaluationCriteriaController ..> UpdateEvaluationCriteriaDTO
+    EvaluationCriteriaService ..> EvaluationCriteriaDetailDTO
+    
+    EvaluationCriteria ||--o{ ReviewCriteriaScore

@@ -1,0 +1,52 @@
+sequenceDiagram
+    actor User
+    participant AuthController
+    participant IAuthService
+    participant AuthService
+    participant UserEntity as User
+    participant JwtService
+
+    Note over User, JwtService: Registration Flow
+    User->>AuthController: POST /api/auth/register (RegisterDTO)
+    activate AuthController
+    AuthController->>IAuthService: SignUpAsync(registerDTO)
+    activate IAuthService
+    IAuthService->>AuthService: SignUpAsync(registerDTO)
+    activate AuthService
+    AuthService->>UserEntity: Create User
+    activate UserEntity
+    UserEntity-->>AuthService: User Created
+    deactivate UserEntity
+    AuthService-->>IAuthService: RegisterResult
+    deactivate AuthService
+    IAuthService-->>AuthController: RegisterResult
+    deactivate IAuthService
+    AuthController-->>User: Registration Response
+    deactivate AuthController
+
+    Note over User, JwtService: Login Flow
+    User->>AuthController: POST /api/auth/login (LoginDTO)
+    activate AuthController
+    AuthController->>IAuthService: SignInAsync(loginDTO)
+    activate IAuthService
+    IAuthService->>AuthService: SignInAsync(loginDTO)
+    activate AuthService
+    AuthService->>UserEntity: ValidateCredentials(emailOrUsername)
+    activate UserEntity
+    UserEntity-->>AuthService: UserData
+    deactivate UserEntity
+    
+    alt Valid credentials
+        AuthService->>JwtService: GenerateToken(UserData)
+        activate JwtService
+        JwtService-->>AuthService: JWT Token
+        deactivate JwtService
+        AuthService-->>IAuthService: LoginResponseDTO (Token)
+    else Invalid credentials
+        AuthService-->>IAuthService: Error Response
+    end
+    deactivate AuthService
+    IAuthService-->>AuthController: Login Result
+    deactivate IAuthService
+    AuthController-->>User: Token/Error Response
+    deactivate AuthController

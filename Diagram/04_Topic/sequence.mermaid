@@ -1,0 +1,125 @@
+sequenceDiagram
+    actor Supervisor
+    actor Admin
+    participant TopicController
+    participant ITopicService
+    participant TopicService
+    participant Topic
+    participant TopicVersion
+    participant TopicCategory
+    participant Semester
+    participant User
+
+    Note over Supervisor, User: Topic Creation Flow
+    Supervisor->>TopicController: POST /api/topic/create (CreateTopicDTO)
+    activate TopicController
+    TopicController->>ITopicService: CreateTopic(data, userId)
+    activate ITopicService
+    ITopicService->>TopicService: CreateTopic(data, userId)
+    activate TopicService
+    TopicService->>Topic: Create New Topic
+    activate Topic
+    Topic-->>TopicService: Topic Created
+    deactivate Topic
+    TopicService->>TopicVersion: Create Initial Version
+    activate TopicVersion
+    TopicVersion-->>TopicService: Version Created
+    deactivate TopicVersion
+    TopicService-->>ITopicService: Creation Result
+    deactivate TopicService
+    ITopicService-->>TopicController: Creation Result
+    deactivate ITopicService
+    TopicController-->>Supervisor: Topic Response
+    deactivate TopicController
+
+    Note over Supervisor, User: Topic Update Flow
+    Supervisor->>TopicController: PUT /api/topic/update (UpdateTopicDTO)
+    activate TopicController
+    TopicController->>ITopicService: UpdateTopic(data, userId, isAdmin)
+    activate ITopicService
+    ITopicService->>TopicService: UpdateTopic(data, userId, isAdmin)
+    activate TopicService
+    TopicService->>Topic: Update Topic Information
+    activate Topic
+    Topic-->>TopicService: Topic Updated
+    deactivate Topic
+    TopicService-->>ITopicService: Update Result
+    deactivate TopicService
+    ITopicService-->>TopicController: Update Result
+    deactivate ITopicService
+    TopicController-->>Supervisor: Update Response
+    deactivate TopicController
+
+    Note over Supervisor, User: Topic Approval Flow
+    Admin->>TopicController: POST /api/topic/approve/{topicId}
+    activate TopicController
+    TopicController->>ITopicService: ApproveTopic(topicId, userId, isAdmin, isModerator)
+    activate ITopicService
+    ITopicService->>TopicService: ApproveTopic(topicId, userId, isAdmin, isModerator)
+    activate TopicService
+    TopicService->>Topic: Update Approval Status
+    activate Topic
+    Topic-->>TopicService: Topic Approved
+    deactivate Topic
+    TopicService->>TopicVersion: Update Version Status
+    activate TopicVersion
+    TopicVersion-->>TopicService: Version Status Updated
+    deactivate TopicVersion
+    TopicService-->>ITopicService: Approval Result
+    deactivate TopicService
+    ITopicService-->>TopicController: Approval Result
+    deactivate ITopicService
+    TopicController-->>Admin: Approval Response
+    deactivate TopicController
+
+    Note over Supervisor, User: Get Topic Detail Flow
+    Supervisor->>TopicController: GET /api/topic/detail/{topicId}
+    activate TopicController
+    TopicController->>ITopicService: GetTopicDetail(topicId)
+    activate ITopicService
+    ITopicService->>TopicService: GetTopicDetail(topicId)
+    activate TopicService
+    TopicService->>Topic: Query Topic with Relations
+    activate Topic
+    Topic->>TopicCategory: Get Category Info
+    activate TopicCategory
+    TopicCategory-->>Topic: Category Data
+    deactivate TopicCategory
+    Topic->>Semester: Get Semester Info
+    activate Semester
+    Semester-->>Topic: Semester Data
+    deactivate Semester
+    Topic->>User: Get Supervisor Info
+    activate User
+    User-->>Topic: Supervisor Data
+    deactivate User
+    Topic->>TopicVersion: Get Current Version
+    activate TopicVersion
+    TopicVersion-->>Topic: Version Data
+    deactivate TopicVersion
+    Topic-->>TopicService: Complete Topic Data
+    deactivate Topic
+    TopicService-->>ITopicService: Topic Detail
+    deactivate TopicService
+    ITopicService-->>TopicController: Topic Detail
+    deactivate ITopicService
+    TopicController-->>Supervisor: Topic Detail Response
+    deactivate TopicController
+
+    Note over Supervisor, User: Get My Topics Flow
+    Supervisor->>TopicController: GET /api/topic/my-topics (GetTopicsQueryDTO)
+    activate TopicController
+    TopicController->>ITopicService: GetMyTopics(userId, query)
+    activate ITopicService
+    ITopicService->>TopicService: GetMyTopics(userId, query)
+    activate TopicService
+    TopicService->>Topic: Query User's Topics with Paging
+    activate Topic
+    Topic-->>TopicService: User's Topic List
+    deactivate Topic
+    TopicService-->>ITopicService: Paged Topic Results
+    deactivate TopicService
+    ITopicService-->>TopicController: Paged Topic Results
+    deactivate ITopicService
+    TopicController-->>Supervisor: My Topics Response
+    deactivate TopicController

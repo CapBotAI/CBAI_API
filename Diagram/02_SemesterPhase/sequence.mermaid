@@ -1,0 +1,86 @@
+sequenceDiagram
+    actor Admin
+    participant SemesterController
+    participant ISemesterService
+    participant SemesterService
+    participant Semester
+    participant PhaseTypeController
+    participant IPhaseTypeService
+    participant PhaseTypeService
+    participant PhaseType
+    participant PhaseController
+    participant IPhaseService
+    participant PhaseService
+    participant Phase
+
+    Note over Admin, Phase: Semester Creation Flow
+    Admin->>SemesterController: POST /api/semester/create (CreateSemesterDTO)
+    activate SemesterController
+    SemesterController->>ISemesterService: CreateSemester(data, userId)
+    activate ISemesterService
+    ISemesterService->>SemesterService: CreateSemester(data, userId)
+    activate SemesterService
+    SemesterService->>Semester: Create New Semester
+    activate Semester
+    Semester-->>SemesterService: Semester Created
+    deactivate Semester
+    SemesterService-->>ISemesterService: Creation Result
+    deactivate SemesterService
+    ISemesterService-->>SemesterController: Creation Result
+    deactivate ISemesterService
+    SemesterController-->>Admin: Semester Response
+    deactivate SemesterController
+
+    Note over Admin, Phase: PhaseType Creation Flow
+    Admin->>PhaseTypeController: POST /api/phase-type/create (CreatePhaseTypeDTO)
+    activate PhaseTypeController
+    PhaseTypeController->>IPhaseTypeService: CreatePhaseType(data, userId)
+    activate IPhaseTypeService
+    IPhaseTypeService->>PhaseTypeService: CreatePhaseType(data, userId)
+    activate PhaseTypeService
+    PhaseTypeService->>PhaseType: Create New PhaseType
+    activate PhaseType
+    PhaseType-->>PhaseTypeService: PhaseType Created
+    deactivate PhaseType
+    PhaseTypeService-->>IPhaseTypeService: Creation Result
+    deactivate PhaseTypeService
+    IPhaseTypeService-->>PhaseTypeController: Creation Result
+    deactivate IPhaseTypeService
+    PhaseTypeController-->>Admin: PhaseType Response
+    deactivate PhaseTypeController
+
+    Note over Admin, Phase: Phase Creation Flow
+    Admin->>PhaseController: POST /api/phase/create (CreatePhaseDTO)
+    activate PhaseController
+    PhaseController->>IPhaseService: CreatePhase(data, userId)
+    activate IPhaseService
+    IPhaseService->>PhaseService: CreatePhase(data, userId)
+    activate PhaseService
+    PhaseService->>Phase: Create New Phase
+    activate Phase
+    Phase-->>PhaseService: Phase Created
+    deactivate Phase
+    PhaseService-->>IPhaseService: Creation Result
+    deactivate PhaseService
+    IPhaseService-->>PhaseController: Creation Result
+    deactivate IPhaseService
+    PhaseController-->>Admin: Phase Response
+    deactivate PhaseController
+
+    Note over Admin, Phase: Phase List Query Flow
+    Admin->>PhaseController: GET /api/phase/list (GetPhasesQueryDTO)
+    activate PhaseController
+    PhaseController->>IPhaseService: GetPhases(query)
+    activate IPhaseService
+    IPhaseService->>PhaseService: GetPhases(query)
+    activate PhaseService
+    PhaseService->>Phase: Query Phases with Semester & PhaseType
+    activate Phase
+    Phase-->>PhaseService: Phase List with Relations
+    deactivate Phase
+    PhaseService-->>IPhaseService: Paged Phase Results
+    deactivate PhaseService
+    IPhaseService-->>PhaseController: Paged Phase Results
+    deactivate IPhaseService
+    PhaseController-->>Admin: Phase List Response
+    deactivate PhaseController

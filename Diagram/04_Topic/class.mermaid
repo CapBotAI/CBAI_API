@@ -1,0 +1,136 @@
+classDiagram
+    class TopicController {
+        -ITopicService _topicService
+        -ILogger~TopicController~ _logger
+        +Create(CreateTopicDTO) IActionResult
+        +Update(UpdateTopicDTO) IActionResult
+        +Delete(int) IActionResult
+        +GetTopicsWithPaging(GetTopicsQueryDTO) IActionResult
+        +GetDetail(int) IActionResult
+        +Approve(int) IActionResult
+        +GetMyTopics(GetTopicsQueryDTO) IActionResult
+    }
+    
+    class ITopicService {
+        <<interface>>
+        +CreateTopic(CreateTopicDTO, string) Task~BaseResponseModel~~
+        +UpdateTopic(UpdateTopicDTO, string, bool) Task~BaseResponseModel~~
+        +DeleteTopic(int, string, bool) Task~BaseResponseModel~~
+        +GetTopicsWithPaging(GetTopicsQueryDTO) Task~BaseResponseModel~~
+        +GetTopicDetail(int) Task~BaseResponseModel~~
+        +ApproveTopic(int, string, bool, bool) Task~BaseResponseModel~~
+        +GetMyTopics(string, GetTopicsQueryDTO) Task~BaseResponseModel~~
+    }
+    
+    class TopicService {
+        +CreateTopic(CreateTopicDTO, string) Task~BaseResponseModel~~
+        +UpdateTopic(UpdateTopicDTO, string, bool) Task~BaseResponseModel~~
+        +DeleteTopic(int, string, bool) Task~BaseResponseModel~~
+        +GetTopicsWithPaging(GetTopicsQueryDTO) Task~BaseResponseModel~~
+        +GetTopicDetail(int) Task~BaseResponseModel~~
+        +ApproveTopic(int, string, bool, bool) Task~BaseResponseModel~~
+        +GetMyTopics(string, GetTopicsQueryDTO) Task~BaseResponseModel~~
+    }
+    
+    class Topic {
+        +int Id
+        +string Title
+        +string Description
+        +string Objectives
+        +int SupervisorId
+        +int CategoryId
+        +int SemesterId
+        +int MaxStudents
+        +bool IsLegacy
+        +bool IsApproved
+        +User Supervisor
+        +TopicCategory Category
+        +Semester Semester
+        +ICollection~TopicVersion~ TopicVersions
+        +ICollection~Submission~ Submissions
+    }
+    
+    class TopicCategory {
+        +int Id
+        +string Name
+        +string Description
+        +ICollection~Topic~ Topics
+    }
+    
+    class Semester {
+        +int Id
+        +string Name
+        +DateTime StartDate
+        +DateTime EndDate
+        +ICollection~Topic~ Topics
+    }
+    
+    class TopicVersion {
+        +int Id
+        +int TopicId
+        +int VersionNumber
+        +string Title
+        +string Description
+        +string Objectives
+        +string Methodology
+        +string ExpectedOutcomes
+        +string Requirements
+        +string DocumentUrl
+        +TopicStatus Status
+        +DateTime SubmittedAt
+        +User SubmittedByUser
+        +Topic Topic
+    }
+    
+    class User {
+        +int Id
+        +string UserName
+        +string Email
+        +ICollection~Topic~ Topics
+        +ICollection~TopicVersion~ TopicVersions
+    }
+    
+    class CreateTopicDTO {
+        +string Title
+        +string Description
+        +string Objectives
+        +int CategoryId
+        +int SemesterId
+        +int MaxStudents
+        +string Methodology
+        +string ExpectedOutcomes
+        +string Requirements
+        +string DocumentUrl
+    }
+    
+    class TopicDetailDTO {
+        +int Id
+        +string Title
+        +string Description
+        +string SupervisorName
+        +string CategoryName
+        +string SemesterName
+        +int MaxStudents
+        +bool IsApproved
+        +TopicStatus CurrentStatus
+        +TopicVersionDetailDTO CurrentVersion
+    }
+
+    TopicController --> ITopicService
+    ITopicService <|.. TopicService
+    TopicService --> Topic
+    TopicService --> TopicVersion
+    
+    Topic --> User
+    Topic --> TopicCategory
+    Topic --> Semester
+    Topic ||--o{ TopicVersion
+    TopicVersion --> Topic
+    TopicVersion --> User
+    
+    TopicController ..> CreateTopicDTO
+    TopicService ..> TopicDetailDTO
+    
+    User ||--o{ Topic
+    TopicCategory ||--o{ Topic
+    Semester ||--o{ Topic

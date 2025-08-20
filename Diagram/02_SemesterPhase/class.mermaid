@@ -1,0 +1,126 @@
+classDiagram
+    class SemesterController {
+        -ISemesterService _semesterService
+        -ILogger~SemesterController~ _logger
+        +Create(CreateSemesterDTO) IActionResult
+        +Update(UpdateSemesterDTO) IActionResult
+        +GetAll() IActionResult
+        +GetDetail(int) IActionResult
+        +Delete(int) IActionResult
+    }
+    
+    class PhaseTypeController {
+        -IPhaseTypeService _phaseTypeService
+        -ILogger~PhaseTypeController~ _logger
+        +Create(CreatePhaseTypeDTO) IActionResult
+        +Update(UpdatePhaseTypeDTO) IActionResult
+        +GetAll() IActionResult
+        +GetDetail(int) IActionResult
+        +Delete(int) IActionResult
+    }
+    
+    class PhaseController {
+        -IPhaseService _phaseService
+        -ILogger~PhaseController~ _logger
+        +Create(CreatePhaseDTO) IActionResult
+        +Update(UpdatePhaseDTO) IActionResult
+        +List(GetPhasesQueryDTO) IActionResult
+        +Detail(int) IActionResult
+        +Delete(int) IActionResult
+    }
+    
+    class ISemesterService {
+        <<interface>>
+        +CreateSemester(CreateSemesterDTO, string) Task~BaseResponseModel~~
+        +UpdateSemester(UpdateSemesterDTO, string) Task~BaseResponseModel~~
+        +GetAllSemester() Task~BaseResponseModel~~
+        +GetSemesterDetail(int) Task~BaseResponseModel~~
+        +DeleteSemester(int) Task~BaseResponseModel~~
+    }
+    
+    class IPhaseTypeService {
+        <<interface>>
+        +CreatePhaseType(CreatePhaseTypeDTO, string) Task~BaseResponseModel~~
+        +UpdatePhaseType(UpdatePhaseTypeDTO, string) Task~BaseResponseModel~~
+        +GetAllPhaseTypes() Task~BaseResponseModel~~
+        +GetPhaseTypeDetail(int) Task~BaseResponseModel~~
+        +DeletePhaseType(int) Task~BaseResponseModel~~
+    }
+    
+    class IPhaseService {
+        <<interface>>
+        +CreatePhase(CreatePhaseDTO, string) Task~BaseResponseModel~~
+        +UpdatePhase(UpdatePhaseDTO, string) Task~BaseResponseModel~~
+        +GetPhases(GetPhasesQueryDTO) Task~BaseResponseModel~~
+        +GetPhaseDetail(int) Task~BaseResponseModel~~
+        +DeletePhase(int) Task~BaseResponseModel~~
+    }
+    
+    class SemesterService {
+        +CreateSemester(CreateSemesterDTO, string) Task~BaseResponseModel~~
+        +UpdateSemester(UpdateSemesterDTO, string) Task~BaseResponseModel~~
+        +GetAllSemester() Task~BaseResponseModel~~
+        +GetSemesterDetail(int) Task~BaseResponseModel~~
+        +DeleteSemester(int) Task~BaseResponseModel~~
+    }
+    
+    class PhaseTypeService {
+        +CreatePhaseType(CreatePhaseTypeDTO, string) Task~BaseResponseModel~~
+        +UpdatePhaseType(UpdatePhaseTypeDTO, string) Task~BaseResponseModel~~
+        +GetAllPhaseTypes() Task~BaseResponseModel~~
+        +GetPhaseTypeDetail(int) Task~BaseResponseModel~~
+        +DeletePhaseType(int) Task~BaseResponseModel~~
+    }
+    
+    class PhaseService {
+        +CreatePhase(CreatePhaseDTO, string) Task~BaseResponseModel~~
+        +UpdatePhase(UpdatePhaseDTO, string) Task~BaseResponseModel~~
+        +GetPhases(GetPhasesQueryDTO) Task~BaseResponseModel~~
+        +GetPhaseDetail(int) Task~BaseResponseModel~~
+        +DeletePhase(int) Task~BaseResponseModel~~
+    }
+    
+    class Semester {
+        +int Id
+        +string Name
+        +DateTime StartDate
+        +DateTime EndDate
+        +ICollection~Phase~ Phases
+        +ICollection~Topic~ Topics
+    }
+    
+    class PhaseType {
+        +int Id
+        +string Name
+        +string Description
+        +ICollection~Phase~ Phases
+    }
+    
+    class Phase {
+        +int Id
+        +int SemesterId
+        +int PhaseTypeId
+        +string Name
+        +DateTime StartDate
+        +DateTime EndDate
+        +DateTime SubmissionDeadline
+        +Semester Semester
+        +PhaseType PhaseType
+    }
+
+    SemesterController --> ISemesterService
+    PhaseTypeController --> IPhaseTypeService
+    PhaseController --> IPhaseService
+    
+    ISemesterService <|.. SemesterService
+    IPhaseTypeService <|.. PhaseTypeService
+    IPhaseService <|.. PhaseService
+    
+    SemesterService --> Semester
+    PhaseTypeService --> PhaseType
+    PhaseService --> Phase
+    
+    Phase --> Semester
+    Phase --> PhaseType
+    Semester ||--o{ Phase
+    PhaseType ||--o{ Phase
