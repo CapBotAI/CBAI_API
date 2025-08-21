@@ -61,4 +61,8 @@ public interface IReviewerAssignmentService
     /// Phân tích skill matching giữa reviewer và submission
     /// </summary>
     Task<BaseResponseModel<ReviewerMatchingResult>> AnalyzeReviewerMatchAsync(int reviewerId, int submissionId);
+    Task<BaseResponseModel<List<ReviewerAssignmentResponseDTO>>> GetAssignmentsByReviewerAndStatusAsync(int reviewerId, AssignmentStatus status);
+    Task<BaseResponseModel<ReviewerStatisticsDTO>> GetReviewerStatisticsAsync(int reviewerId);
+    Task<BaseResponseModel<ReviewerAssignmentResponseDTO>> StartReviewAsync(int assignmentId, int reviewerId);
+    Task<BaseResponseModel<AssignmentDetailsDTO>> GetAssignmentDetailsAsync(int assignmentId);
 }
