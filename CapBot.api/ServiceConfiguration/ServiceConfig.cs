@@ -68,6 +68,7 @@ public class ServiceConfig
 
         // Review Service  
         services.AddScoped<IReviewService, ReviewService>();
+        services.AddScoped<ISubmissionReviewService, SubmissionReviewService>();
 
         //Gemini AI Service 
         services.AddSingleton<GeminiAIService>();
