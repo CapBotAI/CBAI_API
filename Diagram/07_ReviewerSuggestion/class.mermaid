@@ -1,9 +1,29 @@
 classDiagram
+    direction LR
+
+    %% Controller layer
     class ReviewerSuggestionController
+
+    %% Service interface and implementation
     class IReviewerSuggestionService
     class ReviewerSuggestionService
-    class LecturerSkill
+    ReviewerSuggestionController --> IReviewerSuggestionService : "calls"
+    ReviewerSuggestionService ..|> IReviewerSuggestionService : "implements"
 
-    ReviewerSuggestionController --> IReviewerSuggestionService
-    IReviewerSuggestionService <|.. ReviewerSuggestionService
-    ReviewerSuggestionService --> LecturerSkill
+    %% Dependencies
+    class GeminiAIService
+    class IUnitOfWork
+    ReviewerSuggestionService --> GeminiAIService : "uses"
+    ReviewerSuggestionService --> IUnitOfWork : "uses"
+
+    %% Entities (focused)
+    class User
+    class LecturerSkill
+    class ReviewerAssignment
+
+    %% IUnitOfWork provides access to entity repositories
+    IUnitOfWork --> User
+
+    %% Entity relationships (focused, no duplicates)
+    User "1" o-- "*" LecturerSkill : "has skills"
+    User "1" o-- "*" ReviewerPerformance : "has assignments"

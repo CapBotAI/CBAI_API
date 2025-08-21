@@ -1,23 +1,22 @@
 sequenceDiagram
+    actor Admin
     actor Moderator
     participant ReviewerAssignmentController
     participant IReviewerAssignmentService
     participant ReviewerAssignmentService
-    participant ReviewerAssignment
 
-    Moderator->>ReviewerAssignmentController: POST /api/reviewer-assignments (data)
-    activate ReviewerAssignmentController
-    ReviewerAssignmentController->>IReviewerAssignmentService: AssignReviewer(data)
-    activate IReviewerAssignmentService
-    IReviewerAssignmentService->>ReviewerAssignmentService: Assign(data)
-    activate ReviewerAssignmentService
-    ReviewerAssignmentService->>ReviewerAssignment: Add()
-    activate ReviewerAssignment
-    ReviewerAssignment-->>ReviewerAssignmentService: AssignmentId
-    deactivate ReviewerAssignment
-    ReviewerAssignmentService-->>IReviewerAssignmentService: Result
-    deactivate ReviewerAssignmentService
-    IReviewerAssignmentService-->>ReviewerAssignmentController: Result
-    deactivate IReviewerAssignmentService
-    ReviewerAssignmentController-->>Moderator: Response
-    deactivate ReviewerAssignmentController
+    Note over Admin, ReviewerAssignmentController: Assign Reviewer Flow
+    Admin->>ReviewerAssignmentController: POST /api/reviewer-assignments (AssignReviewerDTO)
+    ReviewerAssignmentController->>IReviewerAssignmentService: AssignReviewerAsync(dto, UserId)
+    IReviewerAssignmentService->>ReviewerAssignmentService: AssignReviewerAsync(dto, UserId)
+    ReviewerAssignmentService-->>IReviewerAssignmentService: Assignment Result
+    IReviewerAssignmentService-->>ReviewerAssignmentController: Assignment Result
+    ReviewerAssignmentController-->>Admin: API Response
+
+    Note over Admin, ReviewerAssignmentController: Auto Assign Reviewers Flow
+    Admin->>ReviewerAssignmentController: POST /api/reviewer-assignments/auto-assign (AutoAssignReviewerDTO)
+    ReviewerAssignmentController->>IReviewerAssignmentService: AutoAssignReviewersAsync(dto, UserId)
+    IReviewerAssignmentService->>ReviewerAssignmentService: AutoAssignReviewersAsync(dto, UserId)
+    ReviewerAssignmentService-->>IReviewerAssignmentService: Auto Assignment Result
+    IReviewerAssignmentService-->>ReviewerAssignmentController: Auto Assignment Result
+    ReviewerAssignmentController-->>Admin: API Response

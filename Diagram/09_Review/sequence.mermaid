@@ -4,35 +4,70 @@ sequenceDiagram
     participant IReviewService
     participant ReviewService
     participant Review
-    participant ReviewerAssignment
-    participant ReviewCriteriaScore
-    participant EvaluationCriteria
+    participant IUnitOfWork
 
-    Reviewer->>ReviewController: POST /api/review (data)
+    Note over Reviewer, ReviewController: Create Review Flow
+    Reviewer->>ReviewController: POST /api/reviews (CreateReviewDTO)
     activate ReviewController
-    ReviewController->>IReviewService: SubmitReview(data)
+    ReviewController->>ReviewController: Validate ModelState
+    ReviewController->>IReviewService: CreateAsync(createDTO)
     activate IReviewService
-    IReviewService->>ReviewService: Create(data)
+    IReviewService->>ReviewService: CreateAsync(createDTO)
     activate ReviewService
-    ReviewService->>Review: Add()
+    ReviewService->>Review: Create New Review
     activate Review
-    Review-->>ReviewService: ReviewId
+    Review-->>ReviewService: Review Created
     deactivate Review
-    ReviewService->>ReviewerAssignment: GetAssignment()
-    activate ReviewerAssignment
-    ReviewerAssignment-->>ReviewService: AssignmentData
-    deactivate ReviewerAssignment
-    ReviewService->>ReviewCriteriaScore: AddScores()
-    activate ReviewCriteriaScore
-    ReviewCriteriaScore->>EvaluationCriteria: GetCriteria()
-    activate EvaluationCriteria
-    EvaluationCriteria-->>ReviewCriteriaScore: CriteriaData
-    deactivate EvaluationCriteria
-    ReviewCriteriaScore-->>ReviewService: ScoresAdded
-    deactivate ReviewCriteriaScore
-    ReviewService-->>IReviewService: Result
+    ReviewService->>IUnitOfWork: Commit()
+    IUnitOfWork-->>ReviewService: Commit Result
+    ReviewService-->>IReviewService: Creation Result
     deactivate ReviewService
-    IReviewService-->>ReviewController: Result
+    IReviewService-->>ReviewController: Creation Result
     deactivate IReviewService
-    ReviewController-->>Reviewer: Response
+    ReviewController-->>Reviewer: API Response
+    deactivate ReviewController
+
+    Note over Reviewer, ReviewController: Update Review Flow
+    Reviewer->>ReviewController: PUT /api/reviews (UpdateReviewDTO)
+    activate ReviewController
+    ReviewController->>ReviewController: Validate ModelState
+    ReviewController->>IReviewService: UpdateAsync(updateDTO)
+    activate IReviewService
+    IReviewService->>ReviewService: UpdateAsync(updateDTO)
+    activate ReviewService
+    ReviewService->>Review: Get Review By Id
+    activate Review
+    Review-->>ReviewService: Review Entity
+    ReviewService->>Review: Update Review Data
+    Review-->>ReviewService: Review Updated
+    deactivate Review
+    ReviewService->>IUnitOfWork: Commit()
+    IUnitOfWork-->>ReviewService: Commit Result
+    ReviewService-->>IReviewService: Update Result
+    deactivate ReviewService
+    IReviewService-->>ReviewController: Update Result
+    deactivate IReviewService
+    ReviewController-->>Reviewer: API Response
+    deactivate ReviewController
+
+    Note over Reviewer, ReviewController: Submit Review Flow
+    Reviewer->>ReviewController: POST /api/reviews/{id}/submit
+    activate ReviewController
+    ReviewController->>IReviewService: SubmitReviewAsync(id)
+    activate IReviewService
+    IReviewService->>ReviewService: SubmitReviewAsync(id)
+    activate ReviewService
+    ReviewService->>Review: Get Review By Id
+    activate Review
+    Review-->>ReviewService: Review Entity
+    ReviewService->>Review: Update Status to Submitted
+    Review-->>ReviewService: Status Updated
+    deactivate Review
+    ReviewService->>IUnitOfWork: Commit()
+    IUnitOfWork-->>ReviewService: Commit Result
+    ReviewService-->>IReviewService: Submit Result
+    deactivate ReviewService
+    IReviewService-->>ReviewController: Submit Result
+    deactivate IReviewService
+    ReviewController-->>Reviewer: API Response
     deactivate ReviewController

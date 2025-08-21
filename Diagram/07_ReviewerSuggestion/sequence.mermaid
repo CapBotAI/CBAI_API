@@ -3,21 +3,36 @@ sequenceDiagram
     participant ReviewerSuggestionController
     participant IReviewerSuggestionService
     participant ReviewerSuggestionService
-    participant LecturerSkill
+    participant GeminiAIService
 
-    Moderator->>ReviewerSuggestionController: GET /api/reviewer-suggestion (params)
+    Note over Moderator, ReviewerSuggestionController: AI Reviewer Suggestion Flow
+    Moderator->>ReviewerSuggestionController: POST /api/reviewer-suggestion/ai-suggest (ReviewerSuggestionInputDTO)
     activate ReviewerSuggestionController
-    ReviewerSuggestionController->>IReviewerSuggestionService: SuggestReviewers(params)
+    ReviewerSuggestionController->>IReviewerSuggestionService: SuggestReviewersAsync(input)
     activate IReviewerSuggestionService
-    IReviewerSuggestionService->>ReviewerSuggestionService: GetSuggestions(params)
+    IReviewerSuggestionService->>ReviewerSuggestionService: SuggestReviewersAsync(input)
     activate ReviewerSuggestionService
-    ReviewerSuggestionService->>LecturerSkill: AnalyzeSkills()
-    activate LecturerSkill
-    LecturerSkill-->>ReviewerSuggestionService: SkillMatch
-    deactivate LecturerSkill
-    ReviewerSuggestionService-->>IReviewerSuggestionService: Suggestions
+    ReviewerSuggestionService->>GeminiAIService: Analyze input & suggest reviewers
+    GeminiAIService-->>ReviewerSuggestionService: AI Suggestions
+    ReviewerSuggestionService-->>IReviewerSuggestionService: Suggestion Result
     deactivate ReviewerSuggestionService
-    IReviewerSuggestionService-->>ReviewerSuggestionController: ReviewerList
+    IReviewerSuggestionService-->>ReviewerSuggestionController: Suggestion Result
     deactivate IReviewerSuggestionService
-    ReviewerSuggestionController-->>Moderator: ReviewerList
+    ReviewerSuggestionController-->>Moderator: API Response
+    deactivate ReviewerSuggestionController
+
+    Note over Moderator, ReviewerSuggestionController: Get Top Reviewers Flow
+    Moderator->>ReviewerSuggestionController: GET /api/reviewer-suggestion/top (topicVersionId, count)
+    activate ReviewerSuggestionController
+    ReviewerSuggestionController->>IReviewerSuggestionService: SuggestReviewersAsync(input)
+    activate IReviewerSuggestionService
+    IReviewerSuggestionService->>ReviewerSuggestionService: SuggestReviewersAsync(input)
+    activate ReviewerSuggestionService
+    ReviewerSuggestionService->>GeminiAIService: Analyze input & suggest reviewers
+    GeminiAIService-->>ReviewerSuggestionService: AI Suggestions
+    ReviewerSuggestionService-->>IReviewerSuggestionService: Suggestion Result
+    deactivate ReviewerSuggestionService
+    IReviewerSuggestionService-->>ReviewerSuggestionController: Suggestion Result
+    deactivate IReviewerSuggestionService
+    ReviewerSuggestionController-->>Moderator: API Response
     deactivate ReviewerSuggestionController

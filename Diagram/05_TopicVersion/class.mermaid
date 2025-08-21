@@ -1,11 +1,30 @@
 classDiagram
+    direction LR
+
+    %% Controller layer
     class TopicVersionController
+
+    %% Service interface and implementation
     class ITopicVersionService
     class TopicVersionService
-    class TopicVersion
-    class Topic
+    TopicVersionController --> ITopicVersionService : "calls"
+    TopicVersionService ..|> ITopicVersionService : "implements"
 
-    TopicVersionController --> ITopicVersionService
-    ITopicVersionService <|.. TopicVersionService
-    TopicVersionService --> TopicVersion
-    TopicVersion --> Topic
+    %% Dependencies
+    class IIdentityRepository
+    class IUnitOfWork
+    TopicVersionService --> IIdentityRepository : "uses"
+    TopicVersionService --> IUnitOfWork : "uses"
+
+    %% Entities
+    class Topic
+    class TopicVersion
+    class User
+
+    %% IUnitOfWork provides access to entity repositories
+    IUnitOfWork --> Topic : "GetRepo<Topic>()"
+    IUnitOfWork --> TopicVersion : "GetRepo<TopicVersion>()"
+
+    %% Entity relationships
+    Topic "1" o-- "*" TopicVersion : "has versions"
+    User "1" o-- "*" TopicVersion : "submits"
