@@ -1,42 +1,48 @@
 sequenceDiagram
     actor Supervisor
-    actor Admin
     participant TopicVersionController
     participant ITopicVersionService
     participant TopicVersionService
-    participant TopicVersion
     participant Topic
+    participant TopicVersion
+    participant IUnitOfWork
 
-    Supervisor->>TopicVersionController: POST /api/topic-version (data)
+    Note over Supervisor, TopicVersionController: Topic Version Creation Flow
+    Supervisor->>TopicVersionController: POST /api/topic-version/create (CreateTopicVersionDTO)
     activate TopicVersionController
-    TopicVersionController->>ITopicVersionService: CreateTopicVersion(data)
+    TopicVersionController->>ITopicVersionService: CreateTopicVersion(dto, userId)
     activate ITopicVersionService
-    ITopicVersionService->>TopicVersionService: Create(data)
+    ITopicVersionService->>TopicVersionService: CreateTopicVersion(dto, userId)
     activate TopicVersionService
-    TopicVersionService->>TopicVersion: Add()
-    activate TopicVersion
-    TopicVersion-->>TopicVersionService: VersionId
-    deactivate TopicVersion
-    TopicVersionService-->>ITopicVersionService: Result
+    TopicVersionService->>Topic: Get Topic By Id
+    Topic-->>TopicVersionService: Topic Entity
+    TopicVersionService->>TopicVersion: Create New Version
+    TopicVersion-->>TopicVersionService: Version Created
+    TopicVersionService->>IUnitOfWork: Commit()
+    IUnitOfWork-->>TopicVersionService: Commit Result
+    TopicVersionService-->>ITopicVersionService: Creation Result
     deactivate TopicVersionService
-    ITopicVersionService-->>TopicVersionController: Result
+    ITopicVersionService-->>TopicVersionController: Creation Result
     deactivate ITopicVersionService
-    TopicVersionController-->>Supervisor: Response
+    TopicVersionController-->>Supervisor: Return API Response
     deactivate TopicVersionController
 
-    alt Approval
-        Admin->>TopicVersionController: PUT /api/topic-version/approve (id)
-        activate TopicVersionController
-        TopicVersionController->>ITopicVersionService: ApproveTopicVersion(id)
-        activate ITopicVersionService
-        ITopicVersionService->>TopicVersionService: Approve(id)
-        activate TopicVersionService
-        TopicVersionService->>TopicVersion: UpdateStatus()
-        deactivate TopicVersion
-        TopicVersionService-->>ITopicVersionService: Result
-        deactivate TopicVersionService
-        ITopicVersionService-->>TopicVersionController: Result
-        deactivate ITopicVersionService
-        TopicVersionController-->>Admin: Response
-        deactivate TopicVersionController
-    end
+    Note over Supervisor, TopicVersionController: Topic Version Update Flow
+    Supervisor->>TopicVersionController: PUT /api/topic-version/update (UpdateTopicVersionDTO)
+    activate TopicVersionController
+    TopicVersionController->>ITopicVersionService: UpdateTopicVersion(dto, userId)
+    activate ITopicVersionService
+    ITopicVersionService->>TopicVersionService: UpdateTopicVersion(dto, userId)
+    activate TopicVersionService
+    TopicVersionService->>TopicVersion: Get Version By Id
+    TopicVersion-->>TopicVersionService: Version Entity
+    TopicVersionService->>TopicVersion: Update Version Data
+    TopicVersion-->>TopicVersionService: Version Updated
+    TopicVersionService->>IUnitOfWork: Commit()
+    IUnitOfWork-->>TopicVersionService: Commit Result
+    TopicVersionService-->>ITopicVersionService: Update Result
+    deactivate TopicVersionService
+    ITopicVersionService-->>TopicVersionController: Update Result
+    deactivate ITopicVersionService
+    TopicVersionController-->>Supervisor: Return API Response
+    deactivate TopicVersionController

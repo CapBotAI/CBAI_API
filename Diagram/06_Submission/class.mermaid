@@ -1,13 +1,30 @@
 classDiagram
+    direction LR
+
+    %% Controller layer
     class SubmissionController
+
+    %% Service interface and implementation
     class ISubmissionService
     class SubmissionService
-    class Submission
-    class Phase
-    class TopicVersion
+    SubmissionController --> ISubmissionService : "calls"
+    SubmissionService ..|> ISubmissionService : "implements"
 
-    SubmissionController --> ISubmissionService
-    ISubmissionService <|.. SubmissionService
-    SubmissionService --> Submission
-    Submission --> Phase
-    Submission --> TopicVersion
+    %% Dependencies
+    class IIdentityRepository
+    class IUnitOfWork
+    SubmissionService --> IIdentityRepository : "uses"
+    SubmissionService --> IUnitOfWork : "uses"
+
+    %% Entities
+    class Submission
+    class TopicVersion
+    class Phase
+
+    %% IUnitOfWork provides access to entity repositories
+    IUnitOfWork --> TopicVersion
+    IUnitOfWork --> Phase
+
+    %% Aggregation entity relationships (no duplicate arrows)
+    TopicVersion "1" o-- "*" Submission : "has submissions"
+    Phase "1" o-- "*" Submission : "has submissions"

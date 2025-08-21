@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Swashbuckle.AspNetCore.Annotations;
@@ -17,12 +18,14 @@ public class ReviewerAssignmentController : BaseAPIController
 {
     private readonly IReviewerAssignmentService _reviewerAssignmentService;
     private readonly ILogger<ReviewerAssignmentController> _logger;
+    private readonly IEvaluationCriteriaService _evaluationCriteriaService;
 
     public ReviewerAssignmentController(
-        IReviewerAssignmentService reviewerAssignmentService,
+        IReviewerAssignmentService reviewerAssignmentService,IEvaluationCriteriaService evaluationCriteriaService,
         ILogger<ReviewerAssignmentController> logger)
     {
         _reviewerAssignmentService = reviewerAssignmentService;
+        _evaluationCriteriaService = evaluationCriteriaService;
         _logger = logger;
     }
 
@@ -355,6 +358,169 @@ public class ReviewerAssignmentController : BaseAPIController
             _logger.LogError(ex,
                 "Error occurred while analyzing reviewer match {ReviewerId} for submission {SubmissionId}", reviewerId,
                 submissionId);
+            return Error(ConstantModel.ErrorMessage);
+        }
+    }
+    /// <summary>
+    /// Lấy danh sách đề tài được gán cho reviewer đang đăng nhập
+    /// </summary>
+    /// <returns>Danh sách assignment của reviewer hiện tại</returns>
+    [HttpGet("my-assignments")]
+    [SwaggerOperation(
+        Summary = "Lấy danh sách đề tài được gán cho reviewer đang đăng nhập",
+        Description = "Lấy tất cả assignments được phân công cho reviewer hiện tại, bao gồm thông tin submission và topic"
+    )]
+    [SwaggerResponse(200, "Lấy danh sách thành công")]
+    [SwaggerResponse(401, "Chưa xác thực")]
+    public async Task<IActionResult> GetMyAssignments()
+    {
+        try
+        {
+            var reviewerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var result = await _reviewerAssignmentService.GetAssignmentsByReviewerAsync(reviewerId);
+            return ProcessServiceResponse(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting assignments for current reviewer");
+            return Error(ConstantModel.ErrorMessage);
+        }
+    }
+
+    /// <summary>
+    /// Lấy danh sách đề tài được gán theo trạng thái cho reviewer đang đăng nhập
+    /// </summary>
+    /// <param name="status">Trạng thái assignment (Assigned, InProgress, Completed, etc.)</param>
+    /// <returns>Danh sách assignment theo trạng thái</returns>
+    [HttpGet("my-assignments/by-status/{status}")]
+    [SwaggerOperation(
+        Summary = "Lấy danh sách đề tài được gán theo trạng thái",
+        Description = "Lấy assignments của reviewer hiện tại theo trạng thái cụ thể"
+    )]
+    [SwaggerResponse(200, "Lấy danh sách thành công")]
+    [SwaggerResponse(400, "Trạng thái không hợp lệ")]
+    [SwaggerResponse(401, "Chưa xác thực")]
+    public async Task<IActionResult> GetMyAssignmentsByStatus(string status)
+    {
+        try
+        {
+            if (!Enum.TryParse<AssignmentStatus>(status, true, out var assignmentStatus))
+            {
+                return BadRequest(new { message = "Trạng thái không hợp lệ" });
+            }
+
+            var reviewerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var result = await _reviewerAssignmentService.GetAssignmentsByReviewerAndStatusAsync(reviewerId, assignmentStatus);
+            return ProcessServiceResponse(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting assignments by status {Status} for current reviewer", status);
+            return Error(ConstantModel.ErrorMessage);
+        }
+    }
+
+    /// <summary>
+    /// Lấy thống kê assignments của reviewer đang đăng nhập
+    /// </summary>
+    /// <returns>Thống kê assignments</returns>
+    [HttpGet("my-assignments/statistics")]
+    [SwaggerOperation(
+        Summary = "Lấy thống kê assignments của reviewer đang đăng nhập",
+        Description = "Lấy thống kê tổng quan về assignments của reviewer hiện tại"
+    )]
+    [SwaggerResponse(200, "Lấy thống kê thành công")]
+    [SwaggerResponse(401, "Chưa xác thực")]
+    public async Task<IActionResult> GetMyAssignmentStatistics()
+    {
+        try
+        {
+            var reviewerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var result = await _reviewerAssignmentService.GetReviewerStatisticsAsync(reviewerId);
+            return ProcessServiceResponse(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting assignment statistics for current reviewer");
+            return Error(ConstantModel.ErrorMessage);
+        }
+    }
+
+    /// <summary>
+    /// Lấy danh sách tất cả tiêu chí đánh giá đang hoạt động
+    /// </summary>
+    /// <returns>Danh sách tiêu chí đánh giá</returns>
+    [HttpGet("evaluation-criteria")]
+    [SwaggerOperation(
+        Summary = "Lấy danh sách tiêu chí đánh giá",
+        Description = "Lấy tất cả tiêu chí đánh giá đang hoạt động để sử dụng trong quá trình review"
+    )]
+    [SwaggerResponse(200, "Lấy danh sách thành công")]
+    [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
+    public async Task<IActionResult> GetEvaluationCriteria()
+    {
+        try
+        {
+            var result = await _evaluationCriteriaService.GetAllActiveAsync();
+            return ProcessServiceResponse(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting evaluation criteria");
+            return Error(ConstantModel.ErrorMessage);
+        }
+    }
+
+    /// <summary>
+    /// Bắt đầu review một assignment
+    /// </summary>
+    /// <param name="assignmentId">ID của assignment</param>
+    /// <returns>Kết quả bắt đầu review</returns>
+    [HttpPost("{assignmentId}/start-review")]
+    [SwaggerOperation(
+        Summary = "Bắt đầu review một assignment",
+        Description = "Đánh dấu bắt đầu quá trình review cho một assignment"
+    )]
+    [SwaggerResponse(200, "Bắt đầu review thành công")]
+    [SwaggerResponse(404, "Assignment không tồn tại")]
+    [SwaggerResponse(403, "Không có quyền review assignment này")]
+    public async Task<IActionResult> StartReview(int assignmentId)
+    {
+        try
+        {
+            var reviewerId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+            var result = await _reviewerAssignmentService.StartReviewAsync(assignmentId, reviewerId);
+            return ProcessServiceResponse(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while starting review for assignment {AssignmentId}", assignmentId);
+            return Error(ConstantModel.ErrorMessage);
+        }
+    }
+
+    /// <summary>
+    /// Lấy chi tiết assignment với thông tin submission và topic
+    /// </summary>
+    /// <param name="assignmentId">ID của assignment</param>
+    /// <returns>Chi tiết assignment</returns>
+    [HttpGet("{assignmentId}/details")]
+    [SwaggerOperation(
+        Summary = "Lấy chi tiết assignment",
+        Description = "Lấy thông tin chi tiết của assignment bao gồm submission, topic và thông tin reviewer"
+    )]
+    [SwaggerResponse(200, "Lấy thông tin thành công")]
+    [SwaggerResponse(404, "Assignment không tồn tại")]
+    public async Task<IActionResult> GetAssignmentDetails(int assignmentId)
+    {
+        try
+        {
+            var result = await _reviewerAssignmentService.GetAssignmentDetailsAsync(assignmentId);
+            return ProcessServiceResponse(result);
+        }
+        catch (Exception ex)
+        {
+            _logger.LogError(ex, "Error occurred while getting assignment details {AssignmentId}", assignmentId);
             return Error(ConstantModel.ErrorMessage);
         }
     }
