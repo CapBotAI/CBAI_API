@@ -114,6 +114,7 @@ public class ReviewService : IReviewService
                 TimeSpentMinutes = createDTO.TimeSpentMinutes,
                 Status = ReviewStatus.Draft,
                 CreatedAt = DateTime.UtcNow,
+                LastModifiedAt = DateTime.UtcNow,
                 IsActive = true
             };
 
@@ -156,6 +157,7 @@ public class ReviewService : IReviewService
                     Score = scoreDTO.Score,
                     Comment = scoreDTO.Comment,
                     CreatedAt = DateTime.UtcNow,
+                    LastModifiedAt = DateTime.UtcNow,
                     IsActive = true
                 };
                 scores.Add(score);
@@ -315,6 +317,7 @@ public class ReviewService : IReviewService
                     Score = scoreDTO.Score,
                     Comment = scoreDTO.Comment,
                     CreatedAt = DateTime.UtcNow,
+                    LastModifiedAt = DateTime.UtcNow,
                     IsActive = true
                 };
                 newScores.Add(score);
@@ -417,6 +420,75 @@ public class ReviewService : IReviewService
         catch (Exception ex)
         {
             return new BaseResponseModel
+            {
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = $"Lỗi hệ thống: {ex.Message}"
+            };
+        }
+    }
+    public async Task<BaseResponseModel<ReviewResponseDTO>> WithdrawReviewAsync(int reviewId)
+    {
+        try
+        {
+            var reviewRepo = _unitOfWork.GetRepo<Review>();
+
+            var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
+            {
+                Predicate = x => x.Id == reviewId && x.IsActive
+            });
+
+            if (review == null)
+            {
+                return new BaseResponseModel<ReviewResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Không tìm thấy đánh giá"
+                };
+            }
+
+            if (review.Status != ReviewStatus.Submitted)
+            {
+                return new BaseResponseModel<ReviewResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Chỉ có thể rút lại đánh giá đã submit"
+                };
+            }
+
+            // Chuyển về trạng thái Draft
+            review.Status = ReviewStatus.Draft;
+            review.SubmittedAt = null;
+            review.LastModifiedAt = DateTime.UtcNow;
+
+            await reviewRepo.UpdateAsync(review);
+            var result = await _unitOfWork.SaveAsync();
+
+            if (!result.IsSuccess)
+            {
+                return new BaseResponseModel<ReviewResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = result.Message
+                };
+            }
+
+            // Get updated review
+            var updatedReview = await GetByIdAsync(review.Id);
+            return new BaseResponseModel<ReviewResponseDTO>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Rút lại đánh giá thành công",
+                Data = updatedReview.Data
+            };
+        }
+        catch (Exception ex)
+        {
+            return new BaseResponseModel<ReviewResponseDTO>
             {
                 IsSuccess = false,
                 StatusCode = StatusCodes.Status500InternalServerError,

@@ -21,7 +21,7 @@ public class ReviewerAssignmentController : BaseAPIController
     private readonly IEvaluationCriteriaService _evaluationCriteriaService;
 
     public ReviewerAssignmentController(
-        IReviewerAssignmentService reviewerAssignmentService,IEvaluationCriteriaService evaluationCriteriaService,
+        IReviewerAssignmentService reviewerAssignmentService, IEvaluationCriteriaService evaluationCriteriaService,
         ILogger<ReviewerAssignmentController> logger)
     {
         _reviewerAssignmentService = reviewerAssignmentService;
@@ -238,7 +238,7 @@ public class ReviewerAssignmentController : BaseAPIController
     /// <param name="semesterId">ID học kỳ (tùy chọn)</param>
     /// <returns>Thống kê workload</returns>
     [HttpGet("workload")]
-    [Authorize(Roles = $"{SystemRoleConstants.Administrator},{SystemRoleConstants.Moderator}")]
+    [Authorize(Roles = $"{SystemRoleConstants.Administrator},{SystemRoleConstants.Moderator},{SystemRoleConstants.Reviewer}")]
     [SwaggerOperation(
         Summary = "Lấy thống kê workload của reviewers",
         Description = "Lấy thông tin workload hiện tại của tất cả reviewers"
