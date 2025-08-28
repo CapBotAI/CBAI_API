@@ -41,13 +41,15 @@ namespace App.BLL.Implementations
                     .WithInclude(tv => tv.Topic.Category)
                     .Build()
             );
-            if (topicVersion == null)
+            if (topicVersion?.Topic?.Category == null)
+            {
                 return new BaseResponseModel<ReviewerSuggestionOutputDTO>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Topic version not found"
+                    Message = "Topic version or its category not found"
                 };
+            }
 
             var topic = topicVersion.Topic;
             var topicCategory = topic?.Category;
@@ -133,7 +135,7 @@ namespace App.BLL.Implementations
                 suggestionList.Add(new ReviewerSuggestionDTO
                 {
                     ReviewerId = reviewer.Id,
-                    ReviewerName = reviewer.Email,
+                    ReviewerName = reviewer?.Email ?? "Unknown",
                     SkillMatchScore = skillMatchScore,
                     MatchedSkills = matchedSkills,
                     ReviewerSkills = skillDict,
@@ -202,7 +204,10 @@ Suggest the most suitable reviewers (Reviewer 1, 2, 3) for this topic and explai
                 results.Add(new BulkReviewerSuggestionOutputDTO
                 {
                     TopicVersionId = topicVersionId,
-                    Suggestion = suggestionResult.Data
+                    Suggestion = suggestionResult?.Data ?? new ReviewerSuggestionOutputDTO
+                    {
+                        Suggestions = new List<ReviewerSuggestionDTO>()
+                    },
                 });
             }
             return new BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>
@@ -223,7 +228,7 @@ Suggest the most suitable reviewers (Reviewer 1, 2, 3) for this topic and explai
                 UsePrompt = false
             };
             var suggestion = await SuggestReviewersAsync(input);
-            var reviewer = suggestion.Data.Suggestions.FirstOrDefault(r => r.ReviewerId == reviewerId);
+            var reviewer = suggestion?.Data?.Suggestions?.FirstOrDefault(r => r.ReviewerId == reviewerId);
             if (reviewer == null)
             {
                 return new BaseResponseModel<ReviewerEligibilityDTO>
@@ -248,10 +253,119 @@ Suggest the most suitable reviewers (Reviewer 1, 2, 3) for this topic and explai
             };
         }
 
+        public async Task<BaseResponseModel<ReviewerSuggestionOutputDTO>> SuggestReviewersByTopicIdAsync(ReviewerSuggestionByTopicInputDTO input)
+        {
+            // Logic to fetch the latest approved TopicVersion for the given TopicId
+            var topicVersionRepo = _unitOfWork.GetRepo<TopicVersion>();
+            var topicVersions = await topicVersionRepo.GetAllAsync(
+                new QueryBuilder<TopicVersion>()
+                    .WithPredicate(tv => tv.TopicId == input.TopicId && tv.Status == TopicStatus.Submitted)
+                    .Build()
+            );
+            var topicVersion = topicVersions.OrderByDescending(tv => tv.SubmittedAt).FirstOrDefault();
+
+            if (topicVersion == null)
+            {
+                return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "No approved TopicVersion found for the given TopicId"
+                };
+            }
+
+            // Reuse existing logic for TopicVersionId-based suggestion
+            var topicVersionInput = new ReviewerSuggestionInputDTO
+            {
+                TopicVersionId = topicVersion.Id,
+                MaxSuggestions = input.MaxSuggestions,
+                UsePrompt = input.UsePrompt
+            };
+
+            return await SuggestReviewersAsync(topicVersionInput);
+        }
+
+        public async Task<BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>> BulkSuggestReviewersByTopicIdAsync(BulkReviewerSuggestionByTopicInputDTO input)
+        {
+            var results = new List<BulkReviewerSuggestionOutputDTO>();
+
+            if (input.TopicIds == null || !input.TopicIds.Any())
+            {
+                return new BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "TopicIds cannot be null or empty."
+                };
+            }
+
+            foreach (var topicId in input.TopicIds)
+            {
+                var singleInput = new ReviewerSuggestionByTopicInputDTO
+                {
+                    TopicId = topicId,
+                    MaxSuggestions = input.MaxSuggestions,
+                    UsePrompt = input.UsePrompt
+                };
+
+                var suggestionResult = await SuggestReviewersByTopicIdAsync(singleInput);
+                results.Add(new BulkReviewerSuggestionOutputDTO
+                {
+                    TopicId = topicId,
+                    Suggestion = suggestionResult.Data ?? new ReviewerSuggestionOutputDTO(),
+                });
+            }
+
+            return new BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>
+            {
+                Data = results,
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Bulk reviewer suggestion by TopicId completed successfully."
+            };
+        }
+
+        public async Task<BaseResponseModel<ReviewerEligibilityDTO>> CheckReviewerEligibilityByTopicIdAsync(int reviewerId, int topicId)
+        {
+            var input = new ReviewerSuggestionByTopicInputDTO
+            {
+                TopicId = topicId,
+                MaxSuggestions = 10,
+                UsePrompt = false
+            };
+
+            var suggestion = await SuggestReviewersByTopicIdAsync(input);
+            var reviewer = suggestion.Data?.Suggestions?.FirstOrDefault(r => r.ReviewerId == reviewerId);
+
+            if (reviewer == null)
+            {
+                return new BaseResponseModel<ReviewerEligibilityDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Reviewer not found for the given topic"
+                };
+            }
+
+            return new BaseResponseModel<ReviewerEligibilityDTO>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Data = new ReviewerEligibilityDTO
+                {
+                    ReviewerId = reviewerId,
+                    TopicId = topicId,
+                    IsEligible = reviewer.IsEligible,
+                    Reasons = reviewer.IneligibilityReasons ?? new List<string>()
+                },
+                Message = reviewer.IsEligible ? "Reviewer is eligible" : "Reviewer is not eligible"
+            };
+        }
+
         // Example GET: Return top reviewers by lowest current workload (fake data for demo)
         public async Task<BaseResponseModel<List<ReviewerSuggestionDTO>>> GetTopReviewersAsync(int count = 5)
         {
-            // In real code, reuse the suggestion logic, but here is a mock for demo:
+            await Task.Delay(0); // Placeholder for actual async logic
             var fake = Enumerable.Range(1, count).Select(i => new ReviewerSuggestionDTO
             {
                 ReviewerId = i,
@@ -283,6 +397,12 @@ Suggest the most suitable reviewers (Reviewer 1, 2, 3) for this topic and explai
         public Task<BaseResponseModel<List<ReviewerSuggestionHistoryDTO>>> GetSuggestionHistoryAsync(int topicVersionId)
         {
             throw new NotImplementedException();
+        }
+
+        public async Task<BaseResponseModel<List<ReviewerSuggestionHistoryDTO>>> GetSuggestionHistoryByTopicIdAsync(int topicId)
+        {
+            await Task.Delay(0); // Placeholder for actual async logic
+            throw new NotImplementedException("GetSuggestionHistoryByTopicIdAsync is not implemented yet.");
         }
     }
 }
