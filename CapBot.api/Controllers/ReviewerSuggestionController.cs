@@ -75,19 +75,50 @@ namespace CapBot.api.Controllers
         {
             try
             {
-                var input = new ReviewerSuggestionInputDTO
-                {
-                    TopicVersionId = topicVersionId,
-                    MaxSuggestions = count,
-                    UsePrompt = false
-                };
-                var result = await _reviewerSuggestionService.SuggestReviewersAsync(input);
-                return ProcessServiceResponse(result);
+            var input = new ReviewerSuggestionInputDTO
+            {
+                TopicVersionId = topicVersionId,
+                MaxSuggestions = count,
+                UsePrompt = false
+            };
+            var result = await _reviewerSuggestionService.SuggestReviewersAsync(input);
+            return ProcessServiceResponse(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting top reviewers");
-                return Error(ConstantModel.ErrorMessage);
+            _logger.LogError(ex, "Error occurred while getting top reviewers");
+            return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Lấy danh sách reviewer ít workload nhất cho một chủ đề sử dụng TopicId
+        /// </summary>
+        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
+        [HttpGet("top-by-topic")]
+        [SwaggerOperation(
+            Summary = "Lấy danh sách reviewer ít workload nhất cho một chủ đề",
+            Description = "Dựa trên số lượng assignment đang hoạt động, kỹ năng và hiệu suất, sử dụng TopicId"
+        )]
+        [SwaggerResponse(200, "Danh sách reviewer thành công")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetTopReviewersByTopicId([FromQuery] int topicId, [FromQuery] int count = 5)
+        {
+            try
+            {
+            var input = new ReviewerSuggestionByTopicInputDTO
+            {
+                TopicId = topicId,
+                MaxSuggestions = count,
+                UsePrompt = false
+            };
+            var result = await _reviewerSuggestionService.SuggestReviewersByTopicIdAsync(input);
+            return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+            _logger.LogError(ex, "Error occurred while getting top reviewers");
+            return Error(ConstantModel.ErrorMessage);
             }
         }
 
@@ -172,6 +203,125 @@ namespace CapBot.api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error getting suggestion history");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Gợi ý reviewer cho một chủ đề sử dụng TopicId
+        /// </summary>
+        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
+        [HttpPost("ai-suggest-by-topic")]
+        [SwaggerOperation(
+            Summary = "AI agent gợi ý reviewer cho một chủ đề",
+            Description = "Accessible by Supervisor/Admin/Moderator"
+        )]
+        [SwaggerResponse(200, "Gợi ý reviewer thành công")]
+        [SwaggerResponse(400, "Dữ liệu không hợp lệ")]
+        [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        public async Task<IActionResult> SuggestByTopicId([FromBody] ReviewerSuggestionByTopicInputDTO input)
+        {
+            if (!ModelState.IsValid)
+                return ModelInvalid();
+
+            if (input == null)
+                return Error("Dữ liệu đầu vào không hợp lệ");
+
+            try
+            {
+                var result = await _reviewerSuggestionService.SuggestReviewersByTopicIdAsync(input);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while suggesting reviewers by TopicId");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Gợi ý reviewer cho nhiều chủ đề (bulk) sử dụng TopicId
+        /// </summary>
+        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
+        [HttpPost("bulk-ai-suggest-by-topic")]
+        [SwaggerOperation(
+            Summary = "Gợi ý reviewer cho nhiều chủ đề",
+            Description = "Suggest reviewers using AI for multiple TopicIds"
+        )]
+        [SwaggerResponse(200, "Bulk reviewer suggestions successful")]
+        [SwaggerResponse(400, "Invalid input")]
+        [SwaggerResponse(500, "Internal server error")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        public async Task<IActionResult> BulkSuggestByTopicId([FromBody] BulkReviewerSuggestionByTopicInputDTO input)
+        {
+            if (!ModelState.IsValid)
+                return ModelInvalid();
+
+            if (input == null || input.TopicIds == null || !input.TopicIds.Any())
+                return Error("Dữ liệu đầu vào không hợp lệ");
+
+            try
+            {
+                var result = await _reviewerSuggestionService.BulkSuggestReviewersByTopicIdAsync(input);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while bulk suggesting reviewers by TopicId");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Kiểm tra reviewer có đủ điều kiện cho một chủ đề sử dụng TopicId không
+        /// </summary>
+        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
+        [HttpGet("check-eligibility-by-topic")]
+        [SwaggerOperation(
+            Summary = "Kiểm tra reviewer có đủ điều kiện cho một chủ đề",
+            Description = "Kiểm tra eligibility dựa trên kỹ năng, workload, hiệu suất, v.v."
+        )]
+        [SwaggerResponse(200, "Kiểm tra eligibility thành công")]
+        [SwaggerResponse(404, "Reviewer không tìm thấy")]
+        [Produces("application/json")]
+        public async Task<IActionResult> CheckEligibilityByTopicId([FromQuery] int reviewerId, [FromQuery] int topicId)
+        {
+            try
+            {
+                var result = await _reviewerSuggestionService.CheckReviewerEligibilityByTopicIdAsync(reviewerId, topicId);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking reviewer eligibility by TopicId");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Lấy lịch sử gợi ý reviewer cho một chủ đề sử dụng TopicId
+        /// </summary>
+        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
+        [HttpGet("history-by-topic")]
+        [SwaggerOperation(
+            Summary = "Lấy lịch sử gợi ý reviewer cho một chủ đề",
+            Description = "Trả về lịch sử các lần gợi ý reviewer cho topic"
+        )]
+        [SwaggerResponse(200, "Lấy lịch sử thành công")]
+        [Produces("application/json")]
+        public async Task<IActionResult> SuggestionHistoryByTopicId([FromQuery] int topicId)
+        {
+            try
+            {
+                var result = await _reviewerSuggestionService.GetSuggestionHistoryByTopicIdAsync(topicId);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error getting suggestion history by TopicId");
                 return Error(ConstantModel.ErrorMessage);
             }
         }
