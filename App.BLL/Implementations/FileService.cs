@@ -39,7 +39,9 @@ public class FileService : IFileService
             Height = dto.Height,
             Checksum = dto.Checksum,
             CreatedAt = dto.CreatedAt ?? DateTime.UtcNow,
-            CreatedBy = dto.CreatedBy
+            CreatedBy = dto.CreatedBy,
+            IsActive = true,
+            DeletedAt = null
         };
 
         await repo.CreateAsync(file);
