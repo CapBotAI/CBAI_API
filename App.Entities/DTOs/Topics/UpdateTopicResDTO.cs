@@ -13,11 +13,13 @@ public class UpdateTopicResDTO
     public string SemesterName { get; set; } = null!;
     public int MaxStudents { get; set; }
     public bool IsApproved { get; set; }
+    public long? FileId { get; set; }
+    public string? DocumentUrl { get; set; }
     public DateTime? UpdatedAt { get; set; }
     public string? UpdatedBy { get; set; }
     public int CurrentVersionNumber { get; set; }
 
-    public UpdateTopicResDTO(Topic topic)
+    public UpdateTopicResDTO(Topic topic, EntityFile? entityFile)
     {
         Id = topic.Id;
         Title = topic.Title;
@@ -29,6 +31,11 @@ public class UpdateTopicResDTO
         IsApproved = topic.IsApproved;
         UpdatedAt = topic.LastModifiedAt ?? DateTime.Now;
         UpdatedBy = topic.LastModifiedBy;
-        CurrentVersionNumber = topic.TopicVersions?.Max(v => v.VersionNumber) ?? 1;
+        CurrentVersionNumber = topic.TopicVersions.Any()
+            ? topic.TopicVersions.Max(x => x.VersionNumber)
+            : 0;
+
+        FileId = entityFile?.FileId;
+        DocumentUrl = entityFile?.File?.Url;
     }
 }

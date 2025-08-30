@@ -1075,7 +1075,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 // Submission Info
                 SubmissionId = assignment.SubmissionId,
                 SubmissionStatus = assignment.Submission.Status,
-                SubmittedAt = (DateTime)assignment.Submission.SubmittedAt,
+                SubmittedAt = assignment.Submission.SubmittedAt,
                 DocumentUrl = assignment.Submission.DocumentUrl,
                 AdditionalNotes = assignment.Submission.AdditionalNotes,
 

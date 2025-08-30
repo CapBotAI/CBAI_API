@@ -1,4 +1,4 @@
-﻿using AutoMapper;
+using AutoMapper;
 using App.BLL.Interfaces;
 using App.Commons.ResponseModel;
 using App.Commons.Paging;
@@ -27,7 +27,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-
+            
             // Kiểm tra tên tiêu chí đã tồn tại chưa
             var existingCriteria = await repo.GetSingleAsync(new QueryOptions<EvaluationCriteria>
             {
@@ -87,7 +87,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-
+            
             var criteria = await repo.GetSingleAsync(new QueryOptions<EvaluationCriteria>
             {
                 Predicate = x => x.Id == updateDTO.Id && x.IsActive
@@ -161,7 +161,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-
+            
             var criteria = await repo.GetSingleAsync(new QueryOptions<EvaluationCriteria>
             {
                 Predicate = x => x.Id == id && x.IsActive
@@ -235,7 +235,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-
+            
             var criteria = await repo.GetSingleAsync(new QueryOptions<EvaluationCriteria>
             {
                 Predicate = x => x.Id == id && x.IsActive,
@@ -276,7 +276,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-
+            
             var query = repo.Get(new QueryOptions<EvaluationCriteria>
             {
                 Predicate = x => x.IsActive,
@@ -291,7 +291,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
                 .ToListAsync();
 
             var responseItems = _mapper.Map<List<EvaluationCriteriaResponseDTO>>(items);
-
+            
             pagingModel.TotalRecord = totalItems;
             var pagingData = new PagingDataModel<EvaluationCriteriaResponseDTO>(responseItems, pagingModel);
 
@@ -318,7 +318,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-
+            
             var criteria = await repo.GetAllAsync(new QueryOptions<EvaluationCriteria>
             {
                 Predicate = x => x.IsActive,

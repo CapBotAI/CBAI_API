@@ -15,12 +15,14 @@ public class CreaterTopicVersionResDTO
     public string? Methodology { get; set; }
     public string? ExpectedOutcomes { get; set; }
     public string? Requirements { get; set; }
+
+    public long? FileId { get; set; }
     public string? DocumentUrl { get; set; }
     public TopicStatus Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public string? CreatedBy { get; set; }
 
-    public CreaterTopicVersionResDTO(TopicVersion topicVersion)
+    public CreaterTopicVersionResDTO(TopicVersion topicVersion, EntityFile? entityFile)
     {
         Id = topicVersion.Id;
         TopicId = topicVersion.TopicId;
@@ -31,9 +33,11 @@ public class CreaterTopicVersionResDTO
         Methodology = topicVersion.Methodology;
         ExpectedOutcomes = topicVersion.ExpectedOutcomes;
         Requirements = topicVersion.Requirements;
-        DocumentUrl = topicVersion.DocumentUrl;
         Status = topicVersion.Status;
         CreatedAt = topicVersion.CreatedAt;
         CreatedBy = topicVersion.CreatedBy;
+
+        FileId = entityFile?.FileId;
+        DocumentUrl = entityFile?.File?.Url;
     }
 }

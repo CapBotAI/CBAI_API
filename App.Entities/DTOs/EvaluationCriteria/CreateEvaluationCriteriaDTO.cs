@@ -1,4 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations;
 using App.Commons;
 
 namespace App.Entities.DTOs.EvaluationCriteria;

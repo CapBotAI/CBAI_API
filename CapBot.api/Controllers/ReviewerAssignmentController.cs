@@ -21,7 +21,7 @@ public class ReviewerAssignmentController : BaseAPIController
     private readonly IEvaluationCriteriaService _evaluationCriteriaService;
 
     public ReviewerAssignmentController(
-        IReviewerAssignmentService reviewerAssignmentService, IEvaluationCriteriaService evaluationCriteriaService,
+        IReviewerAssignmentService reviewerAssignmentService,IEvaluationCriteriaService evaluationCriteriaService,
         ILogger<ReviewerAssignmentController> logger)
     {
         _reviewerAssignmentService = reviewerAssignmentService;

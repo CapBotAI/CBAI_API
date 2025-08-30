@@ -12,37 +12,37 @@ public class AssignmentDetailsDTO
     public DateTime? StartedAt { get; set; }
     public DateTime? CompletedAt { get; set; }
     public decimal? SkillMatchScore { get; set; }
-    
+
     // Reviewer Info
     public int ReviewerId { get; set; }
     public string ReviewerName { get; set; } = null!;
     public string ReviewerEmail { get; set; } = null!;
-    
+
     // Submission Info
     public int SubmissionId { get; set; }
     public SubmissionStatus SubmissionStatus { get; set; }
-    public DateTime SubmittedAt { get; set; }
+    public DateTime? SubmittedAt { get; set; }
     public string? DocumentUrl { get; set; }
     public string? AdditionalNotes { get; set; }
-    
+
     // Topic Info
     public int TopicId { get; set; }
     public string TopicTitle { get; set; } = null!;
     public string? TopicDescription { get; set; }
     public string? TopicObjectives { get; set; }
-    
+
     // Student Info
     public int StudentId { get; set; }
     public string StudentName { get; set; } = null!;
     public string StudentEmail { get; set; } = null!;
-    
+
     // Phase Info
     public int PhaseId { get; set; }
     public string PhaseName { get; set; } = null!;
-    
+
     // Review Info (nếu có)
     public List<ReviewSummaryDTO> Reviews { get; set; } = new List<ReviewSummaryDTO>();
-    
+
     public bool IsOverdue { get; set; }
     public bool CanStartReview { get; set; }
     public bool HasActiveReview { get; set; }

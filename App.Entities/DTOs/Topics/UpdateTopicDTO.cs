@@ -21,6 +21,8 @@ public class UpdateTopicDTO
     [Range(1, 5, ErrorMessage = "Số lượng sinh viên tối đa phải từ 1 đến 5")]
     public int MaxStudents { get; set; }
 
+    public long? FileId { get; set; }
+
     public BaseResponseModel Validate()
     {
         if (Id <= 0)

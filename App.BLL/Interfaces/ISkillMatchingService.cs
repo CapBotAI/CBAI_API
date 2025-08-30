@@ -30,4 +30,6 @@ public interface ISkillMatchingService
     /// Tính workload score của reviewer (càng thấp càng tốt)
     /// </summary>
     Task<decimal> CalculateWorkloadScoreAsync(int reviewerId);
+    
+    
 }

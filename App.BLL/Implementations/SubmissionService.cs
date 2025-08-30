@@ -47,7 +47,6 @@ public class SubmissionService : ISubmissionService
                 .WithTracking(true)
                 .Build());
 
-
             if (topic == null)
             {
                 return new BaseResponseModel<SubmissionDetailDTO>
@@ -74,33 +73,68 @@ public class SubmissionService : ISubmissionService
                 };
             }
 
-
-
-            // Ràng buộc semester của phase và topic
-            if (topic.SemesterId != phase.SemesterId)
+            // Check file ownership nếu có FileId
+            if (dto.FileId.HasValue)
             {
-                return new BaseResponseModel<SubmissionDetailDTO>
+                var fileRepo = _unitOfWork.GetRepo<AppFile>();
+                var file = await fileRepo.GetSingleAsync(new QueryBuilder<AppFile>()
+                    .WithPredicate(x => x.Id == dto.FileId.Value && x.CreatedBy == user.UserName && x.IsActive && x.DeletedAt == null)
+                    .WithTracking(false)
+                    .Build());
+
+                if (file == null)
                 {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status409Conflict,
-                    Message = "Giai đoạn không thuộc cùng học kỳ với chủ đề"
-                };
+                    return new BaseResponseModel<SubmissionDetailDTO>
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status409Conflict,
+                        Message = "File không tồn tại hoặc không phải của bạn"
+                    };
+                }
             }
 
             await _unitOfWork.BeginTransactionAsync();
 
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
+            var entityFileRepo = _unitOfWork.GetRepo<EntityFile>();
+
             var submission = dto.GetEntity();
             submission.SubmittedBy = userId;
+            submission.IsActive = true;
+            submission.DeletedAt = null;
+            submission.Status = SubmissionStatus.Pending;
+            submission.CreatedAt = DateTime.Now;
+            submission.CreatedBy = user.UserName;
 
             await submissionRepo.CreateAsync(submission);
+            await _unitOfWork.SaveChangesAsync();
+
+            if (dto.FileId.HasValue)
+            {
+                await entityFileRepo.CreateAsync(new EntityFile
+                {
+                    EntityId = submission.Id,
+                    EntityType = EntityType.Submission,
+                    FileId = dto.FileId.Value,
+                    IsPrimary = true,
+                    Caption = $"Submission #{submission.Id}",
+                    CreatedAt = DateTime.Now,
+                });
+            }
 
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
 
+            var entityFileRepo_2 = _unitOfWork.GetRepo<EntityFile>();
+            var entityFile = await entityFileRepo_2.GetSingleAsync(new QueryBuilder<EntityFile>()
+                .WithPredicate(x => x.EntityId == submission.Id && x.EntityType == EntityType.Submission && x.IsPrimary)
+                .WithInclude(x => x.File!)
+                .WithTracking(false)
+                .Build());
+
             return new BaseResponseModel<SubmissionDetailDTO>
             {
-                Data = new SubmissionDetailDTO(submission),
+                Data = new SubmissionDetailDTO(submission, entityFile),
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status201Created,
                 Message = "Tạo submission thành công"
@@ -166,6 +200,36 @@ public class SubmissionService : ISubmissionService
                 };
             }
 
+            // Validate file nếu có
+            if (dto.FileId.HasValue)
+            {
+                var fileRepo = _unitOfWork.GetRepo<AppFile>();
+                var file = await fileRepo.GetSingleAsync(new QueryBuilder<AppFile>()
+                    .WithPredicate(x => x.Id == dto.FileId.Value && x.IsActive && x.DeletedAt == null)
+                    .WithTracking(false)
+                    .Build());
+
+                if (file == null)
+                {
+                    return new BaseResponseModel<SubmissionDetailDTO>
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status409Conflict,
+                        Message = "File không tồn tại"
+                    };
+                }
+
+                if (file.CreatedBy != user.UserName)
+                {
+                    return new BaseResponseModel<SubmissionDetailDTO>
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status409Conflict,
+                        Message = "File không phải của bạn"
+                    };
+                }
+            }
+
             await _unitOfWork.BeginTransactionAsync();
 
             if (submission.PhaseId != dto.PhaseId)
@@ -188,7 +252,6 @@ public class SubmissionService : ISubmissionService
                     };
                 }
 
-                // So khớp học kỳ dựa trên Topic nếu không có TopicVersion; nếu có TopicVersion thì Topic vẫn cùng học kỳ
                 var topicSemesterId = submission.Topic?.SemesterId;
                 if (!topicSemesterId.HasValue || topicSemesterId.Value != phase.SemesterId)
                 {
@@ -208,12 +271,50 @@ public class SubmissionService : ISubmissionService
             submission.AdditionalNotes = dto.AdditionalNotes?.Trim();
 
             await submissionRepo.UpdateAsync(submission);
+
+            // Gắn/đổi file chính
+            if (dto.FileId.HasValue)
+            {
+                var entityFileRepo = _unitOfWork.GetRepo<EntityFile>();
+                var existed = await entityFileRepo.GetSingleAsync(new QueryBuilder<EntityFile>()
+                    .WithPredicate(x => x.EntityId == submission.Id && x.EntityType == EntityType.Submission && x.IsPrimary)
+                    .WithTracking(false)
+                    .Build());
+
+                if (existed != null)
+                {
+                    existed.FileId = dto.FileId.Value;
+                    existed.Caption = $"Submission #{submission.Id}";
+                    existed.CreatedAt = DateTime.Now;
+                    await entityFileRepo.UpdateAsync(existed);
+                }
+                else
+                {
+                    await entityFileRepo.CreateAsync(new EntityFile
+                    {
+                        EntityId = submission.Id,
+                        EntityType = EntityType.Submission,
+                        FileId = dto.FileId.Value,
+                        IsPrimary = true,
+                        Caption = $"Submission #{submission.Id}",
+                        CreatedAt = DateTime.Now,
+                    });
+                }
+            }
+
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
 
+            var entityFileRepo_2 = _unitOfWork.GetRepo<EntityFile>();
+            var entityFile = await entityFileRepo_2.GetSingleAsync(new QueryBuilder<EntityFile>()
+                .WithPredicate(x => x.EntityId == submission.Id && x.EntityType == EntityType.Submission && x.IsPrimary)
+                .WithInclude(x => x.File!)
+                .WithTracking(false)
+                .Build());
+
             return new BaseResponseModel<SubmissionDetailDTO>
             {
-                Data = new SubmissionDetailDTO(submission),
+                Data = new SubmissionDetailDTO(submission, entityFile),
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
                 Message = "Cập nhật submission thành công"
@@ -479,9 +580,17 @@ public class SubmissionService : ISubmissionService
                 };
             }
 
+            // Lấy file chính (nếu có)
+            var entityFileRepo = _unitOfWork.GetRepo<EntityFile>();
+            var entityFile = await entityFileRepo.GetSingleAsync(new QueryBuilder<EntityFile>()
+                .WithPredicate(x => x.EntityId == id && x.EntityType == EntityType.Submission && x.IsPrimary)
+                .WithInclude(x => x.File!)
+                .WithTracking(false)
+                .Build());
+
             return new BaseResponseModel<SubmissionDetailDTO>
             {
-                Data = new SubmissionDetailDTO(submission),
+                Data = new SubmissionDetailDTO(submission, entityFile),
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK
             };

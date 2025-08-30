@@ -25,13 +25,7 @@ public class CreateTopicDTO : IValidationPipeline, IEntity<Topic>
     [Range(1, 5, ErrorMessage = "Số lượng sinh viên tối đa phải từ 1 đến 5")]
     public int MaxStudents { get; set; } = 1;
 
-    public string? Methodology { get; set; }
-
-    public string? ExpectedOutcomes { get; set; }
-
-    public string? Requirements { get; set; }
-
-    public string? DocumentUrl { get; set; }
+    public long? FileId { get; set; }
 
     public Topic GetEntity()
     {

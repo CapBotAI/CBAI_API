@@ -327,9 +327,8 @@ public class BaseAPIController : ControllerBase
     {
         get
         {
-            var isadmin = User.FindFirst(ConstantModel.IS_ADMIN)?.Value;
-            bool.TryParse(isadmin, out bool isAdmin);
-            return isAdmin;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            return role == "Administrator";
         }
     }
 
@@ -340,9 +339,20 @@ public class BaseAPIController : ControllerBase
     {
         get
         {
-            var is_Moderator = User.FindFirst(ConstantModel.IS_MODERATOR)?.Value;
-            bool.TryParse(is_Moderator, out bool isModerator);
-            return isModerator;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            return role == "Moderator";
+        }
+    }
+
+    /// <summary>
+    /// Get the logged in user is supervisor
+    /// </summary>
+    protected bool IsSupervisor
+    {
+        get
+        {
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            return role == "Supervisor";
         }
     }
 
@@ -353,9 +363,8 @@ public class BaseAPIController : ControllerBase
     {
         get
         {
-            var is_reviewer = User.FindFirst(ConstantModel.IS_REVIEWER)?.Value;
-            bool.TryParse(is_reviewer, out bool isReviewer);
-            return isReviewer;
+            var role = User.FindFirst(ClaimTypes.Role)?.Value;
+            return role == "Reviewer";
         }
     }
 
@@ -366,9 +375,8 @@ public class BaseAPIController : ControllerBase
     {
         get
         {
-            var isRemeber = User.FindFirst(ConstantModel.IS_REMEMBER)?.Value;
-            bool.TryParse(isRemeber, out bool is_remember);
-            return is_remember;
+            var isRemember = User.FindFirst(ConstantModel.IS_REMEMBER)?.Value;
+            return isRemember == "true";
         }
     }
 

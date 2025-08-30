@@ -582,6 +582,35 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.HasIndex(e => new { e.UserId, e.IsRead, e.CreatedAt });
         });
 
+        #region Image Configuration
+
+        modelBuilder.Entity<Entities.Entities.App.AppFile>(entity =>
+            {
+                entity.ToTable("files");
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.FilePath).IsRequired().HasMaxLength(1024);
+                entity.Property(x => x.FileName).IsRequired().HasMaxLength(255);
+                entity.Property(x => x.Url).IsRequired().HasMaxLength(2048);
+                entity.Property(x => x.ThumbnailUrl).HasMaxLength(2048);
+                entity.Property(x => x.MimeType).HasMaxLength(255);
+                entity.Property(x => x.Alt).HasMaxLength(255);
+                entity.Property(x => x.Checksum).HasMaxLength(128);
+                entity.HasMany(x => x.EntityFiles)
+                 .WithOne(x => x.File!)
+                 .HasForeignKey(x => x.FileId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+        modelBuilder.Entity<EntityFile>(entity =>
+        {
+            entity.ToTable("entity_files");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => new { x.EntityType, x.EntityId }); // truy vấn theo entity nhanh hơn
+            entity.Property(x => x.Caption).HasMaxLength(512);
+        });
+
+        #endregion
+
         OnModelCreatingPartial(modelBuilder);
     }
 

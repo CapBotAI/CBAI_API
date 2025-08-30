@@ -1,4 +1,4 @@
-﻿using App.Commons.ResponseModel;
+using App.Commons.ResponseModel;
 using App.Entities.DTOs.EvaluationCriteria;
 using App.Commons.Paging;
 

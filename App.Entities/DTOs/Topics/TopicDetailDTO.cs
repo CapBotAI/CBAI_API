@@ -19,6 +19,8 @@ public class TopicDetailDTO
     public int MaxStudents { get; set; }
     public bool IsApproved { get; set; }
     public bool IsLegacy { get; set; }
+    public long? FileId { get; set; }
+    public string? DocumentUrl { get; set; }
     public TopicStatus CurrentStatus { get; set; }
     public int TotalVersions { get; set; }
     public TopicVersionDetailDTO? CurrentVersion { get; set; }
@@ -29,7 +31,7 @@ public class TopicDetailDTO
 
     public TopicDetailDTO() { }
 
-    public TopicDetailDTO(Topic topic)
+    public TopicDetailDTO(Topic topic, EntityFile? entityFile)
     {
         Id = topic.Id;
         Title = topic.Title;
@@ -48,11 +50,14 @@ public class TopicDetailDTO
 
         var latestVersion = topic.TopicVersions?.OrderByDescending(v => v.VersionNumber).FirstOrDefault();
         CurrentStatus = latestVersion?.Status ?? TopicStatus.Draft;
-        CurrentVersion = latestVersion != null ? new TopicVersionDetailDTO(latestVersion) : null;
+        CurrentVersion = latestVersion != null ? new TopicVersionDetailDTO(latestVersion, null) : null;
 
         CreatedAt = topic.CreatedAt;
         CreatedBy = topic.CreatedBy;
         LastModifiedAt = topic.LastModifiedAt;
         LastModifiedBy = topic.LastModifiedBy;
+
+        FileId = entityFile?.FileId;
+        DocumentUrl = entityFile?.File?.Url;
     }
 }

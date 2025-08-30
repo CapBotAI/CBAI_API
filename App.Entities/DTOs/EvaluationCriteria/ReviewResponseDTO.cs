@@ -1,4 +1,4 @@
-﻿using App.Entities.DTOs.EvaluationCriteria;
+using App.Entities.DTOs.EvaluationCriteria;
 using App.Entities.Enums;
 
 namespace App.Entities.DTOs.Review;

@@ -1,4 +1,4 @@
-﻿namespace App.Entities.DTOs.EvaluationCriteria;
+namespace App.Entities.DTOs.EvaluationCriteria;
 
 public class EvaluationCriteriaResponseDTO
 {

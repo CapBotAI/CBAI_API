@@ -68,6 +68,27 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
+            if (createTopicVersionDTO.FileId.HasValue)
+            {
+                var fileRepo = _unitOfWork.GetRepo<AppFile>();
+                var file = await fileRepo.GetSingleAsync(new QueryBuilder<AppFile>()
+                    .WithPredicate(x => x.Id == createTopicVersionDTO.FileId.Value && x.CreatedBy == user.UserName && x.IsActive && x.DeletedAt == null)
+                    .WithTracking(false)
+                    .Build());
+
+                if (file == null)
+                {
+                    return new BaseResponseModel<CreaterTopicVersionResDTO>
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status409Conflict,
+                        Message = "File không tồn tại hoặc không phải của bạn"
+                    };
+                }
+            }
+
+            await _unitOfWork.BeginTransactionAsync();
+
             var versionRepo = _unitOfWork.GetRepo<TopicVersion>();
 
             var latestVersion = await versionRepo.GetSingleAsync(new QueryBuilder<TopicVersion>()
@@ -90,9 +111,33 @@ public class TopicVersionService : ITopicVersionService
             await versionRepo.CreateAsync(topicVersion);
             await _unitOfWork.SaveChangesAsync();
 
+            if (createTopicVersionDTO.FileId.HasValue)
+            {
+                var entityFileRepo = _unitOfWork.GetRepo<EntityFile>();
+                await entityFileRepo.CreateAsync(new EntityFile
+                {
+                    FileId = createTopicVersionDTO.FileId.Value,
+                    EntityType = EntityType.TopicVersion,
+                    EntityId = topicVersion.Id,
+                    IsPrimary = true,
+                    Caption = topicVersion.Title,
+                    CreatedAt = DateTime.Now,
+                });
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+
+            var entityFileRepo_2 = _unitOfWork.GetRepo<EntityFile>();
+            var entityFile = await entityFileRepo_2.GetSingleAsync(new QueryBuilder<EntityFile>()
+                .WithPredicate(x => x.EntityId == topicVersion.Id && x.EntityType == EntityType.TopicVersion && x.IsPrimary)
+                .WithInclude(x => x.File!)
+                .WithTracking(false)
+                .Build());
+
             return new BaseResponseModel<CreaterTopicVersionResDTO>
             {
-                Data = new CreaterTopicVersionResDTO(topicVersion),
+                Data = new CreaterTopicVersionResDTO(topicVersion, entityFile),
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status201Created
             };
@@ -155,6 +200,27 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
+            if (updateTopicVersionDTO.FileId.HasValue)
+            {
+                var fileRepo = _unitOfWork.GetRepo<AppFile>();
+                var file = await fileRepo.GetSingleAsync(new QueryBuilder<AppFile>()
+                    .WithPredicate(x => x.Id == updateTopicVersionDTO.FileId.Value && x.CreatedBy == user.UserName && x.IsActive && x.DeletedAt == null)
+                    .WithTracking(false)
+                    .Build());
+
+                if (file == null)
+                {
+                    return new BaseResponseModel<TopicVersionDetailDTO>
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status409Conflict,
+                        Message = "File không tồn tại hoặc không phải của bạn"
+                    };
+                }
+            }
+
+            await _unitOfWork.BeginTransactionAsync();
+
             topicVersion.Title = updateTopicVersionDTO.Title.Trim();
             topicVersion.Description = updateTopicVersionDTO.Description?.Trim();
             topicVersion.Objectives = updateTopicVersionDTO.Objectives?.Trim();
@@ -168,9 +234,49 @@ public class TopicVersionService : ITopicVersionService
             await versionRepo.UpdateAsync(topicVersion);
             await _unitOfWork.SaveChangesAsync();
 
+            if (updateTopicVersionDTO.FileId.HasValue)
+            {
+                var entityFileRepo = _unitOfWork.GetRepo<EntityFile>();
+                var existedEntityFile = await entityFileRepo.GetSingleAsync(new QueryBuilder<EntityFile>()
+                    .WithPredicate(x => x.EntityId == topicVersion.Id && x.EntityType == EntityType.TopicVersion && x.IsPrimary)
+                    .WithTracking(false)
+                    .Build());
+
+                if (existedEntityFile != null)
+                {
+                    existedEntityFile.FileId = updateTopicVersionDTO.FileId.Value;
+                    existedEntityFile.Caption = topicVersion.Title;
+                    existedEntityFile.CreatedAt = DateTime.Now;
+                    await entityFileRepo.UpdateAsync(existedEntityFile);
+                }
+                else
+                {
+                    await entityFileRepo.CreateAsync(new EntityFile
+                    {
+                        EntityId = topicVersion.Id,
+                        EntityType = EntityType.TopicVersion,
+                        FileId = updateTopicVersionDTO.FileId.Value,
+                        IsPrimary = true,
+                        Caption = topicVersion.Title,
+                        CreatedAt = DateTime.Now,
+                    });
+                }
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+
+            var entityFileRepo_2 = _unitOfWork.GetRepo<EntityFile>();
+
+            var entityFile = await entityFileRepo_2.GetSingleAsync(new QueryBuilder<EntityFile>()
+                .WithPredicate(x => x.EntityId == topicVersion.Id && x.EntityType == EntityType.TopicVersion && x.IsPrimary)
+                .WithInclude(x => x.File!)
+                .WithTracking(false)
+                .Build());
+
             return new BaseResponseModel<TopicVersionDetailDTO>
             {
-                Data = new TopicVersionDetailDTO(topicVersion),
+                Data = new TopicVersionDetailDTO(topicVersion, entityFile),
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK
             };
@@ -254,9 +360,16 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
+            var entityFileRepo = _unitOfWork.GetRepo<EntityFile>();
+            var entityFile = await entityFileRepo.GetSingleAsync(new QueryBuilder<EntityFile>()
+                .WithPredicate(x => x.EntityId == topicVersion.Id && x.EntityType == EntityType.TopicVersion && x.IsPrimary)
+                .WithInclude(x => x.File!)
+                .WithTracking(false)
+                .Build());
+
             return new BaseResponseModel<TopicVersionDetailDTO>
             {
-                Data = new TopicVersionDetailDTO(topicVersion),
+                Data = new TopicVersionDetailDTO(topicVersion, entityFile),
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK
             };
