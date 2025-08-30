@@ -19,8 +19,6 @@ public class SubmissionDetailDTO
 
     public int SubmissionRound { get; set; } = 1;
 
-    public string? DocumentUrl { get; set; }
-
     public string? AdditionalNotes { get; set; }
 
     public AiCheckStatus AiCheckStatus { get; set; } = AiCheckStatus.Pending;
@@ -39,7 +37,10 @@ public class SubmissionDetailDTO
     public DateTime? DeletedAt { get; set; }
     public string? DeletedBy { get; set; }
 
-    public SubmissionDetailDTO(Submission submission)
+    public long? FileId { get; set; }
+    public string? DocumentUrl { get; set; }
+
+    public SubmissionDetailDTO(Submission submission, EntityFile? entityFile)
     {
         Id = submission.Id;
         TopicVersionId = submission.TopicVersionId ?? 0;
@@ -58,5 +59,7 @@ public class SubmissionDetailDTO
         LastModifiedAt = submission.LastModifiedAt;
         LastModifiedBy = submission.LastModifiedBy;
         DeletedAt = submission.DeletedAt;
+        FileId = entityFile?.FileId;
+        DocumentUrl = entityFile?.File?.Url;
     }
 }

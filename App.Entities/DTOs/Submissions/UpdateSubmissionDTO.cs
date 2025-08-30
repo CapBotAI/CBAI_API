@@ -13,6 +13,8 @@ public class UpdateSubmissionDTO : IValidationPipeline, IEntity<Submission>
     [Required] public int PhaseId { get; set; }
     public string? DocumentUrl { get; set; }
     public string? AdditionalNotes { get; set; }
+
+    public long? FileId { get; set; }
     public Submission GetEntity() => new Submission
     {
         Id = Id,
