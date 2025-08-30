@@ -1,4 +1,4 @@
-﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore;
 using App.BLL.Interfaces;
 using App.DAL.UnitOfWork;
 using App.DAL.Queries;
@@ -24,7 +24,7 @@ public class PerformanceMatchingService : IPerformanceMatchingService
     {
         var performanceOptions = new QueryOptions<ReviewerPerformance>
         {
-            Predicate = rp => rp.ReviewerId == reviewerId &&
+            Predicate = rp => rp.ReviewerId == reviewerId && 
                             (!semesterId.HasValue || rp.SemesterId == semesterId.Value)
         };
         var performances = await _unitOfWork.GetRepo<ReviewerPerformance>().GetAllAsync(performanceOptions);
@@ -42,9 +42,9 @@ public class PerformanceMatchingService : IPerformanceMatchingService
         var qualityScore = (decimal)(latestPerformance.QualityRating ?? 2.5m);
 
         // Weighted average: Reliability 40%, Quality 30%, Efficiency 20%, Consistency 10%
-        var overallScore = (reliabilityScore * 0.4m) +
-                          (qualityScore * 0.3m) +
-                          (efficiencyScore * 0.2m) +
+        var overallScore = (reliabilityScore * 0.4m) + 
+                          (qualityScore * 0.3m) + 
+                          (efficiencyScore * 0.2m) + 
                           (consistencyScore * 0.1m);
 
         return Math.Min(5.0m, Math.Max(0.0m, overallScore));
@@ -54,7 +54,7 @@ public class PerformanceMatchingService : IPerformanceMatchingService
     {
         var performanceOptions = new QueryOptions<ReviewerPerformance>
         {
-            Predicate = rp => rp.ReviewerId == reviewerId &&
+            Predicate = rp => rp.ReviewerId == reviewerId && 
                             (!semesterId.HasValue || rp.SemesterId == semesterId.Value)
         };
         var performances = await _unitOfWork.GetRepo<ReviewerPerformance>().GetAllAsync(performanceOptions);
@@ -95,7 +95,7 @@ public class PerformanceMatchingService : IPerformanceMatchingService
     {
         var performanceOptions = new QueryOptions<ReviewerPerformance>
         {
-            Predicate = rp => rp.ReviewerId == reviewerId &&
+            Predicate = rp => rp.ReviewerId == reviewerId && 
                             (!semesterId.HasValue || rp.SemesterId == semesterId.Value)
         };
         var performances = await _unitOfWork.GetRepo<ReviewerPerformance>().GetAllAsync(performanceOptions);
@@ -132,7 +132,7 @@ public class PerformanceMatchingService : IPerformanceMatchingService
     {
         var performanceOptions = new QueryOptions<ReviewerPerformance>
         {
-            Predicate = rp => rp.ReviewerId == reviewerId &&
+            Predicate = rp => rp.ReviewerId == reviewerId && 
                             (!semesterId.HasValue || rp.SemesterId == semesterId.Value)
         };
         var performances = await _unitOfWork.GetRepo<ReviewerPerformance>().GetAllAsync(performanceOptions);
@@ -231,7 +231,7 @@ public class PerformanceMatchingService : IPerformanceMatchingService
             // Get current workload
             var activeAssignmentOptions = new QueryOptions<ReviewerAssignment>
             {
-                Predicate = ra => ra.ReviewerId == reviewer.Id &&
+                Predicate = ra => ra.ReviewerId == reviewer.Id && 
                                (ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress)
             };
             var activeAssignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(activeAssignmentOptions);
@@ -259,13 +259,13 @@ public class PerformanceMatchingService : IPerformanceMatchingService
     {
         var activeAssignmentOptions = new QueryOptions<ReviewerAssignment>
         {
-            Predicate = ra => ra.ReviewerId == reviewerId &&
+            Predicate = ra => ra.ReviewerId == reviewerId && 
                            (ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress)
         };
         var activeAssignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(activeAssignmentOptions);
-
+        
         int activeCount = activeAssignments.Count();
-
+        
         // Workload score: lower load = higher score
         // 0 assignments = 5.0, 10+ assignments = 0.0
         return Math.Max(0, 5.0m - (activeCount * 0.5m));
@@ -331,7 +331,7 @@ public class PerformanceMatchingService : IPerformanceMatchingService
         // Experience bonus based on completed assignments
         decimal experienceScore = Math.Min(5.0m, result.CompletedAssignments * 0.1m);
 
-        decimal overallScore =
+        decimal overallScore = 
             (result.PerformanceScore * performanceWeight) +
             (result.WorkloadScore * workloadWeight) +
             (experienceScore * experienceWeight);

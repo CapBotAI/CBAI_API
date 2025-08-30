@@ -23,8 +23,6 @@ public class UpdateSemesterDTO : IValidationPipeline
     [DataType(DataType.Date)]
     public DateTime EndDate { get; set; }
 
-    public string? Description { get; set; }
-
     public BaseResponseModel Validate()
     {
         var validationResult = new BaseResponseModel();

@@ -14,8 +14,6 @@ public partial class Semester : CommonDataModel
 
     public DateTime EndDate { get; set; }
 
-    public string? Description { get; set; }
-
     public virtual ICollection<Phase> Phases { get; set; } = new List<Phase>();
     public virtual ICollection<Topic> Topics { get; set; } = new List<Topic>();
     public virtual ICollection<ReviewerPerformance> ReviewerPerformances { get; set; } = new List<ReviewerPerformance>();

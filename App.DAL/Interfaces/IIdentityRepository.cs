@@ -57,27 +57,12 @@ public interface IIdentityRepository
     Task<bool> CreateUpdateRoleAsync(string roleName, bool isAdmin);
 
     /// <summary>
-    ///Kiểm tra role tồn tại
-    /// </summary>
-    /// <param name="roleName"></param>
-    /// <returns></returns>
-    Task<bool> IsRoleExist(string roleName);
-
-    /// <summary>
     /// thêm role cho người dùng theo tên role
     /// </summary>
     /// <param name="userId"></param>
     /// <param name="roleName"></param>
     /// <returns></returns>
     Task<bool> AddRoleByNameAsync(string userId, string roleName);
-
-    /// <summary>
-    /// Adds a list of roles to a user.
-    /// </summary>
-    /// <param name="userId"></param>
-    /// <param name="roles"></param>
-    /// <returns></returns>
-    Task<bool> AddRolesToUserAsync(User user, List<string> roles);
 
     /// <summary>
     /// generate email confirm token

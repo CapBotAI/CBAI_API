@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using App.BLL.Interfaces;
 using App.Entities.DTOs.Review;
 using App.Commons.BaseAPI;
@@ -288,7 +288,7 @@ namespace CapBot.api.Controllers
                             Comment = cs.Comment
                         }).ToList()
                     };
-
+                    
                     return Ok(new { IsSuccess = true, Data = scoreData });
                 }
                 return ProcessServiceResponse(result);
@@ -318,16 +318,8 @@ namespace CapBot.api.Controllers
         {
             try
             {
-                // Cần implement method WithdrawReviewAsync trong service
-                // Tạm thời sử dụng GetById để kiểm tra
-                var reviewResult = await _reviewService.GetByIdAsync(id);
-                if (!reviewResult.IsSuccess)
-                {
-                    return ProcessServiceResponse(reviewResult);
-                }
-
-                // Logic rút lại đánh giá sẽ được implement trong service
-                return Ok(new { IsSuccess = true, Message = "Tính năng rút lại đánh giá sẽ được implement" });
+                var result = await _reviewService.WithdrawReviewAsync(id);
+                return ProcessServiceResponse(result);
             }
             catch (Exception ex)
             {

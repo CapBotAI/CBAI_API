@@ -1,4 +1,4 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
 using App.BLL.Interfaces;
 using App.Entities.DTOs.EvaluationCriteria;
 using App.Commons.BaseAPI;

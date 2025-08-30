@@ -29,10 +29,10 @@ public class AutoAssignReviewerDTO
     public DateTime? Deadline { get; set; }
 
     /// <summary>
-    /// Minimum skill match score yêu cầu (0-5)
+    /// Minimum performance score yêu cầu (0-5) - thay thế cho skill match score
     /// </summary>
-    [Range(0, 5, ErrorMessage = "Minimum skill match score phải từ 0 đến 5")]
-    public decimal MinimumSkillMatchScore { get; set; } = 2.0m;
+    [Range(0, 5, ErrorMessage = "Minimum performance score phải từ 0 đến 5")]
+    public decimal MinimumSkillMatchScore { get; set; } = 2.5m; // Rename property later to MinimumPerformanceScore
 
     /// <summary>
     /// Maximum workload cho reviewer (số assignment đang active)
@@ -46,7 +46,19 @@ public class AutoAssignReviewerDTO
     public bool PrioritizeHighPerformance { get; set; } = true;
 
     /// <summary>
-    /// Skill tags của đề tài (tùy chọn, để override auto detect)
+    /// Minimum quality rating yêu cầu (chỉ áp dụng khi PrioritizeHighPerformance = true)
     /// </summary>
-    public List<string> TopicSkillTags { get; set; } = new();
+    [Range(0, 5, ErrorMessage = "Minimum quality rating phải từ 0 đến 5")]
+    public decimal MinimumQualityRating { get; set; } = 3.0m;
+
+    /// <summary>
+    /// Minimum on-time rate yêu cầu (0-1, chỉ áp dụng khi PrioritizeHighPerformance = true)
+    /// </summary>
+    [Range(0, 1, ErrorMessage = "Minimum on-time rate phải từ 0 đến 1")]
+    public decimal MinimumOnTimeRate { get; set; } = 0.7m;
+
+    /// <summary>
+    /// Có ưu tiên reviewer có kinh nghiệm không (nhiều assignment đã hoàn thành)
+    /// </summary>
+    public bool PrioritizeExperience { get; set; } = false;
 }

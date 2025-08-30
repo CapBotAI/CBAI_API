@@ -30,8 +30,6 @@ public class CreateTopicResDTO
         IsApproved = topic.IsApproved;
         CreatedAt = topic.CreatedAt;
         CreatedBy = topic.CreatedBy;
-        CurrentVersionNumber = (topic.TopicVersions != null && topic.TopicVersions.Any())
-            ? topic.TopicVersions.Max(v => v.VersionNumber)
-            : 0;
+        CurrentVersionNumber = topic.TopicVersions?.Max(v => v.VersionNumber) ?? 1;
     }
 }

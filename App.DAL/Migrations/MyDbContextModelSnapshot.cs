@@ -543,9 +543,6 @@ namespace App.DAL.Migrations
                     b.Property<DateTime?>("DeletedAt")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
-
                     b.Property<DateTime>("EndDate")
                         .HasColumnType("datetime2");
 
@@ -597,27 +594,9 @@ namespace App.DAL.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(1);
 
-                    b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("CreatedBy")
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<DateTime?>("DeletedAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<string>("DocumentUrl")
                         .HasMaxLength(500)
                         .HasColumnType("nvarchar(500)");
-
-                    b.Property<bool>("IsActive")
-                        .HasColumnType("bit");
-
-                    b.Property<DateTime?>("LastModifiedAt")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("LastModifiedBy")
-                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("PhaseId")
                         .HasColumnType("int");
@@ -632,7 +611,7 @@ namespace App.DAL.Migrations
                         .HasColumnType("int")
                         .HasDefaultValue(1);
 
-                    b.Property<DateTime?>("SubmittedAt")
+                    b.Property<DateTime>("SubmittedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("datetime2")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -640,23 +619,18 @@ namespace App.DAL.Migrations
                     b.Property<int>("SubmittedBy")
                         .HasColumnType("int");
 
-                    b.Property<int>("TopicId")
-                        .HasColumnType("int");
-
-                    b.Property<int?>("TopicVersionId")
+                    b.Property<int>("TopicVersionId")
                         .HasColumnType("int");
 
                     b.HasKey("Id");
 
                     b.HasIndex("SubmittedBy");
 
-                    b.HasIndex("TopicVersionId");
-
                     b.HasIndex("PhaseId", "Status");
 
                     b.HasIndex("PhaseId", "Status", "SubmittedAt");
 
-                    b.HasIndex("TopicId", "PhaseId", "SubmissionRound")
+                    b.HasIndex("TopicVersionId", "PhaseId", "SubmissionRound")
                         .IsUnique();
 
                     b.ToTable("submissions", (string)null);
@@ -1366,21 +1340,15 @@ namespace App.DAL.Migrations
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("App.Entities.Entities.App.Topic", "Topic")
-                        .WithMany("Submissions")
-                        .HasForeignKey("TopicId")
-                        .OnDelete(DeleteBehavior.Restrict);
-
                     b.HasOne("App.Entities.Entities.App.TopicVersion", "TopicVersion")
                         .WithMany("Submissions")
                         .HasForeignKey("TopicVersionId")
-                        .OnDelete(DeleteBehavior.Restrict);
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
 
                     b.Navigation("Phase");
 
                     b.Navigation("SubmittedByUser");
-
-                    b.Navigation("Topic");
 
                     b.Navigation("TopicVersion");
                 });
@@ -1607,8 +1575,6 @@ namespace App.DAL.Migrations
 
             modelBuilder.Entity("App.Entities.Entities.App.Topic", b =>
                 {
-                    b.Navigation("Submissions");
-
                     b.Navigation("TopicVersions");
                 });
 

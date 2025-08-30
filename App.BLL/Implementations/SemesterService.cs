@@ -115,7 +115,6 @@ public class SemesterService : ISemesterService
             semester.Name = updateSemesterDTO.Name;
             semester.StartDate = updateSemesterDTO.StartDate;
             semester.EndDate = updateSemesterDTO.EndDate;
-            semester.Description = updateSemesterDTO.Description;
             semester.LastModifiedBy = user.UserName;
             semester.LastModifiedAt = DateTime.Now;
 

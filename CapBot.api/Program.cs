@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.OData;
 using App.BLL.Interfaces;
 using Microsoft.AspNetCore.Identity;
 using App.Entities.Entities.Core;
+using CapBot.api.Configuration;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using Microsoft.AspNetCore.Mvc;
 
@@ -175,6 +176,8 @@ public class Program
 
         //<=====Register Service=====>
         ServiceConfig.Register(builder.Services, builder.Configuration);
+        // Add Elasticsearch
+        builder.Services.AddElasticsearch(builder.Configuration);
 
         builder.Services.AddHttpContextAccessor();
 
