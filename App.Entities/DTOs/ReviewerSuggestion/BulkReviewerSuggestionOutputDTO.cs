@@ -9,6 +9,7 @@ namespace App.Entities.DTOs.ReviewerSuggestion
     public class BulkReviewerSuggestionOutputDTO
     {
         public int TopicVersionId { get; set; }
-        public ReviewerSuggestionOutputDTO Suggestion { get; set; }
+        public int TopicId { get; set; }
+        public ReviewerSuggestionOutputDTO? Suggestion { get; set; }
     }
 }

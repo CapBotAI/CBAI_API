@@ -13,4 +13,5 @@ public interface IReviewService
     Task<BaseResponseModel<PagingDataModel<ReviewResponseDTO>>> GetAllAsync(PagingModel pagingModel);
     Task<BaseResponseModel<ReviewResponseDTO>> SubmitReviewAsync(int reviewId);
     Task<BaseResponseModel<List<ReviewResponseDTO>>> GetReviewsByAssignmentAsync(int assignmentId);
+    Task<BaseResponseModel<ReviewResponseDTO>> WithdrawReviewAsync(int reviewId);
 }

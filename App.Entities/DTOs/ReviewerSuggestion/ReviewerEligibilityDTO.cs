@@ -10,7 +10,8 @@ namespace App.Entities.DTOs.ReviewerSuggestion
     {
         public int ReviewerId { get; set; }
         public int TopicVersionId { get; set; }
+        public int TopicId { get; set; }
         public bool IsEligible { get; set; }
-        public List<string> Reasons { get; set; }
+        public List<string>? Reasons { get; set; }
     }
 }
