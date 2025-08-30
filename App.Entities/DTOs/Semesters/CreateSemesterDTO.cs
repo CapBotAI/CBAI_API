@@ -20,6 +20,8 @@ public class CreateSemesterDTO : IEntity<App.Entities.Entities.App.Semester>, IV
     [DataType(DataType.Date)]
     public DateTime EndDate { get; set; }
 
+    public string? Description { get; set; }
+
     public App.Entities.Entities.App.Semester GetEntity()
     {
         return new App.Entities.Entities.App.Semester
@@ -27,6 +29,7 @@ public class CreateSemesterDTO : IEntity<App.Entities.Entities.App.Semester>, IV
             Name = Name,
             StartDate = StartDate,
             EndDate = EndDate,
+            Description = Description,
             IsActive = true,
         };
     }

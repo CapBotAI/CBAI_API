@@ -4,6 +4,7 @@ using App.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App.DAL.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250828072812_UpdateConfigForFileEntity")]
+    partial class UpdateConfigForFileEntity
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -93,7 +96,7 @@ namespace App.DAL.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("files", (string)null);
+                    b.ToTable("Images", (string)null);
                 });
 
             modelBuilder.Entity("App.Entities.Entities.App.EntityFile", b =>
@@ -129,7 +132,7 @@ namespace App.DAL.Migrations
 
                     b.HasIndex("EntityType", "EntityId");
 
-                    b.ToTable("entity_files", (string)null);
+                    b.ToTable("EntityImages", (string)null);
                 });
 
             modelBuilder.Entity("App.Entities.Entities.App.EvaluationCriteria", b =>

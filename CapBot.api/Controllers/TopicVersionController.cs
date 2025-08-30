@@ -115,8 +115,8 @@ namespace CapBot.api.Controllers
         [HttpPut("update")]
         [SwaggerOperation(
             Summary = "Cập nhật phiên bản chủ đề",
-            Description = "Cập nhật phiên bản chủ đề ở trạng thái Draft"
-        )]
+    Description = "Cập nhật phiên bản chủ đề ở trạng thái Draft hoặc SubmissionPending"
+)]
         [SwaggerResponse(200, "Cập nhật phiên bản chủ đề thành công")]
         [SwaggerResponse(400, "Dữ liệu không hợp lệ hoặc phiên bản không ở trạng thái Draft")]
         [SwaggerResponse(401, "Lỗi xác thực")]
@@ -229,120 +229,6 @@ namespace CapBot.api.Controllers
             }
         }
 
-        /// <summary>
-        /// Submit phiên bản chủ đề để review
-        /// </summary>
-        /// <param name="submitTopicVersionDTO">Thông tin submit phiên bản</param>
-        /// <returns>Kết quả submit phiên bản</returns>
-        /// <remarks>
-        /// Submit phiên bản chủ đề từ trạng thái Draft sang Submitted để review
-        /// Chỉ supervisor của chủ đề mới có thể submit
-        ///
-        /// Sample request:
-        ///
-        ///     POST /api/topic-version/submit
-        ///     {
-        ///         "versionId": 1
-        ///     }
-        ///
-        /// </remarks>
-        [Authorize(Roles = SystemRoleConstants.Supervisor)]
-        [HttpPost("submit")]
-        [SwaggerOperation(
-            Summary = "Submit phiên bản chủ đề để review",
-            Description = "Submit phiên bản chủ đề từ trạng thái Draft sang Submitted"
-        )]
-        [SwaggerResponse(200, "Submit phiên bản thành công")]
-        [SwaggerResponse(400, "Phiên bản không ở trạng thái Draft")]
-        [SwaggerResponse(401, "Lỗi xác thực")]
-        [SwaggerResponse(403, "Quyền truy cập bị từ chối")]
-        [SwaggerResponse(404, "Không tìm thấy phiên bản")]
-        [SwaggerResponse(422, "Model không hợp lệ")]
-        [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
-        [Consumes("application/json")]
-        [Produces("application/json")]
-        public async Task<IActionResult> Submit([FromBody] SubmitTopicVersionDTO submitTopicVersionDTO)
-        {
-            if (!ModelState.IsValid)
-            {
-                return ModelInvalid();
-            }
-
-            if (!submitTopicVersionDTO.Validate().IsSuccess)
-            {
-                return ProcessServiceResponse(submitTopicVersionDTO.Validate());
-            }
-
-            try
-            {
-                var result = await _topicVersionService.SubmitTopicVersion(submitTopicVersionDTO, UserId);
-                return ProcessServiceResponse(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while submitting topic version");
-                return Error(ConstantModel.ErrorMessage);
-            }
-        }
-
-        /// <summary>
-        /// Review phiên bản chủ đề
-        /// </summary>
-        /// <param name="reviewTopicVersionDTO">Thông tin review phiên bản</param>
-        /// <returns>Kết quả review phiên bản</returns>
-        /// <remarks>
-        /// Review phiên bản chủ đề và cập nhật trạng thái
-        /// Chỉ admin/reviewer mới có thể review
-        /// Trạng thái có thể là: Approved, Rejected, RevisionRequired
-        ///
-        /// Sample request:
-        ///
-        ///     POST /api/topic-version/review
-        ///     {
-        ///         "versionId": 1,
-        ///         "status": 4,
-        ///         "reviewNote": "Phiên bản này cần bổ sung thêm phương pháp nghiên cứu"
-        ///     }
-        ///
-        /// </remarks>
-        [Authorize(Roles = SystemRoleConstants.Administrator + "," + SystemRoleConstants.Reviewer)]
-        [HttpPost("review")]
-        [SwaggerOperation(
-            Summary = "Review phiên bản chủ đề",
-            Description = "Review phiên bản chủ đề và cập nhật trạng thái"
-        )]
-        [SwaggerResponse(200, "Review phiên bản thành công")]
-        [SwaggerResponse(400, "Phiên bản không ở trạng thái Submitted hoặc status không hợp lệ")]
-        [SwaggerResponse(401, "Lỗi xác thực")]
-        [SwaggerResponse(403, "Quyền truy cập bị từ chối")]
-        [SwaggerResponse(404, "Không tìm thấy phiên bản")]
-        [SwaggerResponse(422, "Model không hợp lệ")]
-        [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
-        [Consumes("application/json")]
-        [Produces("application/json")]
-        public async Task<IActionResult> Review([FromBody] ReviewTopicVersionDTO reviewTopicVersionDTO)
-        {
-            if (!ModelState.IsValid)
-            {
-                return ModelInvalid();
-            }
-
-            if (!reviewTopicVersionDTO.Validate().IsSuccess)
-            {
-                return ProcessServiceResponse(reviewTopicVersionDTO.Validate());
-            }
-
-            try
-            {
-                var result = await _topicVersionService.ReviewTopicVersion(reviewTopicVersionDTO, UserId, IsReviewer);
-                return ProcessServiceResponse(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while reviewing topic version");
-                return Error(ConstantModel.ErrorMessage);
-            }
-        }
 
         /// <summary>
         /// Xóa phiên bản chủ đề

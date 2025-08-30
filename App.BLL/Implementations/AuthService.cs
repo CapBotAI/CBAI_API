@@ -51,7 +51,7 @@ public class AuthService : IAuthService
                 };
             }
 
-            var token = await _jwtService.GenerateJwtToken(user);
+            var token = await _jwtService.GenerateJwtTokenWithSpecificRole(user, loginDTO.Role.ToString());
             return new BaseResponseModel<LoginResponseDTO>
             {
                 IsSuccess = true,

@@ -145,13 +145,13 @@ public class TopicVersionService : ITopicVersionService
                 };
             }
 
-            if (topicVersion.Status != TopicStatus.Draft)
+            if (topicVersion.Status != TopicStatus.Draft && topicVersion.Status != TopicStatus.SubmissionPending)
             {
                 return new BaseResponseModel<TopicVersionDetailDTO>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Chỉ có thể cập nhật phiên bản ở trạng thái Draft"
+                    Message = "Chỉ có thể cập nhật phiên bản ở trạng thái Draft hoặc SubmissionPending"
                 };
             }
 
@@ -267,6 +267,12 @@ public class TopicVersionService : ITopicVersionService
         }
     }
 
+    /// <summary>
+    /// Outdated
+    /// </summary>
+    /// <param name="submitTopicVersionDTO"></param>
+    /// <param name="userId"></param>
+    /// <returns></returns>
     public async Task<BaseResponseModel> SubmitTopicVersion(SubmitTopicVersionDTO submitTopicVersionDTO, int userId)
     {
         try
@@ -341,6 +347,14 @@ public class TopicVersionService : ITopicVersionService
         }
     }
 
+
+    /// <summary>
+    /// Outdated
+    /// </summary>
+    /// <param name="reviewTopicVersionDTO"></param>
+    /// <param name="userId"></param>
+    /// <param name="isReviewer"></param>
+    /// <returns></returns>
     public async Task<BaseResponseModel> ReviewTopicVersion(ReviewTopicVersionDTO reviewTopicVersionDTO, int userId, bool isReviewer)
     {
         try
@@ -411,6 +425,7 @@ public class TopicVersionService : ITopicVersionService
             throw;
         }
     }
+
 
     public async Task<BaseResponseModel> DeleteTopicVersion(int versionId, int userId, bool isAdmin)
     {

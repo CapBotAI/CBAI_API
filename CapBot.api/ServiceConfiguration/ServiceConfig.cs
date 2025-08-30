@@ -44,6 +44,15 @@ public class ServiceConfig
         //Topic Version Service
         services.AddScoped<ITopicVersionService, TopicVersionService>();
 
+        //Phase Type Service
+        services.AddScoped<IPhaseTypeService, PhaseTypeService>();
+
+        //Phase Service
+        services.AddScoped<IPhaseService, PhaseService>();
+
+        //Submission Service
+        services.AddScoped<ISubmissionService, SubmissionService>();
+
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 

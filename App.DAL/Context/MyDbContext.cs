@@ -312,11 +312,17 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.Status).HasDefaultValue(App.Entities.Enums.SubmissionStatus.Pending);
             entity.Property(e => e.SubmittedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+            entity.HasOne(d => d.Topic)
+                .WithMany(p => p.Submissions)
+                .HasForeignKey(d => d.TopicId)
+                .IsRequired(false)
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasOne(d => d.TopicVersion)
                 .WithMany(p => p.Submissions)
                 .HasForeignKey(d => d.TopicVersionId)
-                .IsRequired()
-                .OnDelete(DeleteBehavior.Restrict);
+            .IsRequired(false)
+            .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasOne(d => d.Phase)
                 .WithMany(p => p.Submissions)
@@ -330,7 +336,7 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
                 .IsRequired()
                 .OnDelete(DeleteBehavior.Restrict);
 
-            entity.HasIndex(e => new { e.TopicVersionId, e.PhaseId, e.SubmissionRound }).IsUnique();
+            entity.HasIndex(e => new { e.TopicId, e.PhaseId, e.SubmissionRound }).IsUnique();
             entity.HasIndex(e => new { e.PhaseId, e.Status });
             entity.HasIndex(e => new { e.PhaseId, e.Status, e.SubmittedAt });
         });
@@ -575,6 +581,35 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
 
             entity.HasIndex(e => new { e.UserId, e.IsRead, e.CreatedAt });
         });
+
+        #region Image Configuration
+
+        modelBuilder.Entity<Entities.Entities.App.AppFile>(entity =>
+            {
+                entity.ToTable("files");
+                entity.HasKey(x => x.Id);
+                entity.Property(x => x.FilePath).IsRequired().HasMaxLength(1024);
+                entity.Property(x => x.FileName).IsRequired().HasMaxLength(255);
+                entity.Property(x => x.Url).IsRequired().HasMaxLength(2048);
+                entity.Property(x => x.ThumbnailUrl).HasMaxLength(2048);
+                entity.Property(x => x.MimeType).HasMaxLength(255);
+                entity.Property(x => x.Alt).HasMaxLength(255);
+                entity.Property(x => x.Checksum).HasMaxLength(128);
+                entity.HasMany(x => x.EntityFiles)
+                 .WithOne(x => x.File!)
+                 .HasForeignKey(x => x.FileId)
+                 .OnDelete(DeleteBehavior.Cascade);
+            });
+
+        modelBuilder.Entity<EntityFile>(entity =>
+        {
+            entity.ToTable("entity_files");
+            entity.HasKey(x => x.Id);
+            entity.HasIndex(x => new { x.EntityType, x.EntityId }); // truy vấn theo entity nhanh hơn
+            entity.Property(x => x.Caption).HasMaxLength(512);
+        });
+
+        #endregion
 
         OnModelCreatingPartial(modelBuilder);
     }

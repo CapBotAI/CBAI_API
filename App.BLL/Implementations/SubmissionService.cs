@@ -92,6 +92,11 @@ public class SubmissionService : ISubmissionService
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
             var submission = dto.GetEntity();
             submission.SubmittedBy = userId;
+            submission.IsActive = true;
+            submission.DeletedAt = null;
+            submission.Status = SubmissionStatus.Pending;
+            submission.CreatedAt = DateTime.Now;
+            submission.LastModifiedBy = user.UserName;
 
             await submissionRepo.CreateAsync(submission);
 
