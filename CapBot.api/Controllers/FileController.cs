@@ -1,7 +1,14 @@
 using App.BLL.Interfaces;
 using App.Commons.BaseAPI;
+using App.Commons.Utils;
+using App.Entities.DTOs.Files;
+using App.Entities.Enums;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using SixLabors.ImageSharp;
+using SixLabors.ImageSharp.Processing;
+using System.Security.Cryptography;
 
 namespace CapBot.api.Controllers
 {
@@ -15,6 +22,8 @@ namespace CapBot.api.Controllers
         private readonly IConfiguration _configuration;
         private readonly IHostEnvironment _hostEnvironment;
 
+        private readonly long _fileSizeLimit;
+
         public FileController(IFileService fileService,
             ILogger<FileController> logger,
             IWebHostEnvironment environment,
@@ -26,6 +35,295 @@ namespace CapBot.api.Controllers
             this._environment = environment;
             this._configuration = configuration;
             this._hostEnvironment = hostEnvironment;
+            this._fileSizeLimit = Helpers.FromMB(int.Parse(configuration["AppSettings:FileSizeLimit"] ?? "20"));
         }
+
+        [Authorize]
+        [HttpPost("upload-image")]
+        public async Task<ActionResult> UploadImage(IFormFile file)
+        {
+            try
+            {
+                if (file == null)
+                    return SaveError("file upload không được để trống");
+
+                var uploaded = await ProcessUploadImage(file, IsAdmin);
+                if (uploaded == null)
+                    return GetError("Lỗi xử lý file");
+
+                var createFileDTO = new CreateFileDTO
+                {
+                    FileName = uploaded.FileName,
+                    FilePath = uploaded.FilePath,
+                    Url = uploaded.Url,
+                    ThumbnailUrl = uploaded.ThumbnailUrl,
+                    FileSize = uploaded.FileSize,
+                    MimeType = uploaded.MimeType,
+                    Alt = uploaded.Alt,
+                    FileType = FileType.Image,
+                    Width = uploaded.Width,
+                    Height = uploaded.Height,
+                    Checksum = uploaded.Checksum,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = UserName
+                };
+
+                var saved = await _fileService.SaveFileInfoAsync(createFileDTO);
+
+                return SaveSuccess(new
+                {
+                    Success = true,
+                    FileId = saved.Id,
+                    Url = saved.Url,
+                    ThumbnailUrl = saved.ThumbnailUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error uploading image: {ex.Message}", ex);
+                return GetError(ex.Message);
+            }
+        }
+
+        [Authorize]
+        [HttpPost("upload")]
+        public async Task<ActionResult> UploadFile(IFormFile file)
+        {
+            try
+            {
+                if (file == null)
+                    return SaveError("file upload không được để trống");
+
+                var uploaded = await ProcessUploadGeneric(file, IsAdmin);
+                if (uploaded == null)
+                    return GetError("Lỗi xử lý file");
+
+                var fileType = DetermineFileType(Path.GetExtension(uploaded.FileName), uploaded.MimeType);
+
+                var createFileDTO = new CreateFileDTO
+                {
+                    FileName = uploaded.FileName,
+                    FilePath = uploaded.FilePath,
+                    Url = uploaded.Url,
+                    ThumbnailUrl = uploaded.ThumbnailUrl,
+                    FileSize = uploaded.FileSize,
+                    MimeType = uploaded.MimeType,
+                    Alt = uploaded.Alt,
+                    FileType = fileType,
+                    Width = uploaded.Width,
+                    Height = uploaded.Height,
+                    Checksum = uploaded.Checksum,
+                    CreatedAt = DateTime.UtcNow,
+                    CreatedBy = UserName
+                };
+
+                var saved = await _fileService.SaveFileInfoAsync(createFileDTO);
+
+                return SaveSuccess(new
+                {
+                    Success = true,
+                    FileId = saved.Id,
+                    Url = saved.Url,
+                    ThumbnailUrl = saved.ThumbnailUrl
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError($"Error uploading file: {ex.Message}", ex);
+                return GetError(ex.Message);
+            }
+        }
+
+        #region PRIVATE
+
+        private async Task<UploadedFileInfo> ProcessUploadImage(IFormFile file, bool isAdmin)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("File is required");
+
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            var validExtensions = new string[] { ".jpg", ".png", ".svg", ".jpeg", ".dng", ".webp" };
+
+            if (!validExtensions.Contains(extension))
+                throw new ArgumentException("Định dạng file ảnh không được hỗ trợ");
+
+            if (file.Length > _fileSizeLimit)
+                throw new ArgumentException($"Kích thước ảnh vượt quá quy định cho phép ({Helpers.FormatFileSize(_fileSizeLimit)})");
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.CopyToAsync(memoryStream);
+                var bytes = memoryStream.ToArray();
+
+                var guidFileName = Path.GetRandomFileName();
+                var isSvg = extension.Equals(".svg", StringComparison.OrdinalIgnoreCase);
+
+                var guildStringPath = new string[] { "images", isAdmin ? string.Empty : "entities", $"{guidFileName}{extension}" };
+                var path = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot", Helpers.PathCombine(guildStringPath));
+
+                string directory = Path.GetDirectoryName(path);
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
+                await System.IO.File.WriteAllBytesAsync(path, bytes);
+
+                string cdnhost = _configuration.GetSection("AppSettings").GetValue<string>("CdnUrl");
+                string url = $"{cdnhost}{Helpers.UrlCombine(guildStringPath)}";
+
+                // Tạo thumbnail
+                string thumbnailUrl = isSvg ? url : $"{cdnhost}{CompressThumbnailWithNew(guildStringPath, path)}";
+
+                int? width = null, height = null;
+                if (!isSvg)
+                {
+                    using var img = Image.Load(path);
+                    width = img.Width;
+                    height = img.Height;
+                }
+
+                return new UploadedFileInfo
+                {
+                    FileName = $"{guidFileName}{extension}",
+                    FilePath = path,
+                    Url = url,
+                    ThumbnailUrl = thumbnailUrl,
+                    FileSize = file.Length,
+                    MimeType = file.ContentType,
+                    Alt = Path.GetFileNameWithoutExtension(file.FileName),
+                    Width = width,
+                    Height = height,
+                    Checksum = ComputeChecksum(bytes)
+                };
+            }
+        }
+
+        private async Task<UploadedFileInfo> ProcessUploadGeneric(IFormFile file, bool isAdmin)
+        {
+            if (file == null || file.Length == 0)
+                throw new ArgumentException("File is required");
+
+            var extension = Path.GetExtension(file.FileName).ToLowerInvariant();
+            // Cho phép nhiều loại phổ biến, có thể lấy từ config
+            var validExtensions = new string[] { ".pdf", ".doc", ".docx", ".xls", ".xlsx", ".ppt", ".pptx", ".txt", ".csv", ".zip", ".rar", ".7z", ".mp3", ".mp4", ".mov", ".avi", ".png", ".jpg", ".jpeg", ".svg", ".webp" };
+
+            if (!validExtensions.Contains(extension))
+                throw new ArgumentException("Định dạng file không được hỗ trợ");
+
+            if (file.Length > _fileSizeLimit)
+                throw new ArgumentException($"Kích thước file vượt quá quy định cho phép ({Helpers.FormatFileSize(_fileSizeLimit)})");
+
+            using (var memoryStream = new MemoryStream())
+            {
+                await file.CopyToAsync(memoryStream);
+                var bytes = memoryStream.ToArray();
+
+                var guidFileName = Path.GetRandomFileName();
+
+                var guildStringPath = new string[] { "files", isAdmin ? string.Empty : "entities", $"{guidFileName}{extension}" };
+                var path = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot", Helpers.PathCombine(guildStringPath));
+
+                string directory = Path.GetDirectoryName(path);
+                if (!Directory.Exists(directory))
+                    Directory.CreateDirectory(directory);
+
+                await System.IO.File.WriteAllBytesAsync(path, bytes);
+
+                string cdnhost = _configuration.GetSection("AppSettings").GetValue<string>("CdnUrl");
+                string url = $"{cdnhost}{Helpers.UrlCombine(guildStringPath)}";
+
+                return new UploadedFileInfo
+                {
+                    FileName = $"{guidFileName}{extension}",
+                    FilePath = path,
+                    Url = url,
+                    ThumbnailUrl = null,
+                    FileSize = file.Length,
+                    MimeType = file.ContentType,
+                    Alt = Path.GetFileNameWithoutExtension(file.FileName),
+                    Width = null,
+                    Height = null,
+                    Checksum = ComputeChecksum(bytes)
+                };
+            }
+        }
+
+        private FileType DetermineFileType(string extension, string? mime)
+        {
+            extension = (extension ?? string.Empty).ToLowerInvariant();
+
+            if (new[] { ".jpg", ".jpeg", ".png", ".svg", ".webp", ".gif", ".bmp", ".tiff", ".dng" }.Contains(extension))
+                return FileType.Image;
+            if (new[] { ".pdf" }.Contains(extension))
+                return FileType.Pdf;
+            if (new[] { ".xls", ".xlsx", ".csv" }.Contains(extension))
+                return FileType.Spreadsheet;
+            if (new[] { ".ppt", ".pptx" }.Contains(extension))
+                return FileType.Presentation;
+            if (new[] { ".doc", ".docx", ".txt" }.Contains(extension))
+                return FileType.Document;
+            if (new[] { ".zip", ".rar", ".7z" }.Contains(extension))
+                return FileType.Archive;
+            if (new[] { ".mp3", ".wav", ".aac" }.Contains(extension))
+                return FileType.Audio;
+            if (new[] { ".mp4", ".mov", ".avi", ".mkv" }.Contains(extension))
+                return FileType.Video;
+
+            return FileType.Unknown;
+        }
+
+        private static string ComputeChecksum(byte[] bytes)
+        {
+            using var sha = SHA256.Create();
+            var hash = sha.ComputeHash(bytes);
+            return BitConverter.ToString(hash).Replace("-", "").ToLowerInvariant();
+        }
+
+        private string CompressThumbnailWithNew(string[] guildStringPath, string originalImagePath)
+        {
+            var originalFileName = guildStringPath.Last();
+            var thumbnailFileName = Path.GetFileNameWithoutExtension(originalFileName) + "_thumb" +
+                                    Path.GetExtension(originalFileName);
+
+            var thumbnailGuildStringPath = guildStringPath.Take(guildStringPath.Length - 1)
+                .Concat(new[] { thumbnailFileName })
+                .ToArray();
+
+            var thumbnailPhysicalPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot",
+                Helpers.PathCombine(thumbnailGuildStringPath));
+
+            string directory = Path.GetDirectoryName(thumbnailPhysicalPath);
+            if (!Directory.Exists(directory))
+                Directory.CreateDirectory(directory);
+
+            using (var image = Image.Load(originalImagePath))
+            {
+                image.Mutate(x => x.Resize(new ResizeOptions
+                {
+                    Mode = ResizeMode.Max,
+                    Size = new Size(150, 0)
+                }));
+                image.Save(thumbnailPhysicalPath);
+            }
+
+            var thumbnailUrlPath = Helpers.UrlCombine(thumbnailGuildStringPath);
+            return thumbnailUrlPath;
+        }
+
+        // Model hỗ trợ cho việc lưu thông tin upload
+        private class UploadedFileInfo
+        {
+            public string FileName { get; set; }
+            public string FilePath { get; set; }
+            public string Url { get; set; }
+            public string? ThumbnailUrl { get; set; }
+            public long FileSize { get; set; }
+            public string MimeType { get; set; }
+            public string Alt { get; set; }
+            public int? Width { get; set; }
+            public int? Height { get; set; }
+            public string? Checksum { get; set; }
+        }
+
+        #endregion
     }
 }
