@@ -14250,3 +14250,9 @@ WHERE [e].[EntityId] = @__p_0 AND [e].[EntityType] = 3 AND [e].[IsPrimary] = CAS
 2025-08-28 18:47:32.701 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
 2025-08-28 18:47:32.701 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
 2025-08-28 18:47:32.701 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/api/submission/detail/2 - 200 null application/json; charset=utf-8 17.8578ms
+2025-08-28 18:49:43.008 +07:00 [DBG] Connection id "0HNF64V3FA6BA" is closing.
+2025-08-28 18:49:43.010 +07:00 [DBG] Connection id "0HNF64V3FA6BA" is closed. The last processed stream ID was 5.
+2025-08-28 18:49:43.013 +07:00 [DBG] Connection id "0HNF64V3FA6BA" received FIN.
+2025-08-28 18:49:43.018 +07:00 [DBG] Connection id "0HNF64V3FA6BA" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-08-28 18:49:43.022 +07:00 [DBG] The connection queue processing loop for 0HNF64V3FA6BA completed.
+2025-08-28 18:49:43.023 +07:00 [DBG] Connection id "0HNF64V3FA6BA" stopped.
