@@ -50,7 +50,7 @@ public class TopicDetailDTO
 
         var latestVersion = topic.TopicVersions?.OrderByDescending(v => v.VersionNumber).FirstOrDefault();
         CurrentStatus = latestVersion?.Status ?? TopicStatus.Draft;
-        CurrentVersion = latestVersion != null ? new TopicVersionDetailDTO(latestVersion) : null;
+        CurrentVersion = latestVersion != null ? new TopicVersionDetailDTO(latestVersion, null) : null;
 
         CreatedAt = topic.CreatedAt;
         CreatedBy = topic.CreatedBy;

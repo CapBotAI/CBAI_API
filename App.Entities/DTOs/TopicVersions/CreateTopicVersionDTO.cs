@@ -22,6 +22,8 @@ public class CreateTopicVersionDTO : IEntity<TopicVersion>, IValidationPipeline
     public string? ExpectedOutcomes { get; set; }
     public string? Requirements { get; set; }
 
+    public long? FileId { get; set; }
+
     public string? DocumentUrl { get; set; }
 
     public TopicVersion GetEntity()

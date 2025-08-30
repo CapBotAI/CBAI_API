@@ -30,6 +30,8 @@ public class UpdateTopicVersionDTO : IValidationPipeline
     [StringLength(2000, ErrorMessage = "Yêu cầu không được vượt quá 2000 ký tự")]
     public string? Requirements { get; set; }
 
+    public long? FileId { get; set; }
+
     public string? DocumentUrl { get; set; }
 
     public BaseResponseModel Validate()
