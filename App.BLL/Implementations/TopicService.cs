@@ -144,7 +144,6 @@ public class TopicService : ITopicService
 
                 if (!createBulkNotification.IsSuccess)
                 {
-                    await _unitOfWork.RollBackAsync();
                     throw new Exception(createBulkNotification.Message);
                 }
             }
