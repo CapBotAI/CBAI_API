@@ -6,6 +6,8 @@ using App.Commons.ResponseModel;
 using App.DAL.Interfaces;
 using App.DAL.Queries.Implementations;
 using App.DAL.UnitOfWork;
+using App.Entities.Constants;
+using App.Entities.DTOs.Notifications;
 using App.Entities.DTOs.Topics;
 using App.Entities.Entities.App;
 using App.Entities.Enums;
@@ -19,11 +21,15 @@ public class TopicService : ITopicService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IIdentityRepository _identityRepository;
+    private readonly INotificationService _notificationService;
 
-    public TopicService(IUnitOfWork unitOfWork, IIdentityRepository identityRepository)
+
+    public TopicService(IUnitOfWork unitOfWork, IIdentityRepository identityRepository, INotificationService notificationService)
     {
         this._unitOfWork = unitOfWork;
         this._identityRepository = identityRepository;
+        this._notificationService = notificationService;
+
     }
 
     public async Task<BaseResponseModel<CreateTopicResDTO>> CreateTopic(CreateTopicDTO createTopicDTO, int userId)
@@ -120,6 +126,27 @@ public class TopicService : ITopicService
                     Caption = topic.Title,
                     CreatedAt = DateTime.Now,
                 });
+            }
+
+            var moderators = await _identityRepository.GetUsersInRoleAsync(SystemRoleConstants.Moderator);
+            var moderatorIds = moderators.Select(x => x.Id).Distinct().ToList();
+            if (moderatorIds.Count > 0)
+            {
+                var createBulkNotification = await _notificationService.CreateBulkAsync(new CreateBulkNotificationsDTO
+                {
+                    UserIds = moderatorIds,
+                    Title = "Thông báo về chủ đề mới",
+                    Message = $"Chủ đề {topic.Title} đã được tạo bởi {user.UserName}",
+                    Type = NotificationTypes.Info,
+                    RelatedEntityType = EntityType.Topic.ToString(),
+                    RelatedEntityId = topic.Id
+                });
+
+                if (!createBulkNotification.IsSuccess)
+                {
+                    await _unitOfWork.RollBackAsync();
+                    throw new Exception(createBulkNotification.Message);
+                }
             }
 
             await _unitOfWork.SaveChangesAsync();
