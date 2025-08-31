@@ -57,6 +57,9 @@ public class ServiceConfig
         //File Service
         services.AddScoped<IFileService, FileService>();
 
+        //Lecturer Skill Service
+        services.AddScoped<ILecturerSkillService, LecturerSkillService>();
+
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 
