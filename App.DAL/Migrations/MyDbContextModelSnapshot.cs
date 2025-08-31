@@ -1068,6 +1068,55 @@ namespace App.DAL.Migrations
                     b.ToTable("topic_versions", (string)null);
                 });
 
+            modelBuilder.Entity("App.Entities.Entities.App.UserProfile", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("Address")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Avatar")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("CoverImage")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("CreatedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("DeletedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("FullName")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<bool>("IsActive")
+                        .HasColumnType("bit");
+
+                    b.Property<DateTime?>("LastModifiedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("LastModifiedBy")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("UserProfile");
+                });
+
             modelBuilder.Entity("App.Entities.Entities.App.WorkflowState", b =>
                 {
                     b.Property<int>("Id")
@@ -1595,6 +1644,17 @@ namespace App.DAL.Migrations
                     b.Navigation("Topic");
                 });
 
+            modelBuilder.Entity("App.Entities.Entities.App.UserProfile", b =>
+                {
+                    b.HasOne("App.Entities.Entities.Core.User", "User")
+                        .WithOne("Profile")
+                        .HasForeignKey("App.Entities.Entities.App.UserProfile", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("App.Entities.Entities.App.WorkflowTransition", b =>
                 {
                     b.HasOne("App.Entities.Entities.App.WorkflowState", "FromState")
@@ -1775,6 +1835,8 @@ namespace App.DAL.Migrations
                     b.Navigation("LecturerSkills");
 
                     b.Navigation("Logins");
+
+                    b.Navigation("Profile");
 
                     b.Navigation("ReviewerAssignments");
 

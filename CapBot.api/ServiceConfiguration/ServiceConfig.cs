@@ -1,6 +1,7 @@
 using App.BLL.Implementations;
 using App.BLL.Interfaces;
 using App.BLL.Mapper;
+using App.BLL.Services;
 using App.DAL.Implementations;
 using App.DAL.Interfaces;
 using App.DAL.UnitOfWork;
@@ -56,14 +57,21 @@ public class ServiceConfig
         //File Service
         services.AddScoped<IFileService, FileService>();
 
+        //Lecturer Skill Service
+        services.AddScoped<ILecturerSkillService, LecturerSkillService>();
+
+        //User Profile Service
+        services.AddScoped<IUserProfileService, UserProfileService>();
+
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 
+        // Reviewer Suggestion Service
+        services.AddScoped<IReviewerSuggestionService, ReviewerSuggestionService>();
         services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
-
         services.AddScoped<ISkillMatchingService, SkillMatchingService>();
-
         services.AddScoped<IPerformanceMatchingService, PerformanceMatchingService>();
+        
         // EvaluationCriteria Service
         services.AddScoped<IEvaluationCriteriaService, EvaluationCriteriaService>();
 
@@ -71,7 +79,10 @@ public class ServiceConfig
         services.AddScoped<IReviewService, ReviewService>();
         services.AddScoped<ISubmissionReviewService, SubmissionReviewService>();
         services.AddScoped<IReviewCommentService, ReviewCommentService>();
+
         services.AddScoped<IElasticsearchService, ElasticsearchService>();
 
+        //Gemini AI Service 
+        services.AddSingleton<GeminiAIService>();
     }
 }
