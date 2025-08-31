@@ -1,34 +1,34 @@
 ## User Profile API Guide
 
-### T?ng quan
+### Tổng quan
 
-- **Auth**: T?t c? endpoints y�u c?u Bearer JWT.
-- **Ph�n quy?n**:
-  - Non-admin: ch? ???c thao t�c h? s? c?a ch�nh m�nh.
-  - Admin (claim Role = "Administrator"): ???c thao t�c h? s? c?a b?t k? `UserId` n�o.
-- **Quy t?c d? li?u**:
-  - M?i `UserId` ch? c� t?i ?a 1 h? s? ?ang ho?t ??ng (IsActive = true, DeletedAt = null).
-  - X�a l� soft delete: `IsActive=false`, set `DeletedAt`.
+- **Auth**: Tất cả endpoints yêu cầu Bearer JWT.
+- **Phân quyền**:
+  - Non-admin: chỉ được thao tác hồ sơ của chính mình.
+  - Admin (claim Role = "Administrator"): được thao tác hồ sơ của bất kỳ `UserId` nào.
+- **Quy tắc dữ liệu**:
+  - Mỗi `UserId` chỉ có tối đa 1 hồ sơ đang hoạt động (IsActive = true, DeletedAt = null).
+  - Xóa là soft delete: `IsActive=false`, set `DeletedAt`.
 
 ### Base URL
 
-- M?c ??nh: `https://{host}/api/user-profiles`
+- Mặc định: `https://{host}/api/user-profiles`
 
 ### Response Envelope
 
-- T?t c? endpoints tr? v? d?ng `FSResponse`:
-  - `statusCode`: HTTP code (v� d? 200, 201, 403, 404, 409, 500)
+- Tất cả endpoints trả về dạng `FSResponse`:
+  - `statusCode`: HTTP code (ví dụ 200, 201, 403, 404, 409, 500)
   - `success`: bool
   - `message`: string
-  - `data`: d? li?u (n?u c�)
+  - `data`: dữ liệu (nếu có)
 
-V� d?:
+Ví dụ:
 
 ```json
 {
   "statusCode": 200,
   "success": true,
-  "message": "C?p nh?t h? s? th�nh c�ng",
+  "message": "Cập nhật hồ sơ thành công",
   "data": {
     "id": 12,
     "userId": 34,
@@ -50,11 +50,11 @@ V� d?:
 
 ```json
 {
-  "userId": 0, // optional; admin c� th? truy?n ?? t?o cho user kh�c; non-admin b? qua ho?c tr�ng v?i ch�nh m�nh
-  "fullName": "string?", // <= 255 k� t?
-  "address": "string?", // <= 512 k� t?
-  "avatar": "string?", // <= 1024 k� t? (URL)
-  "coverImage": "string?" // <= 1024 k� t? (URL)
+  "userId": 0, // optional; admin có thể truyền để tạo cho user khác; non-admin bỏ qua hoặc trùng với chính mình
+  "fullName": "string?", // <= 255 ký tự
+  "address": "string?", // <= 512 ký tự
+  "avatar": "string?", // <= 1024 ký tự (URL)
+  "coverImage": "string?" // <= 1024 ký tự (URL)
 }
 ```
 
@@ -62,7 +62,7 @@ V� d?:
 
 ```json
 {
-  "id": 0, // b?t bu?c
+  "id": 0, // bắt buộc
   "fullName": "string?",
   "address": "string?",
   "avatar": "string?",
@@ -89,18 +89,18 @@ V� d?:
 
 ### Endpoints
 
-#### 1) T?o h? s?
+#### 1) Tạo hồ sơ
 
 - POST `/api/user-profiles`
-- Quy?n:
-  - Non-admin: t?o cho ch�nh m�nh (b? `userId` ho?c `userId` ph?i tr�ng `UserId` c?a token).
-  - Admin: c� th? truy?n `userId` b?t k? h?p l?.
-- Tr? v?:
-  - 201 Created: th�nh c�ng
-  - 403 Forbidden: kh�ng c� quy?n t?o cho user kh�c
-  - 409 Conflict: h? s? ?� t?n t?i
-  - 404 Not Found: user trong token kh�ng t?n t?i
-  - 500: l?i h? th?ng
+- Quyền:
+  - Non-admin: tạo cho chính mình (bỏ `userId` hoặc `userId` phải trùng `UserId` của token).
+  - Admin: có thể truyền `userId` bất kỳ hợp lệ.
+- Trả về:
+  - 201 Created: thành công
+  - 403 Forbidden: không có quyền tạo cho user khác
+  - 409 Conflict: hồ sơ đã tồn tại
+  - 404 Not Found: user trong token không tồn tại
+  - 500: lỗi hệ thống
 
 cURL:
 
@@ -129,17 +129,17 @@ await fetch("/api/user-profiles", {
 });
 ```
 
-#### 2) C?p nh?t h? s?
+#### 2) Cập nhật hồ sơ
 
 - PUT `/api/user-profiles`
-- Quy?n:
-  - Non-admin: ch? c?p nh?t h? s? c� `userId` tr�ng `UserId` c?a token.
-  - Admin: c?p nh?t b?t k? h? s?.
-- Tr? v?:
-  - 200 OK: th�nh c�ng
-  - 403 Forbidden: kh�ng c� quy?n
-  - 404 Not Found: kh�ng t�m th?y h? s?
-  - 500: l?i h? th?ng
+- Quyền:
+  - Non-admin: chỉ cập nhật hồ sơ có `userId` trùng `UserId` của token.
+  - Admin: cập nhật bất kỳ hồ sơ.
+- Trả về:
+  - 200 OK: thành công
+  - 403 Forbidden: không có quyền
+  - 404 Not Found: không tìm thấy hồ sơ
+  - 500: lỗi hệ thống
 
 cURL:
 
@@ -156,17 +156,17 @@ curl -X PUT https://{host}/api/user-profiles \
   }'
 ```
 
-#### 3) X�a h? s? (soft delete)
+#### 3) Xóa hồ sơ (soft delete)
 
 - DELETE `/api/user-profiles/{id}`
-- Quy?n:
-  - Non-admin: ch? x�a h? s? c?a ch�nh m�nh.
-  - Admin: x�a b?t k?.
-- Tr? v?:
-  - 200 OK: th�nh c�ng
+- Quyền:
+  - Non-admin: chỉ xóa hồ sơ của chính mình.
+  - Admin: xóa bất kỳ.
+- Trả về:
+  - 200 OK: thành công
   - 403 Forbidden
   - 404 Not Found
-  - 500: l?i h? th?ng
+  - 500: lỗi hệ thống
 
 cURL:
 
@@ -175,48 +175,48 @@ curl -X DELETE https://{host}/api/user-profiles/12 \
   -H "Authorization: Bearer {token}"
 ```
 
-#### 4) L?y h? s? theo Id
+#### 4) Lấy hồ sơ theo Id
 
 - GET `/api/user-profiles/{id}`
-- Tr? v?:
+- Trả về:
   - 200 OK + `UserProfileResponseDTO`
   - 404 Not Found
-  - 500: l?i h? th?ng
+  - 500: lỗi hệ thống
 
-#### 5) L?y h? s? theo UserId
+#### 5) Lấy hồ sơ theo UserId
 
 - GET `/api/user-profiles/by-user/{userId}`
-- Tr? v?:
+- Trả về:
   - 200 OK + `UserProfileResponseDTO`
   - 404 Not Found
-  - 500: l?i h? th?ng
+  - 500: lỗi hệ thống
 
-#### 6) L?y h? s? c?a ch�nh m�nh
+#### 6) Lấy hồ sơ của chính mình
 
 - GET `/api/user-profiles/me`
-- Tr? v?:
+- Trả về:
   - 200 OK + `UserProfileResponseDTO`
-  - 404 Not Found (ch?a c� h? s?)
-  - 500: l?i h? th?ng
+  - 404 Not Found (chưa có hồ sơ)
+  - 500: lỗi hệ thống
 
-### Lu?ng g?i � cho FE
+### Luồng gợi ý cho FE
 
 - On login/profile page:
-  1. G?i `GET /api/user-profiles/me`.
-  2. N?u 200: hi?n th? d? li?u.
-  3. N?u 404: cho ph�p ng??i d�ng t?o m?i v?i `POST /api/user-profiles`.
-- Khi l?u form:
-  - N?u ?� c� `id`: d�ng `PUT /api/user-profiles`.
-  - N?u ch?a c�: d�ng `POST /api/user-profiles`.
+  1. Gọi `GET /api/user-profiles/me`.
+  2. Nếu 200: hiển thị dữ liệu.
+  3. Nếu 404: cho phép người dùng tạo mới với `POST /api/user-profiles`.
+- Khi lưu form:
+  - Nếu đã có `id`: dùng `PUT /api/user-profiles`.
+  - Nếu chưa có: dùng `POST /api/user-profiles`.
 
-### L?u � t�ch h?p
+### Lưu ý tích hợp
 
-- B? sung header `Authorization: Bearer {token}` cho m?i request.
-- Ki?m tra c? HTTP status code v� `FSResponse.success/message` ?? hi?n th? th�ng b�o ph� h?p.
-- R�ng bu?c ?? d�i tr??ng theo m� t? trong DTO (255/512/1024).
-- Non-admin kh�ng c?n (v� kh�ng n�n) g?i `userId` trong POST; backend s? m?c ??nh l?y t? token.
+- Bổ sung header `Authorization: Bearer {token}` cho mọi request.
+- Kiểm tra cả HTTP status code và `FSResponse.success/message` để hiển thị thông báo phù hợp.
+- Ràng buộc độ dài trường theo mô tả trong DTO (255/512/1024).
+- Non-admin không cần (và không nên) gửi `userId` trong POST; backend sẽ mặc định lấy từ token.
 
-### V� d? x? l� FE (Axios)
+### Ví dụ xử lý FE (Axios)
 
 ```js
 import axios from "axios";
@@ -229,7 +229,7 @@ const api = axios.create({
 // Get my profile
 const { data: res } = await api.get("/user-profiles/me");
 if (res.statusCode === 200 && res.success) {
-  // res.data l� UserProfileResponseDTO
+  // res.data là UserProfileResponseDTO
 } else if (res.statusCode === 404) {
   // show create form
 }
@@ -244,7 +244,7 @@ await api.put("/user-profiles", { id, fullName, address, avatar, coverImage });
 await api.delete(`/user-profiles/${id}`);
 ```
 
-### Ghi ch� k? thu?t
+### Ghi chú kỹ thuật
 
-- Admin ???c nh?n di?n qua claim `Role = "Administrator"` trong token.
-- Truy v?n l?y h? s? lu�n l?c `IsActive = true` v� `DeletedAt = null`.
+- Admin được nhận diện qua claim `Role = "Administrator"` trong token.
+- Truy vấn lấy hồ sơ luôn lọc `IsActive = true` và `DeletedAt = null`.

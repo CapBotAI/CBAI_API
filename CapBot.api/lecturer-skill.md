@@ -1,18 +1,18 @@
-## API T�i li?u � LecturerSkill
+## API Tài liệu — LecturerSkill
 
-### T?ng quan
+### Tổng quan
 
-- Th?c th?: `LecturerSkill` (k? n?ng c?a gi?ng vi�n)
-- Quy ??c ph?n h?i: B?c trong `FSResponse` v?i c�c tr??ng: `data`, `statusCode`, `message`, `success`.
-- Y�u c?u x�c th?c: T?t c? endpoints ??u c?n JWT (`Authorization: Bearer <token>`).
-- Ph�n quy?n:
-  - T?o/C?p nh?t/X�a: Admin ho?c ch�nh gi?ng vi�n s? h?u skill.
-  - Xem theo `lecturerId`: ai c?ng g?i ???c (?� ??ng nh?p).
-  - L?y k? n?ng c?a ch�nh m�nh: d�ng `/me`.
+- Thực thể: `LecturerSkill` (kỹ năng của giảng viên)
+- Quy ước phản hồi: Bọc trong `FSResponse` với các trường: `data`, `statusCode`, `message`, `success`.
+- Yêu cầu xác thực: Tất cả endpoints đều cần JWT (`Authorization: Bearer <token>`).
+- Phân quyền:
+  - Tạo/Cập nhật/Xóa: Admin hoặc chính giảng viên sở hữu skill.
+  - Xem theo `lecturerId`: ai cũng gọi được (đã đăng nhập).
+  - Lấy kỹ năng của chính mình: dùng `/me`.
 
 ### Base URL
 
-- Local (v� d?): `https://localhost:7190/api/lecturer-skills`
+- Local (ví dụ): `https://localhost:7190/api/lecturer-skills`
 
 ### Model
 
@@ -28,7 +28,7 @@
 
 - `CreateLecturerSkillDTO`
 
-  - `lecturerId?` (number, optional; Admin c� th? ch? ??nh, gi?ng vi�n th??ng s? ?? tr?ng ?? m?c ??nh l� ch�nh m�nh)
+  - `lecturerId?` (number, optional; Admin có thể chỉ định, giảng viên thường sẽ để trống để mặc định là chính mình)
   - `skillTag` (string, required, max 100)
   - `proficiencyLevel` (number, optional, default 2)
 
@@ -44,10 +44,10 @@
   - 3: Advanced
   - 4: Expert
 
-### Ph�n trang
+### Phân trang
 
 - Query params chung: `PageNumber` (default 1), `PageSize` (default 10)
-- Response ph�n trang:
+- Response phân trang:
 
 ```json
 {
@@ -78,13 +78,13 @@
 
 ---
 
-### 1) T?o k? n?ng
+### 1) Tạo kỹ năng
 
 - Method: POST
 - Path: `/api/lecturer-skills`
-- Quy?n:
-  - Admin: t?o cho b?t k? `lecturerId` ho?c ?? tr?ng (n?u ?? tr?ng s? g�n theo ng??i g?i).
-  - Gi?ng vi�n: ch? t?o cho ch�nh m�nh (b? `lecturerId` ho?c `lecturerId` ph?i b?ng `UserId`).
+- Quyền:
+  - Admin: tạo cho bất kỳ `lecturerId` hoặc để trống (nếu để trống sẽ gán theo người gọi).
+  - Giảng viên: chỉ tạo cho chính mình (bỏ `lecturerId` hoặc `lecturerId` phải bằng `UserId`).
 - Body (JSON):
 
 ```json
@@ -109,16 +109,16 @@
     "lastModifiedAt": "2025-08-30T07:00:00Z"
   },
   "statusCode": 201,
-  "message": "T?o k? n?ng th�nh c�ng",
+  "message": "Tạo kỹ năng thành công",
   "success": true
 }
 ```
 
-- L?i th??ng g?p:
-  - 403: t?o cho ng??i kh�c khi kh�ng ph?i Admin.
-  - 409: tr�ng `(lecturerId, skillTag)`.
+- Lỗi thường gặp:
+  - 403: tạo cho người khác khi không phải Admin.
+  - 409: trùng `(lecturerId, skillTag)`.
 
-V� d? cURL:
+Ví dụ cURL:
 
 ```bash
 curl -X POST "https://localhost:7190/api/lecturer-skills" \
@@ -127,7 +127,7 @@ curl -X POST "https://localhost:7190/api/lecturer-skills" \
   -d '{"skillTag":"AI","proficiencyLevel":3}'
 ```
 
-V� d? fetch:
+Ví dụ fetch:
 
 ```javascript
 await fetch(`/api/lecturer-skills`, {
@@ -142,11 +142,11 @@ await fetch(`/api/lecturer-skills`, {
 
 ---
 
-### 2) C?p nh?t k? n?ng
+### 2) Cập nhật kỹ năng
 
 - Method: PUT
 - Path: `/api/lecturer-skills`
-- Quy?n: Admin ho?c ch? s? h?u skill.
+- Quyền: Admin hoặc chủ sở hữu skill.
 - Body:
 
 ```json
@@ -171,40 +171,40 @@ await fetch(`/api/lecturer-skills`, {
     "lastModifiedAt": "2025-08-30T07:05:00Z"
   },
   "statusCode": 200,
-  "message": "C?p nh?t k? n?ng th�nh c�ng",
+  "message": "Cập nhật kỹ năng thành công",
   "success": true
 }
 ```
 
-- L?i th??ng g?p:
-  - 404: kh�ng t�m th?y `id`.
-  - 403: kh�ng ph?i Admin v� kh�ng ph?i ch? s? h?u.
-  - 409: ??i `skillTag` g�y tr�ng v?i skill kh�c c?a c�ng `lecturerId`.
+- Lỗi thường gặp:
+  - 404: không tìm thấy `id`.
+  - 403: không phải Admin và không phải chủ sở hữu.
+  - 409: đổi `skillTag` gây trùng với skill khác của cùng `lecturerId`.
 
 ---
 
-### 3) X�a k? n?ng (soft delete)
+### 3) Xóa kỹ năng (soft delete)
 
 - Method: DELETE
 - Path: `/api/lecturer-skills/{id}`
-- Quy?n: Admin ho?c ch? s? h?u skill.
+- Quyền: Admin hoặc chủ sở hữu skill.
 - Response (200):
 
 ```json
 {
   "data": null,
   "statusCode": 200,
-  "message": "X�a k? n?ng th�nh c�ng",
+  "message": "Xóa kỹ năng thành công",
   "success": true
 }
 ```
 
-- L?i th??ng g?p:
+- Lỗi thường gặp:
   - 404, 403.
 
 ---
 
-### 4) L?y k? n?ng theo ID
+### 4) Lấy kỹ năng theo ID
 
 - Method: GET
 - Path: `/api/lecturer-skills/{id}`
@@ -227,19 +227,19 @@ await fetch(`/api/lecturer-skills`, {
 }
 ```
 
-- L?i: 404.
+- Lỗi: 404.
 
 ---
 
-### 5) L?y danh s�ch k? n?ng theo gi?ng vi�n (ph�n trang)
+### 5) Lấy danh sách kỹ năng theo giảng viên (phân trang)
 
 - Method: GET
 - Path: `/api/lecturer-skills`
 - Query:
   - `lecturerId` (number, required)
   - `PageNumber`, `PageSize`
-- Response: d?ng ph�n trang (xem m?c Ph�n trang).
-- V� d?:
+- Response: dạng phân trang (xem mục Phân trang).
+- Ví dụ:
 
 ```bash
 curl -G "https://localhost:7190/api/lecturer-skills" \
@@ -251,21 +251,21 @@ curl -G "https://localhost:7190/api/lecturer-skills" \
 
 ---
 
-### 6) L?y danh s�ch k? n?ng c?a ch�nh m�nh (ph�n trang)
+### 6) Lấy danh sách kỹ năng của chính mình (phân trang)
 
 - Method: GET
 - Path: `/api/lecturer-skills/me`
 - Query: `PageNumber`, `PageSize`
-- Response: d?ng ph�n trang.
+- Response: dạng phân trang.
 
 ---
 
-### Headers chu?n
+### Headers chuẩn
 
 - `Authorization: Bearer <token>`
-- `Content-Type: application/json` (v?i POST/PUT)
+- `Content-Type: application/json` (với POST/PUT)
 
-### M?u x? l� response (frontend)
+### Mẫu xử lý response (frontend)
 
 ```typescript
 type FSResponse<T> = {
@@ -279,24 +279,24 @@ async function api<T>(input: RequestInfo, init?: RequestInit): Promise<T> {
   const res = await fetch(input, init);
   const payload = (await res.json()) as FSResponse<T>;
   if (!payload.success) {
-    throw new Error(payload.message ?? "C� l?i x?y ra");
+    throw new Error(payload.message ?? "Có lỗi xảy ra");
   }
   return payload.data as T;
 }
 ```
 
-### G?i � UI/Validation
+### Gợi ý UI/Validation
 
-- Ch?n t?o/c?p nh?t n?u `skillTag` r?ng ho?c qu� 100 k� t?.
+- Chặn tạo/cập nhật nếu `skillTag` rỗng hoặc quá 100 ký tự.
 - Map enum `proficiencyLevel` => label theo `proficiencyLevelName`.
-- B?t l?i 409 ?? hi?n th? �K? n?ng ?� t?n t?i�.
-- Ph�n trang: ??c `data.paging.totalRecord` ?? hi?n th? t?ng v� ?i?u khi?n trang.
+- Bắt lỗi 409 để hiển thị “Kỹ năng đã tồn tại”.
+- Phân trang: đọc `data.paging.totalRecord` để hiển thị tổng và điều khiển trang.
 
-### M� l?i th??ng g?p
+### Mã lỗi thường gặp
 
-- 400: body kh�ng h?p l? (thi?u tr??ng, sai format).
-- 401: thi?u/invalid token.
-- 403: kh�ng ?? quy?n (kh�ng ph?i Admin/Owner).
-- 404: kh�ng t�m th?y resource.
-- 409: xung ??t d? li?u (tr�ng `(lecturerId, skillTag)`).
-- 500: l?i h? th?ng.
+- 400: body không hợp lệ (thiếu trường, sai format).
+- 401: thiếu/invalid token.
+- 403: không đủ quyền (không phải Admin/Owner).
+- 404: không tìm thấy resource.
+- 409: xung đột dữ liệu (trùng `(lecturerId, skillTag)`).
+- 500: lỗi hệ thống.
