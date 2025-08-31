@@ -17,6 +17,7 @@ using App.Entities.Entities.Core;
 using CapBot.api.Configuration;
 using Swashbuckle.AspNetCore.SwaggerUI;
 using Microsoft.AspNetCore.Mvc;
+using CapBot.api.Hubs;
 
 namespace CapBot.api;
 
@@ -266,7 +267,7 @@ public class Program
         app.UseAuthentication();
         app.UseAuthorization();
         app.UseRateLimiter();
-
+        app.MapHub<NotificationHub>("/hubs/notifications");
         app.MapControllers();
 
         app.Run();

@@ -156,4 +156,6 @@ public interface IIdentityRepository
     /// <param name="dto"></param>
     /// <returns></returns>
     // Task<List<User>> GetAccounts(AccountGetListDTO dto);
+
+    Task<List<User>> GetUsersInRoleAsync(string roleName);
 }

@@ -2,9 +2,11 @@ using App.BLL.Implementations;
 using App.BLL.Interfaces;
 using App.BLL.Mapper;
 using App.BLL.Services;
+using App.Commons.Interfaces;
 using App.DAL.Implementations;
 using App.DAL.Interfaces;
 using App.DAL.UnitOfWork;
+using CapBot.api.Services;
 
 namespace CapBot.api.ServiceConfiguration;
 
@@ -62,6 +64,11 @@ public class ServiceConfig
 
         //User Profile Service
         services.AddScoped<IUserProfileService, UserProfileService>();
+
+        // Notification Service
+        services.AddSignalR();
+        services.AddScoped<INotificationBroadcaster, SignalRNotificationBroadcaster>();
+        services.AddScoped<INotificationService, NotificationService>();
 
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();

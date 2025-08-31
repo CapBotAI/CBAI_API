@@ -570,7 +570,7 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.Message).IsRequired();
             entity.Property(e => e.Type).HasDefaultValue(App.Entities.Enums.NotificationTypes.Info);
             entity.Property(e => e.RelatedEntityType).HasMaxLength(50);
-            entity.Property(e => e.IsRead).HasDefaultValue(true);
+            entity.Property(e => e.IsRead).HasDefaultValue(false);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(d => d.User)

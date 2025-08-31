@@ -347,4 +347,10 @@ public class IdentityRepository : IIdentityRepository
     {
         throw new NotImplementedException();
     }
+
+    public async Task<List<User>> GetUsersInRoleAsync(string roleName)
+    {
+        var users = await _userManager.GetUsersInRoleAsync(roleName);
+        return users?.ToList() ?? new List<User>();
+    }
 }

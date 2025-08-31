@@ -4,6 +4,7 @@ using App.DAL.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace App.DAL.Migrations
 {
     [DbContext(typeof(MyDbContext))]
-    partial class MyDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250817174217_AddDescriptionToSemester")]
+    partial class AddDescriptionToSemester
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,116 +24,6 @@ namespace App.DAL.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 128);
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
-
-            modelBuilder.Entity("App.Entities.Entities.App.AppFile", b =>
-            {
-                b.Property<long>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("bigint");
-
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                b.Property<string>("Alt")
-                    .HasMaxLength(255)
-                    .HasColumnType("nvarchar(255)");
-
-                b.Property<string>("Checksum")
-                    .HasMaxLength(128)
-                    .HasColumnType("nvarchar(128)");
-
-                b.Property<DateTime>("CreatedAt")
-                    .HasColumnType("datetime2");
-
-                b.Property<string>("CreatedBy")
-                    .HasColumnType("nvarchar(max)");
-
-                b.Property<DateTime?>("DeletedAt")
-                    .HasColumnType("datetime2");
-
-                b.Property<string>("FileName")
-                    .IsRequired()
-                    .HasMaxLength(255)
-                    .HasColumnType("nvarchar(255)");
-
-                b.Property<string>("FilePath")
-                    .IsRequired()
-                    .HasMaxLength(1024)
-                    .HasColumnType("nvarchar(1024)");
-
-                b.Property<long>("FileSize")
-                    .HasColumnType("bigint");
-
-                b.Property<int>("FileType")
-                    .HasColumnType("int");
-
-                b.Property<int?>("Height")
-                    .HasColumnType("int");
-
-                b.Property<bool>("IsActive")
-                    .HasColumnType("bit");
-
-                b.Property<DateTime?>("LastModifiedAt")
-                    .HasColumnType("datetime2");
-
-                b.Property<string>("LastModifiedBy")
-                    .HasColumnType("nvarchar(max)");
-
-                b.Property<string>("MimeType")
-                    .HasMaxLength(255)
-                    .HasColumnType("nvarchar(255)");
-
-                b.Property<string>("ThumbnailUrl")
-                    .HasMaxLength(2048)
-                    .HasColumnType("nvarchar(2048)");
-
-                b.Property<string>("Url")
-                    .IsRequired()
-                    .HasMaxLength(2048)
-                    .HasColumnType("nvarchar(2048)");
-
-                b.Property<int?>("Width")
-                    .HasColumnType("int");
-
-                b.HasKey("Id");
-
-                b.ToTable("files", (string)null);
-            });
-
-            modelBuilder.Entity("App.Entities.Entities.App.EntityFile", b =>
-            {
-                b.Property<long>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("bigint");
-
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                b.Property<string>("Caption")
-                    .HasMaxLength(512)
-                    .HasColumnType("nvarchar(512)");
-
-                b.Property<DateTime>("CreatedAt")
-                    .HasColumnType("datetime2");
-
-                b.Property<long>("EntityId")
-                    .HasColumnType("bigint");
-
-                b.Property<int>("EntityType")
-                    .HasColumnType("int");
-
-                b.Property<long>("FileId")
-                    .HasColumnType("bigint");
-
-                b.Property<bool>("IsPrimary")
-                    .HasColumnType("bit");
-
-                b.HasKey("Id");
-
-                b.HasIndex("FileId");
-
-                b.HasIndex("EntityType", "EntityId");
-
-                b.ToTable("entity_files", (string)null);
-            });
 
             modelBuilder.Entity("App.Entities.Entities.App.EvaluationCriteria", b =>
             {
@@ -832,7 +725,7 @@ namespace App.DAL.Migrations
                 b.Property<bool>("IsRead")
                     .ValueGeneratedOnAdd()
                     .HasColumnType("bit")
-                    .HasDefaultValue(false);
+                    .HasDefaultValue(true);
 
                 b.Property<string>("Message")
                     .IsRequired()
@@ -1066,55 +959,6 @@ namespace App.DAL.Migrations
                     .IsUnique();
 
                 b.ToTable("topic_versions", (string)null);
-            });
-
-            modelBuilder.Entity("App.Entities.Entities.App.UserProfile", b =>
-            {
-                b.Property<int>("Id")
-                    .ValueGeneratedOnAdd()
-                    .HasColumnType("int");
-
-                SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                b.Property<string>("Address")
-                    .HasColumnType("nvarchar(max)");
-
-                b.Property<string>("Avatar")
-                    .HasColumnType("nvarchar(max)");
-
-                b.Property<string>("CoverImage")
-                    .HasColumnType("nvarchar(max)");
-
-                b.Property<DateTime>("CreatedAt")
-                    .HasColumnType("datetime2");
-
-                b.Property<string>("CreatedBy")
-                    .HasColumnType("nvarchar(max)");
-
-                b.Property<DateTime?>("DeletedAt")
-                    .HasColumnType("datetime2");
-
-                b.Property<string>("FullName")
-                    .HasColumnType("nvarchar(max)");
-
-                b.Property<bool>("IsActive")
-                    .HasColumnType("bit");
-
-                b.Property<DateTime?>("LastModifiedAt")
-                    .HasColumnType("datetime2");
-
-                b.Property<string>("LastModifiedBy")
-                    .HasColumnType("nvarchar(max)");
-
-                b.Property<int>("UserId")
-                    .HasColumnType("int");
-
-                b.HasKey("Id");
-
-                b.HasIndex("UserId")
-                    .IsUnique();
-
-                b.ToTable("profiles", (string)null);
             });
 
             modelBuilder.Entity("App.Entities.Entities.App.WorkflowState", b =>
@@ -1394,17 +1238,6 @@ namespace App.DAL.Migrations
                 b.ToTable("user_tokens", (string)null);
             });
 
-            modelBuilder.Entity("App.Entities.Entities.App.EntityFile", b =>
-            {
-                b.HasOne("App.Entities.Entities.App.AppFile", "File")
-                    .WithMany("EntityFiles")
-                    .HasForeignKey("FileId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-
-                b.Navigation("File");
-            });
-
             modelBuilder.Entity("App.Entities.Entities.App.LecturerSkill", b =>
             {
                 b.HasOne("App.Entities.Entities.Core.User", "Lecturer")
@@ -1644,17 +1477,6 @@ namespace App.DAL.Migrations
                 b.Navigation("Topic");
             });
 
-            modelBuilder.Entity("App.Entities.Entities.App.UserProfile", b =>
-            {
-                b.HasOne("App.Entities.Entities.Core.User", "User")
-                    .WithOne("Profile")
-                    .HasForeignKey("App.Entities.Entities.App.UserProfile", "UserId")
-                    .OnDelete(DeleteBehavior.Cascade)
-                    .IsRequired();
-
-                b.Navigation("User");
-            });
-
             modelBuilder.Entity("App.Entities.Entities.App.WorkflowTransition", b =>
             {
                 b.HasOne("App.Entities.Entities.App.WorkflowState", "FromState")
@@ -1741,11 +1563,6 @@ namespace App.DAL.Migrations
                     .IsRequired();
 
                 b.Navigation("User");
-            });
-
-            modelBuilder.Entity("App.Entities.Entities.App.AppFile", b =>
-            {
-                b.Navigation("EntityFiles");
             });
 
             modelBuilder.Entity("App.Entities.Entities.App.EvaluationCriteria", b =>
@@ -1835,8 +1652,6 @@ namespace App.DAL.Migrations
                 b.Navigation("LecturerSkills");
 
                 b.Navigation("Logins");
-
-                b.Navigation("Profile");
 
                 b.Navigation("ReviewerAssignments");
 
