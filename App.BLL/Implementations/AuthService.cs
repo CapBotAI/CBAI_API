@@ -40,6 +40,17 @@ public class AuthService : IAuthService
                 };
             }
 
+            var userRoles = await _identityRepository.GetRolesAsync(user.Id);
+            if (!userRoles.Contains(loginDTO.Role.ToString()))
+            {
+                return new BaseResponseModel<LoginResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Message = "Người dùng không có quyền truy cập"
+                };
+            }
+
             var checkPassword = await _identityRepository.CheckPasswordAsync(user, loginDTO.Password);
             if (!checkPassword)
             {
