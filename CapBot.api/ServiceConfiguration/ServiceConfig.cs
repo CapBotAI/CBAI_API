@@ -60,6 +60,9 @@ public class ServiceConfig
         //Lecturer Skill Service
         services.AddScoped<ILecturerSkillService, LecturerSkillService>();
 
+        //User Profile Service
+        services.AddScoped<IUserProfileService, UserProfileService>();
+
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 

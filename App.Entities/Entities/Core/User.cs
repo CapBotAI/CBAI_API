@@ -22,4 +22,5 @@ public partial class User : IdentityUser<int>
     public virtual ICollection<SubmissionWorkflowLog> SubmissionWorkflowLogs { get; set; }
     public virtual ICollection<ReviewerPerformance> ReviewerPerformances { get; set; }
     public virtual ICollection<SystemNotification> SystemNotifications { get; set; }
+    public virtual UserProfile? Profile { get; set; }
 }
