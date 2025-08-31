@@ -567,6 +567,46 @@ public class SubmissionService : ISubmissionService
             topicVersion.Status = TopicStatus.Submitted;
             await versionRepo.UpdateAsync(topicVersion);
 
+
+            var moderators = await _identityRepository.GetUsersInRoleAsync(SystemRoleConstants.Moderator);
+            var moderatorIds = moderators.Select(x => (int)x.Id).Distinct().ToList();
+            if (moderatorIds.Count > 0)
+            {
+                var createBulkNotification = await _notificationService.CreateBulkAsync(new CreateBulkNotificationsDTO
+                {
+                    UserIds = moderatorIds,
+                    Title = "Thông báo về submission mới",
+                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.Title} và phiên bản đề tài {topicVersion.Title}",
+                    Type = NotificationTypes.Info,
+                    RelatedEntityType = EntityType.Submission.ToString(),
+                    RelatedEntityId = submission.Id
+                });
+
+                if (!createBulkNotification.IsSuccess)
+                {
+                    throw new Exception(createBulkNotification.Message);
+                }
+            }
+
+            var reviewerIds = submission.ReviewerAssignments.Select(x => x.ReviewerId).Distinct().ToList();
+            if (reviewerIds.Count > 0)
+            {
+                var createBulkNotification = await _notificationService.CreateBulkAsync(new CreateBulkNotificationsDTO
+                {
+                    UserIds = reviewerIds,
+                    Title = "Thông báo về submission mới",
+                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.Title} và phiên bản đề tài {topicVersion.Title}",
+                    Type = NotificationTypes.Info,
+                    RelatedEntityType = EntityType.Submission.ToString(),
+                    RelatedEntityId = submission.Id
+                });
+
+                if (!createBulkNotification.IsSuccess)
+                {
+                    throw new Exception(createBulkNotification.Message);
+                }
+            }
+
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
 
@@ -579,6 +619,7 @@ public class SubmissionService : ISubmissionService
         }
         catch (Exception)
         {
+            await _unitOfWork.RollBackAsync();
             throw;
         }
     }
