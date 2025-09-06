@@ -179,6 +179,8 @@ public class Program
         ServiceConfig.Register(builder.Services, builder.Configuration);
         // Add Elasticsearch
         builder.Services.AddElasticsearch(builder.Configuration);
+        builder.Services.AddHttpClient();
+        builder.Services.AddHttpContextAccessor();
 
         builder.Services.AddHttpContextAccessor();
 

@@ -88,6 +88,9 @@ public class ServiceConfig
         services.AddScoped<IReviewCommentService, ReviewCommentService>();
 
         services.AddScoped<IElasticsearchService, ElasticsearchService>();
+        // AI Service
+        services.AddScoped<IAIService, GeminiService>();
+        services.AddScoped<IElasticsearchService, ElasticsearchService>();
 
         //Gemini AI Service 
         services.AddSingleton<GeminiAIService>();

@@ -22,13 +22,22 @@ public class SubmissionService : ISubmissionService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IIdentityRepository _identityRepository;
     private readonly INotificationService _notificationService;
+    private readonly IAIService _aIService;
+    private readonly IElasticsearchService _elasticsearchService;
 
 
-    public SubmissionService(IUnitOfWork unitOfWork, IIdentityRepository identityRepository, INotificationService notificationService)
+ 
+    public SubmissionService(IUnitOfWork unitOfWork,
+     IIdentityRepository identityRepository,
+     INotificationService notificationService,
+     IAIService aIService,
+     IElasticsearchService elasticsearchService)
     {
         _unitOfWork = unitOfWork;
         _identityRepository = identityRepository;
         _notificationService = notificationService;
+        _aIService = aIService;
+        _elasticsearchService = elasticsearchService;
 
     }
 
@@ -404,6 +413,41 @@ public class SubmissionService : ISubmissionService
                     Message = "Đã quá hạn nộp cho giai đoạn này"
                 };
             }
+
+            // ===== AI duplicate check (Gemini + Elasticsearch) =====
+            var title = submission.TopicVersion?.Title ?? submission.Topic.Title;
+            var description = submission.TopicVersion?.Description ?? submission.Topic.Description;
+            var keywords = await _aIService.GenerateKeywordsAsync(title, description);
+            if (keywords.Count > 0)
+            {
+                var query = string.Join(" ", keywords.Distinct());
+                var searchRes = await _elasticsearchService.SearchTopicsAsync(query, size: 10);
+                if (searchRes.IsSuccess && searchRes.Data != null)
+                {
+                    var duplicates = searchRes.Data.Where(d => d.Id != submission.TopicId).Take(5).ToList();
+                    if (duplicates.Count > 0)
+                    {
+                        submission.AiCheckStatus = AiCheckStatus.Failed;
+                        submission.AiCheckScore = null;
+                        submission.AiCheckDetails = $"Found {duplicates.Count} similar topics by AI keywords: {string.Join("; ", duplicates.Select(d => $"{d.Id}:{d.Title}"))}";
+                        await submissionRepo.UpdateAsync(submission);
+                        await _unitOfWork.SaveChangesAsync();
+
+                        return new BaseResponseModel
+                        {
+                            IsSuccess = false,
+                            StatusCode = StatusCodes.Status409Conflict,
+                            Message = "Phát hiện đề tài tương tự. Vui lòng xem lại hoặc điều chỉnh đề tài."
+                        }
+                        ;
+                    }
+                }
+            }
+            submission.AiCheckStatus = AiCheckStatus.Passed;
+            submission.AiCheckDetails = keywords.Count > 0 ? $"AI keywords: {string.Join(", ", keywords)}" : "AI skipped/no keywords";
+            await submissionRepo.UpdateAsync(submission);
+            await _unitOfWork.SaveChangesAsync();
+            // ===== End AI duplicate check =====
 
             await _unitOfWork.BeginTransactionAsync();
 
