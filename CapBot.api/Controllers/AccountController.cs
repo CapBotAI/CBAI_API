@@ -37,7 +37,7 @@ namespace CapBot.api.Controllers
         [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public async Task<IActionResult> AddRolesToUser([FromRoute] long userId, [FromBody] List<string> roles)
+        public async Task<IActionResult> AddRolesToUser([FromRoute] int userId, [FromBody] List<string> roles)
         {
             try
             {
@@ -47,6 +47,35 @@ namespace CapBot.api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error occurred while adding roles to user");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Xoá roles cho người dùng
+        /// </summary>
+        /// <returns>Thông tin chi tiết người dùng sau khi xoá role</returns>
+        [Authorize(Roles = SystemRoleConstants.Administrator)]
+        [HttpDelete("user-roles/{userId}")]
+        [SwaggerOperation(
+            Summary = "Xoá roles cho người dùng",
+            Description = "Xoá roles cho người dùng"
+        )]
+        [SwaggerResponse(200, "Xoá roles thành công")]
+        [SwaggerResponse(401, "Lỗi xác thực")]
+        [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        public async Task<IActionResult> RemoveRolesFromUser([FromRoute] int userId, [FromBody] List<string> roles)
+        {
+            try
+            {
+                var result = await _accountService.RemoveRoleFromUserRoles(userId, roles);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while removing roles from user");
                 return Error(ConstantModel.ErrorMessage);
             }
         }

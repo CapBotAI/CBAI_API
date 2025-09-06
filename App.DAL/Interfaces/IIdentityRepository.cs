@@ -88,6 +88,14 @@ public interface IIdentityRepository
     Task<bool> AddRolesToUserAsync(User user, List<string> roles);
 
     /// <summary>
+    /// Removes a list of roles from a user.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="roles"></param>
+    /// <returns></returns>
+    Task<bool> RemoveRolesFromUserAsync(User user, List<string> roles);
+
+    /// <summary>
     /// generate email confirm token
     /// </summary>
     /// <param name="user"></param>

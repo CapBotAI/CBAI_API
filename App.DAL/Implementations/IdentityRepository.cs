@@ -275,6 +275,19 @@ public class IdentityRepository : IIdentityRepository
         return result.Succeeded;
     }
 
+
+    /// <summary>
+    /// Removes a list of roles from a user.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="roles"></param>
+    /// <returns></returns>
+    public async Task<bool> RemoveRolesFromUserAsync(User user, List<string> roles)
+    {
+        var result = await _userManager.RemoveFromRolesAsync(user, roles);
+        return result.Succeeded;
+    }
+
     public async Task<string> GenerateEmailConfirmationTokenAsync(User user)
     {
         return await _userManager.GenerateEmailConfirmationTokenAsync(user);
