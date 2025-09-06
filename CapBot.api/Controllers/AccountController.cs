@@ -2,6 +2,7 @@ using App.BLL.Interfaces;
 using App.Commons;
 using App.Commons.BaseAPI;
 using App.Entities.Constants;
+using App.Entities.DTOs.Accounts;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -52,12 +53,12 @@ namespace CapBot.api.Controllers
 
 
         /// <summary>
-        /// Lấy danh sách chủ đề
+        /// Lấy danh sách quyền của user
         /// </summary>
         /// <param name="query">Thông tin lọc</param>
-        /// <returns>Danh sách chủ đề</returns>
+        /// <returns>Danh sách quyền của user</returns>
         /// <remarks>
-        /// Lấy danh sách chủ đề với bộ lọc tùy chọn
+        /// Lấy danh sách quyền của user với bộ lọc tùy chọn
         ///
         /// Sample request:
         ///
@@ -93,12 +94,53 @@ namespace CapBot.api.Controllers
         }
 
         /// <summary>
-        /// Lấy danh sách chủ đề
+        /// Lấy danh sách user hiện tại
         /// </summary>
         /// <param name="query">Thông tin lọc</param>
-        /// <returns>Danh sách chủ đề</returns>
+        /// <returns>Danh sách user hiện tại</returns>
         /// <remarks>
-        /// Lấy danh sách chủ đề với bộ lọc tùy chọn
+        /// Lấy danh sáchuser hiện tại với bộ lọc tùy chọn
+        ///
+        /// Sample request:
+        ///
+        ///     GET /api/topic/list
+        ///     GET /api/topic/list?semesterId=1
+        ///     GET /api/topic/list?categoryId=1
+        ///     GET /api/topic/list?semesterId=1&categoryId=1
+        ///
+        /// </remarks>
+        [Authorize(Roles = SystemRoleConstants.Administrator)]
+        [HttpGet("users")]
+        [SwaggerOperation(
+            Summary = "Lấy danh sách user",
+            Description = "Lấy danh sáchuser"
+        )]
+        [SwaggerResponse(200, "Lấy danh sách thành công")]
+        [SwaggerResponse(401, "Lỗi xác thực")]
+        [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        public async Task<IActionResult> GetUsers([FromQuery] GetUsersQueryDTO query)
+        {
+            try
+            {
+                var result = await _accountService.GetUsers(query);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting all user roles");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Lấy danh sách quyền của tài khoản đăng nhập hiện tại
+        /// </summary>
+        /// <param name="query">Thông tin lọc</param>
+        /// <returns>Danh sách quyền của tài khoản đăng nhập hiện tại</returns>
+        /// <remarks>
+        /// Lấy danh sách quyền của tài khoản đăng nhập hiện tại với bộ lọc tùy chọn
         ///
         /// Sample request:
         ///

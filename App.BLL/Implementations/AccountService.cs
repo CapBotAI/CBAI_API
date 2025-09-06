@@ -1,5 +1,6 @@
 using System;
 using App.BLL.Interfaces;
+using App.Commons.Paging;
 using App.Commons.ResponseModel;
 using App.DAL.Interfaces;
 using App.Entities.DTOs.Accounts;
@@ -136,4 +137,38 @@ public class AccountService : IAccountService
             throw;
         }
     }
+
+    public async Task<BaseResponseModel<PagingDataModel<UserOverviewDTO, GetUsersQueryDTO>>> GetUsers(GetUsersQueryDTO query)
+    {
+        try
+        {
+            var users = await _identityRepository.GetAccounts(query);
+            if (users == null || users.Count == 0) return new BaseResponseModel<PagingDataModel<UserOverviewDTO, GetUsersQueryDTO>>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Danh sách người dùng rỗng",
+                Data = new PagingDataModel<UserOverviewDTO, GetUsersQueryDTO>(new List<UserOverviewDTO>(), query)
+            };
+
+            var userOverviews = new List<UserOverviewDTO>();
+            foreach (var user in users)
+            {
+                var roles = await _identityRepository.GetUserRolesAsync(user.Id);
+                userOverviews.Add(new UserOverviewDTO(user, roles.Select(r => r.Name).Take(1).FirstOrDefault()));
+            }
+            return new BaseResponseModel<PagingDataModel<UserOverviewDTO, GetUsersQueryDTO>>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Lấy danh sách người dùng thành công",
+                Data = new PagingDataModel<UserOverviewDTO, GetUsersQueryDTO>(userOverviews, query)
+            };
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
 }

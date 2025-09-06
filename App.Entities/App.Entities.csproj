@@ -7,6 +7,10 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <None Include="DTOs\Accounts\UserOverviewDTO.cs" />
+    </ItemGroup>
+
+    <ItemGroup>
       <ProjectReference Include="..\App.Commons\App.Commons.csproj" />
     </ItemGroup>
 

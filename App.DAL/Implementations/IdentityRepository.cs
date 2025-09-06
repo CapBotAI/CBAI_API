@@ -1,9 +1,11 @@
 using System;
 using System.Web;
+using App.Commons.Extensions;
 using App.Commons.ResponseModel;
 using App.DAL.Context;
 using App.DAL.Interfaces;
 using App.DAL.UnitOfWork;
+using App.Entities.DTOs.Accounts;
 using App.Entities.Entities.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -75,19 +77,19 @@ public class IdentityRepository : IIdentityRepository
         }
     }
 
-    // public async Task<List<User>> GetAccounts(AccountGetListDTO dto)
-    // {
-    //     var users = _userManager.Users
-    //     .AsNoTracking()
-    //     .AsQueryable();
+    public async Task<List<User>> GetAccounts(GetUsersQueryDTO dto)
+    {
+        var users = _userManager.Users
+        .AsNoTracking()
+        .AsQueryable();
 
-    //     if (!string.IsNullOrEmpty(dto.Keyword))
-    //         users = users.Where(x => x.Email.Contains(dto.Keyword) || x.UserName.Contains(dto.Keyword));
+        if (!string.IsNullOrEmpty(dto.Keyword))
+            users = users.Where(x => x.Email.Contains(dto.Keyword) || x.UserName.Contains(dto.Keyword));
 
-    //     dto.TotalRecord = await users.CountAsync();
-    //     var response = await users.ToPagedList(dto.PageNumber, dto.PageSize).ToListAsync();
-    //     return response;
-    // }
+        dto.TotalRecord = await users.CountAsync();
+        var response = await users.ToPagedList(dto.PageNumber, dto.PageSize).ToListAsync();
+        return response;
+    }
 
     /// <summary>
     /// This is used to find a user by Email or UserName

@@ -1,4 +1,5 @@
 using System;
+using App.Commons.Paging;
 using App.Commons.ResponseModel;
 using App.Entities.DTOs.Accounts;
 
@@ -8,4 +9,6 @@ public interface IAccountService
 {
     Task<BaseResponseModel<List<RoleOverviewDTO>>> GetAllUserRoles(long userId);
     Task<BaseResponseModel<UserDetailDTO>> AddRoleToUser(long userId, List<string> roles, long loggedUserId);
+
+    Task<BaseResponseModel<PagingDataModel<UserOverviewDTO, GetUsersQueryDTO>>> GetUsers(GetUsersQueryDTO query);
 }
