@@ -11,4 +11,6 @@ public interface IAccountService
     Task<BaseResponseModel<UserDetailDTO>> AddRoleToUser(long userId, List<string> roles, long loggedUserId);
 
     Task<BaseResponseModel<PagingDataModel<UserOverviewDTO, GetUsersQueryDTO>>> GetUsers(GetUsersQueryDTO query);
+
+    Task<BaseResponseModel> SoftDeleteUser(int userId);
 }

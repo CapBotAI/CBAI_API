@@ -40,6 +40,16 @@ public class AuthService : IAuthService
                 };
             }
 
+            if (user.DeletedAt != null)
+            {
+                return new BaseResponseModel<LoginResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status401Unauthorized,
+                    Message = "Tài khoản đã bị vô hiệu hóa"
+                };
+            }
+
             var userRoles = await _identityRepository.GetRolesAsync(user.Id);
             if (!userRoles.Contains(loginDTO.Role.ToString()))
             {

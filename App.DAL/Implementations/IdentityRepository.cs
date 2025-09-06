@@ -83,6 +83,8 @@ public class IdentityRepository : IIdentityRepository
         .AsNoTracking()
         .AsQueryable();
 
+        users = users.Where(x => x.DeletedAt == null);
+
         if (!string.IsNullOrEmpty(dto.Keyword))
             users = users.Where(x => x.Email.Contains(dto.Keyword) || x.UserName.Contains(dto.Keyword));
 
@@ -135,9 +137,10 @@ public class IdentityRepository : IIdentityRepository
         return -1;
     }
 
-    public Task<bool> UpdateAsync(User dto)
+    public async Task<bool> UpdateAsync(User user)
     {
-        throw new NotImplementedException();
+        var result = await _userManager.UpdateAsync(user);
+        return result.Succeeded;
     }
 
     public async Task<User?> GetByIdAsync(long id)

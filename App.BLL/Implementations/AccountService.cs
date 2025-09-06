@@ -3,18 +3,22 @@ using App.BLL.Interfaces;
 using App.Commons.Paging;
 using App.Commons.ResponseModel;
 using App.DAL.Interfaces;
+using App.Entities.Constants;
 using App.Entities.DTOs.Accounts;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
 
 namespace App.BLL.Implementations;
 
 public class AccountService : IAccountService
 {
     private readonly IIdentityRepository _identityRepository;
+    private readonly IConfiguration _configuration;
 
-    public AccountService(IIdentityRepository identityRepository)
+    public AccountService(IIdentityRepository identityRepository, IConfiguration configuration)
     {
         _identityRepository = identityRepository;
+        _configuration = configuration;
     }
 
     public async Task<BaseResponseModel<List<RoleOverviewDTO>>> GetAllUserRoles(long userId)
@@ -163,6 +167,57 @@ public class AccountService : IAccountService
                 StatusCode = StatusCodes.Status200OK,
                 Message = "Lấy danh sách người dùng thành công",
                 Data = new PagingDataModel<UserOverviewDTO, GetUsersQueryDTO>(userOverviews, query)
+            };
+        }
+        catch (Exception)
+        {
+            throw;
+        }
+    }
+
+    public async Task<BaseResponseModel> SoftDeleteUser(int userId)
+    {
+        try
+        {
+            var user = await _identityRepository.GetByIdAsync(userId);
+            if (user == null)
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Người dùng không tồn tại.",
+                };
+            }
+
+            if (user.UserName == SystemRoleConstants.Administrator || user.Email == _configuration["AdminAccount:Email"])
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Không thể xóa tài khoản admin.",
+                };
+            }
+
+            user.DeletedAt = DateTime.Now;
+            var result = await _identityRepository.UpdateAsync(user);
+
+            if (!result)
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Xóa người dùng thất bại.",
+                };
+            }
+
+            return new BaseResponseModel
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Xóa người dùng thành công.",
             };
         }
         catch (Exception)

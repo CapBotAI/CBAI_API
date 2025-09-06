@@ -129,7 +129,48 @@ namespace CapBot.api.Controllers
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error occurred while getting all user roles");
+                _logger.LogError(ex, "Error occurred while getting all users");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Xoá người dùng
+        /// </summary>
+        /// <param name="userId">ID của người dùng</param>
+        /// <returns>Thông tin kết quả</returns>
+        /// <remarks>
+        /// xoá người dùng
+        ///
+        /// Sample request:
+        ///
+        ///     GET /api/topic/list
+        ///     GET /api/topic/list?semesterId=1
+        ///     GET /api/topic/list?categoryId=1
+        ///     GET /api/topic/list?semesterId=1&categoryId=1
+        ///
+        /// </remarks>
+        [Authorize(Roles = SystemRoleConstants.Administrator)]
+        [HttpDelete("users/{userId}")]
+        [SwaggerOperation(
+            Summary = "xoá user",
+            Description = "Xoá người dùng"
+        )]
+        [SwaggerResponse(200, "Xoá người dùng thành công")]
+        [SwaggerResponse(401, "Lỗi xác thực")]
+        [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        public async Task<IActionResult> SoftDeleteUsers([FromRoute] int userId)
+        {
+            try
+            {
+                var result = await _accountService.SoftDeleteUser(userId);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while soft deleting user");
                 return Error(ConstantModel.ErrorMessage);
             }
         }
