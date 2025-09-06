@@ -8,7 +8,11 @@ public class SubmissionDetailDTO
 {
     public int Id { get; set; }
 
-    public int TopicVersionId { get; set; }
+    public int TopicId { get; set; }
+
+    public string TopicTitle { get; set; }
+
+    public int? TopicVersionId { get; set; }
     public string? TopicVersionTitle { get; set; }
 
     public int PhaseId { get; set; }
@@ -43,7 +47,9 @@ public class SubmissionDetailDTO
     public SubmissionDetailDTO(Submission submission, EntityFile? entityFile)
     {
         Id = submission.Id;
-        TopicVersionId = submission.TopicVersionId ?? 0;
+        TopicId = submission.TopicId;
+        TopicTitle = submission.Topic.Title;
+        TopicVersionId = submission.TopicVersionId;
         PhaseId = submission.PhaseId;
         SubmittedBy = submission.SubmittedBy;
         SubmissionRound = submission.SubmissionRound;
