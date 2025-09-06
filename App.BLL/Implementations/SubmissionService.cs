@@ -26,7 +26,6 @@ public class SubmissionService : ISubmissionService
     private readonly IElasticsearchService _elasticsearchService;
 
 
- 
     public SubmissionService(IUnitOfWork unitOfWork,
      IIdentityRepository identityRepository,
      INotificationService notificationService,
@@ -364,12 +363,13 @@ public class SubmissionService : ISubmissionService
             }
 
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
+            // Đọc ngoài transaction bằng NoTracking
             var submission = await submissionRepo.GetSingleAsync(new QueryBuilder<Submission>()
                 .WithPredicate(x => x.Id == dto.Id && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.Phase)
                 .WithInclude(x => x.TopicVersion)
                 .WithInclude(x => x.Topic)
-                .WithTracking(true)
+                .WithTracking(false)
                 .Build());
 
             if (submission == null)
@@ -414,10 +414,14 @@ public class SubmissionService : ISubmissionService
                 };
             }
 
-            // ===== AI duplicate check (Gemini + Elasticsearch) =====
+            // ===== AI duplicate check (Gemini + Elasticsearch) ngoài transaction =====
             var title = submission.TopicVersion?.Title ?? submission.Topic.Title;
             var description = submission.TopicVersion?.Description ?? submission.Topic.Description;
             var keywords = await _aIService.GenerateKeywordsAsync(title, description);
+
+            bool hasDuplicate = false;
+            string? aiDetails = null;
+
             if (keywords.Count > 0)
             {
                 var query = string.Join(" ", keywords.Distinct());
@@ -427,39 +431,59 @@ public class SubmissionService : ISubmissionService
                     var duplicates = searchRes.Data.Where(d => d.Id != submission.TopicId).Take(5).ToList();
                     if (duplicates.Count > 0)
                     {
-                        submission.AiCheckStatus = AiCheckStatus.Failed;
-                        submission.AiCheckScore = null;
-                        submission.AiCheckDetails = $"Found {duplicates.Count} similar topics by AI keywords: {string.Join("; ", duplicates.Select(d => $"{d.Id}:{d.Title}"))}";
-                        await submissionRepo.UpdateAsync(submission);
-                        await _unitOfWork.SaveChangesAsync();
-
-                        return new BaseResponseModel
-                        {
-                            IsSuccess = false,
-                            StatusCode = StatusCodes.Status409Conflict,
-                            Message = "Phát hiện đề tài tương tự. Vui lòng xem lại hoặc điều chỉnh đề tài."
-                        }
-                        ;
+                        hasDuplicate = true;
+                        aiDetails = $"Found {duplicates.Count} similar topics by AI keywords: {string.Join("; ", duplicates.Select(d => $"{d.Id}:{d.Title}"))}";
                     }
                 }
             }
-            submission.AiCheckStatus = AiCheckStatus.Passed;
-            submission.AiCheckDetails = keywords.Count > 0 ? $"AI keywords: {string.Join(", ", keywords)}" : "AI skipped/no keywords";
-            await submissionRepo.UpdateAsync(submission);
-            await _unitOfWork.SaveChangesAsync();
             // ===== End AI duplicate check =====
 
             await _unitOfWork.BeginTransactionAsync();
 
-            submission.Status = SubmissionStatus.UnderReview;
-            submission.SubmittedAt = DateTime.Now;
-            await submissionRepo.UpdateAsync(submission);
+            // Reload với tracking trong transaction
+            var submissionRepoT = _unitOfWork.GetRepo<Submission>();
+            var versionRepoT = _unitOfWork.GetRepo<TopicVersion>();
 
-            if (submission.TopicVersionId.HasValue && submission.TopicVersion != null)
+            var submissionT = await submissionRepoT.GetSingleAsync(new QueryBuilder<Submission>()
+                .WithPredicate(x => x.Id == dto.Id && x.IsActive && x.DeletedAt == null)
+                .WithInclude(x => x.TopicVersion)
+                .WithTracking(true)
+                .Build());
+
+            if (submissionT == null)
             {
-                var versionRepo = _unitOfWork.GetRepo<TopicVersion>();
-                submission.TopicVersion.Status = TopicStatus.Submitted;
-                await versionRepo.UpdateAsync(submission.TopicVersion);
+                await _unitOfWork.RollBackAsync();
+                return new BaseResponseModel { IsSuccess = false, StatusCode = StatusCodes.Status404NotFound, Message = "Submission không tồn tại" };
+            }
+
+            if (hasDuplicate)
+            {
+                submissionT.AiCheckStatus = AiCheckStatus.Failed;
+                submissionT.AiCheckScore = null;
+                submissionT.AiCheckDetails = aiDetails;
+                await submissionRepoT.UpdateAsync(submissionT);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status409Conflict,
+                    Message = "Phát hiện đề tài tương tự. Vui lòng xem lại hoặc điều chỉnh đề tài."
+                };
+            }
+
+            // Pass: cập nhật AI và chuyển trạng thái trong cùng transaction
+            submissionT.AiCheckStatus = AiCheckStatus.Passed;
+            submissionT.AiCheckDetails = keywords.Count > 0 ? $"AI keywords: {string.Join(", ", keywords)}" : "AI skipped/no keywords";
+            submissionT.Status = SubmissionStatus.UnderReview;
+            submissionT.SubmittedAt = DateTime.Now;
+            await submissionRepoT.UpdateAsync(submissionT);
+
+            if (submissionT.TopicVersionId.HasValue && submissionT.TopicVersion != null)
+            {
+                submissionT.TopicVersion.Status = TopicStatus.Submitted;
+                await versionRepoT.UpdateAsync(submissionT.TopicVersion);
             }
 
             var moderators = await _identityRepository.GetUsersInRoleAsync(SystemRoleConstants.Moderator);
@@ -470,10 +494,10 @@ public class SubmissionService : ISubmissionService
                 {
                     UserIds = moderatorIds,
                     Title = "Thông báo về submission mới",
-                    Message = $"Submission #{submission.Id} đã được submit với chủ đề {submission.Topic.Title}",
+                    Message = $"Submission #{submissionT.Id} đã được submit với chủ đề {submissionT.Topic.Title}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Submission.ToString(),
-                    RelatedEntityId = submission.Id
+                    RelatedEntityId = submissionT.Id
                 });
 
                 if (!createBulkNotification.IsSuccess)
@@ -518,7 +542,7 @@ public class SubmissionService : ISubmissionService
             var submission = await submissionRepo.GetSingleAsync(new QueryBuilder<Submission>()
                 .WithPredicate(x => x.Id == dto.Id && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.Phase)
-                .WithTracking(true)
+                .WithTracking(false)
                 .Build());
 
             if (submission == null)
@@ -567,7 +591,7 @@ public class SubmissionService : ISubmissionService
             var topicVersion = await versionRepo.GetSingleAsync(new QueryBuilder<TopicVersion>()
                 .WithPredicate(x => x.Id == dto.TopicVersionId && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.Topic)
-                .WithTracking(true)
+                .WithTracking(false)
                 .Build());
 
             if (topicVersion == null)
@@ -600,17 +624,82 @@ public class SubmissionService : ISubmissionService
                 };
             }
 
+            //? ===== AI duplicate check (Gemini + Elasticsearch) =====
+            //* (1) Đọc dữ liệu cần thiết ngoài transaction (nên dùng NoTracking) và gọi AI
+            var title = topicVersion.Title ?? submission.Topic.Title;
+            var description = topicVersion.Description ?? submission.Topic.Description;
+            var keywords = await _aIService.GenerateKeywordsAsync(title, description);
+
+            bool hasDuplicate = false;
+            string? aiDetails = null;
+
+            if (keywords.Count > 0)
+            {
+                var query = string.Join(" ", keywords.Distinct());
+                var searchRes = await _elasticsearchService.SearchTopicsAsync(query, size: 10);
+                if (searchRes.IsSuccess && searchRes.Data != null)
+                {
+                    var duplicates = searchRes.Data.Where(d => d.Id != submission.TopicId).Take(5).ToList();
+                    if (duplicates.Count > 0)
+                    {
+                        hasDuplicate = true;
+                        aiDetails = $"Found {duplicates.Count} similar topics by AI keywords: {string.Join("; ", duplicates.Select(d => $"{d.Id}:{d.Title}"))}";
+                    }
+                }
+            }
+            //? ===== End AI duplicate check =====
+
             await _unitOfWork.BeginTransactionAsync();
 
-            submission.Status = SubmissionStatus.UnderReview;
-            submission.SubmittedAt = DateTime.Now;
-            submission.SubmissionRound += 1;
-            submission.TopicVersionId = topicVersion.Id;
-            await submissionRepo.UpdateAsync(submission);
+            //* (2) Reload entity với tracking trong transaction
+            var submissionRepoT = _unitOfWork.GetRepo<Submission>();
+            var versionRepoT = _unitOfWork.GetRepo<TopicVersion>();
 
-            topicVersion.Status = TopicStatus.Submitted;
-            await versionRepo.UpdateAsync(topicVersion);
+            var submissionT = await submissionRepoT.GetSingleAsync(new QueryBuilder<Submission>()
+                .WithPredicate(x => x.Id == dto.Id && x.IsActive && x.DeletedAt == null)
+                .WithInclude(x => x.TopicVersion)
+                .WithTracking(true)
+                .Build());
 
+            if (submissionT == null)
+            {
+                await _unitOfWork.RollBackAsync();
+                return new BaseResponseModel { IsSuccess = false, StatusCode = StatusCodes.Status404NotFound, Message = "Submission không tồn tại" };
+            }
+
+            //* (3) Ghi theo nhánh
+            if (hasDuplicate)
+            {
+                submissionT.AiCheckStatus = AiCheckStatus.Failed;
+                submissionT.AiCheckScore = null;
+                submissionT.AiCheckDetails = aiDetails;
+                await submissionRepoT.UpdateAsync(submissionT);
+                await _unitOfWork.SaveChangesAsync();
+                await _unitOfWork.CommitTransactionAsync();
+
+                return new BaseResponseModel
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status409Conflict,
+                    Message = "Phát hiện đề tài tương tự. Vui lòng xem lại hoặc điều chỉnh đề tài."
+                };
+            }
+
+            //* Pass: cập nhật AI và tiến hành đổi trạng thái
+            submissionT.AiCheckStatus = AiCheckStatus.Passed;
+            submissionT.AiCheckDetails = keywords.Count > 0 ? $"AI keywords: {string.Join(", ", keywords)}" : "AI skipped/no keywords";
+            submissionT.Status = SubmissionStatus.UnderReview;
+            submissionT.SubmittedAt = DateTime.Now;
+            submissionT.SubmissionRound += 1;
+            submissionT.TopicVersionId = topicVersion.Id;
+            await submissionRepoT.UpdateAsync(submissionT);
+
+            var topicVersionT = await versionRepoT.GetSingleAsync(new QueryBuilder<TopicVersion>()
+                .WithPredicate(x => x.Id == topicVersion.Id && x.IsActive && x.DeletedAt == null)
+                .WithTracking(true)
+                .Build());
+            topicVersionT.Status = TopicStatus.Submitted;
+            await versionRepoT.UpdateAsync(topicVersionT);
 
             var moderators = await _identityRepository.GetUsersInRoleAsync(SystemRoleConstants.Moderator);
             var moderatorIds = moderators.Select(x => (int)x.Id).Distinct().ToList();
