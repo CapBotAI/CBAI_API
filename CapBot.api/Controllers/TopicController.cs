@@ -1,3 +1,4 @@
+using App.BLL.Implementations;
 using App.BLL.Interfaces;
 using App.Commons;
 using App.Commons.BaseAPI;
@@ -350,6 +351,58 @@ namespace CapBot.api.Controllers
             {
                 _logger.LogError(ex, "Error occurred while getting my topics");
                 return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        [Authorize]
+        [HttpGet("check-duplicate/{topicId}")]
+        [SwaggerOperation(
+                Summary = "Kiểm tra Topic có bị trùng hay không",
+                Description = "Nhận vào TopicId; nếu có trùng trả danh sách topic trùng + kỳ + supervisor; nếu không trùng trả 'topic passed'"
+                            )]
+        [SwaggerResponse(200, "Kiểm tra thành công")]
+        [SwaggerResponse(404, "Topic không tồn tại")]
+        public async Task<IActionResult> CheckDuplicate(int topicId, [FromQuery] double threshold = 0.6)
+        {
+            try
+            {
+                var result = await _topicService.CheckDuplicateByTopicIdAsync(topicId, threshold);
+                if (!result.IsSuccess)
+                    return ProcessServiceResponse(result);
+
+                // Trả đúng format yêu cầu
+                var data = result.Data!;
+                if (data.IsDuplicate)
+                {
+                    return Ok(new
+                    {
+                        isDuplicate = true,
+                        queryTopicId = data.QueryTopicId,
+                        queryTopicTitle = data.QueryTopicTitle,
+                        duplicates = data.Duplicates.Select(d => new
+                        {
+                            topicId = d.TopicId,
+                            title = d.Title,
+                            semesterName = d.SemesterName,
+                            supervisorName = d.SupervisorName,
+                            similarityScore = d.SimilarityScore,
+                            similarityPercentage = d.SimilarityPercentage
+                        })
+                    });
+                }
+
+                return Ok(new
+                {
+                    isDuplicate = false,
+                    message = "topic passed",
+                    queryTopicId = data.QueryTopicId,
+                    queryTopicTitle = data.QueryTopicTitle
+                });
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error checking duplicate for topic {TopicId}", topicId);
+                return Error("Lỗi kiểm tra trùng lặp");
             }
         }
     }

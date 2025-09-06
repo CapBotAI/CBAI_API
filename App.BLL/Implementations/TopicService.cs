@@ -22,13 +22,21 @@ public class TopicService : ITopicService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IIdentityRepository _identityRepository;
     private readonly INotificationService _notificationService;
+    private readonly IAIService _aiService;
+    private readonly IElasticsearchService _elasticsearchService;
 
 
-    public TopicService(IUnitOfWork unitOfWork, IIdentityRepository identityRepository, INotificationService notificationService)
+    public TopicService(IUnitOfWork unitOfWork,
+     IIdentityRepository identityRepository,
+     INotificationService notificationService,
+     IAIService aiService,
+     IElasticsearchService elasticsearchService)
     {
         this._unitOfWork = unitOfWork;
         this._identityRepository = identityRepository;
         this._notificationService = notificationService;
+        this._aiService = aiService;
+        this._elasticsearchService = elasticsearchService;
 
     }
 
@@ -560,6 +568,84 @@ public class TopicService : ITopicService
         catch (System.Exception)
         {
             throw;
+        }
+    }
+    public async Task<BaseResponseModel<TopicDuplicateCheckResDTO>> CheckDuplicateByTopicIdAsync(int topicId, double threshold = 0.6)
+    {
+        try
+        {
+            var topicRepo = _unitOfWork.GetRepo<Topic>();
+            var topic = await topicRepo.GetSingleAsync(new App.DAL.Queries.Implementations.QueryBuilder<Topic>()
+                .WithPredicate(x => x.Id == topicId && x.IsActive && x.DeletedAt == null)
+                .WithTracking(false)
+                .Build());
+
+            if (topic == null)
+            {
+                return new BaseResponseModel<TopicDuplicateCheckResDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Topic không tồn tại"
+                };
+            }
+
+            var title = topic.Title;
+            var description = topic.Description;
+            var keywords = await _aiService.GenerateKeywordsAsync(title, description);
+
+            // Nếu AI không trả từ khóa, fallback dùng tiêu đề/mô tả
+            var query = keywords.Count > 0
+                ? string.Join(" ", keywords.Distinct())
+                : $"{title} {description}".Trim();
+
+            var searchRes = await _elasticsearchService.FindSimilarTopicsAsync(topicId, threshold);
+            if (!searchRes.IsSuccess || searchRes.Data == null)
+            {
+                return new BaseResponseModel<TopicDuplicateCheckResDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = "Không thể tìm kiếm trùng lặp vào lúc này"
+                };
+            }
+
+            var duplicates = searchRes.Data.SimilarTopics
+                .Where(s => s.TopicId != topicId)
+                .Select(s => new TopicDuplicateItemDTO
+                {
+                    TopicId = s.TopicId,
+                    Title = s.Title,
+                    SemesterName = s.SemesterName,
+                    SupervisorName = s.SupervisorName,
+                    SimilarityScore = s.SimilarityScore
+                })
+                .ToList();
+
+            var response = new TopicDuplicateCheckResDTO
+            {
+                QueryTopicId = topic.Id,
+                QueryTopicTitle = topic.Title,
+                IsDuplicate = duplicates.Any(),
+                Message = duplicates.Any() ? "found duplicates" : "topic passed",
+                Duplicates = duplicates
+            };
+
+            return new BaseResponseModel<TopicDuplicateCheckResDTO>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Data = response
+            };
+        }
+        catch (Exception ex)
+        {
+            return new BaseResponseModel<TopicDuplicateCheckResDTO>
+            {
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = $"Lỗi kiểm tra trùng lặp: {ex.Message}"
+            };
         }
     }
 }
