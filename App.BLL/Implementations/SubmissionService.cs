@@ -765,6 +765,7 @@ public class SubmissionService : ISubmissionService
             var submission = await submissionRepo.GetSingleAsync(new QueryBuilder<Submission>()
                 .WithPredicate(x => x.Id == id && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.TopicVersion)
+                .WithInclude(x => x.Topic)
                 .WithInclude(x => x.Phase)
                 .WithInclude(x => x.SubmittedByUser)
                 .WithTracking(false)
@@ -830,6 +831,7 @@ public class SubmissionService : ISubmissionService
             var qb = new QueryBuilder<Submission>()
                 .WithPredicate(predicate)
                 .WithInclude(x => x.SubmittedByUser)
+                 .WithInclude(x => x.Topic)
                 .WithTracking(false);
 
             // Lọc theo SemesterId qua join Phase.SemesterId nếu có
