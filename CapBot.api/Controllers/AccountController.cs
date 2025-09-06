@@ -25,7 +25,7 @@ namespace CapBot.api.Controllers
         /// Thêm roles cho người dùng
         /// </summary>
         /// <returns>Thông tin chi tiết người dùng sau khi thêm role</returns>
-        [Authorize(SystemRoleConstants.Administrator)]
+        [Authorize(Roles = SystemRoleConstants.Administrator)]
         [HttpPost("user-roles/{userId}")]
         [SwaggerOperation(
             Summary = "Thêm roles cho người dùng",
