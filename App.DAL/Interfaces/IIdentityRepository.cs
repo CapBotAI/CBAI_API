@@ -1,5 +1,6 @@
 using System;
 using App.Commons.ResponseModel;
+using App.Entities.DTOs.Accounts;
 using App.Entities.Entities.Core;
 using Microsoft.AspNetCore.Identity;
 
@@ -16,6 +17,13 @@ public interface IIdentityRepository
     Task<bool> CheckPasswordAsync(User dto, string password);
     Task<bool> HasPasswordAsync(User dto);
     Task<IdentityResult> AddPasswordAsync(User dto, string password);
+
+    /// <summary>
+    ///get paginated list user
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns></returns>
+    Task<List<User>> GetAccounts(GetUsersQueryDTO dto);
 
     /// <summary>
     /// lấy thông tin user theo điện thoại
@@ -78,6 +86,14 @@ public interface IIdentityRepository
     /// <param name="roles"></param>
     /// <returns></returns>
     Task<bool> AddRolesToUserAsync(User user, List<string> roles);
+
+    /// <summary>
+    /// Removes a list of roles from a user.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="roles"></param>
+    /// <returns></returns>
+    Task<bool> RemoveRolesFromUserAsync(User user, List<string> roles);
 
     /// <summary>
     /// generate email confirm token

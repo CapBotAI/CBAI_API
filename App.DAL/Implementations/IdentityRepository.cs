@@ -1,9 +1,11 @@
 using System;
 using System.Web;
+using App.Commons.Extensions;
 using App.Commons.ResponseModel;
 using App.DAL.Context;
 using App.DAL.Interfaces;
 using App.DAL.UnitOfWork;
+using App.Entities.DTOs.Accounts;
 using App.Entities.Entities.Core;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -75,19 +77,21 @@ public class IdentityRepository : IIdentityRepository
         }
     }
 
-    // public async Task<List<User>> GetAccounts(AccountGetListDTO dto)
-    // {
-    //     var users = _userManager.Users
-    //     .AsNoTracking()
-    //     .AsQueryable();
+    public async Task<List<User>> GetAccounts(GetUsersQueryDTO dto)
+    {
+        var users = _userManager.Users
+        .AsNoTracking()
+        .AsQueryable();
 
-    //     if (!string.IsNullOrEmpty(dto.Keyword))
-    //         users = users.Where(x => x.Email.Contains(dto.Keyword) || x.UserName.Contains(dto.Keyword));
+        users = users.Where(x => x.DeletedAt == null);
 
-    //     dto.TotalRecord = await users.CountAsync();
-    //     var response = await users.ToPagedList(dto.PageNumber, dto.PageSize).ToListAsync();
-    //     return response;
-    // }
+        if (!string.IsNullOrEmpty(dto.Keyword))
+            users = users.Where(x => x.Email.Contains(dto.Keyword) || x.UserName.Contains(dto.Keyword));
+
+        dto.TotalRecord = await users.CountAsync();
+        var response = await users.ToPagedList(dto.PageNumber, dto.PageSize).ToListAsync();
+        return response;
+    }
 
     /// <summary>
     /// This is used to find a user by Email or UserName
@@ -133,9 +137,10 @@ public class IdentityRepository : IIdentityRepository
         return -1;
     }
 
-    public Task<bool> UpdateAsync(User dto)
+    public async Task<bool> UpdateAsync(User user)
     {
-        throw new NotImplementedException();
+        var result = await _userManager.UpdateAsync(user);
+        return result.Succeeded;
     }
 
     public async Task<User?> GetByIdAsync(long id)
@@ -267,6 +272,19 @@ public class IdentityRepository : IIdentityRepository
     public async Task<bool> AddRolesToUserAsync(User user, List<string> roles)
     {
         var result = await _userManager.AddToRolesAsync(user, roles);
+        return result.Succeeded;
+    }
+
+
+    /// <summary>
+    /// Removes a list of roles from a user.
+    /// </summary>
+    /// <param name="user"></param>
+    /// <param name="roles"></param>
+    /// <returns></returns>
+    public async Task<bool> RemoveRolesFromUserAsync(User user, List<string> roles)
+    {
+        var result = await _userManager.RemoveFromRolesAsync(user, roles);
         return result.Succeeded;
     }
 

@@ -18,8 +18,8 @@ public class ReviewerAssignmentResponseDTO
     public DateTime? CompletedAt { get; set; }
 
     // Navigation properties
-    public UserViewDTO? Reviewer { get; set; }
-    public UserViewDTO? AssignedByUser { get; set; }
+    public UserOverviewDTO? Reviewer { get; set; }
+    public UserOverviewDTO? AssignedByUser { get; set; }
     public string? SubmissionTitle { get; set; }
     public string? TopicTitle { get; set; }
 }
