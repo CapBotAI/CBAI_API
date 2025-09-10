@@ -252,7 +252,7 @@ public class AccountService : IAccountService
             foreach (var user in users)
             {
                 var roles = await _identityRepository.GetUserRolesAsync(user.Id);
-                userOverviews.Add(new UserOverviewDTO(user, roles.Select(r => r.Name).Take(1).FirstOrDefault()));
+                userOverviews.Add(new UserOverviewDTO(user, roles));
             }
             return new BaseResponseModel<PagingDataModel<UserOverviewDTO, GetUsersQueryDTO>>
             {
