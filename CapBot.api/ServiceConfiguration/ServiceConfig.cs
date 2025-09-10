@@ -3,6 +3,7 @@ using App.BLL.Interfaces;
 using App.BLL.Mapper;
 using App.BLL.Services;
 using App.Commons.Interfaces;
+using App.Commons.Services;
 using App.DAL.Implementations;
 using App.DAL.Interfaces;
 using App.DAL.UnitOfWork;
@@ -72,6 +73,9 @@ public class ServiceConfig
 
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
+
+        //Email Service
+        services.AddScoped<IEmailService, EmailService>();
 
         // Reviewer Suggestion Service
         services.AddScoped<IReviewerSuggestionService, ReviewerSuggestionService>();
