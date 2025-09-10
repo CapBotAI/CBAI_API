@@ -1,6 +1,10 @@
 using System;
 using App.BLL.Interfaces;
+using App.Commons;
+using App.Commons.Email;
+using App.Commons.Email.Interfaces;
 using App.Commons.Extensions;
+using App.Commons.Interfaces;
 using App.Commons.Paging;
 using App.Commons.ResponseModel;
 using App.DAL.Interfaces;
@@ -13,6 +17,7 @@ using App.Entities.Entities.App;
 using App.Entities.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace App.BLL.Implementations;
@@ -24,19 +29,30 @@ public class TopicService : ITopicService
     private readonly INotificationService _notificationService;
     private readonly IAIService _aiService;
     private readonly IElasticsearchService _elasticsearchService;
-
+    private readonly IEmailService _emailService;
+    private readonly IPathProvider _pathProvider;
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<TopicService> _logger;
 
     public TopicService(IUnitOfWork unitOfWork,
-     IIdentityRepository identityRepository,
-     INotificationService notificationService,
-     IAIService aiService,
-     IElasticsearchService elasticsearchService)
+    IIdentityRepository identityRepository,
+    INotificationService notificationService,
+    IAIService aiService,
+    IElasticsearchService elasticsearchService,
+    IEmailService emailService,
+    IPathProvider pathProvider,
+    IConfiguration configuration,
+    ILogger<TopicService> logger)
     {
         this._unitOfWork = unitOfWork;
         this._identityRepository = identityRepository;
         this._notificationService = notificationService;
         this._aiService = aiService;
         this._elasticsearchService = elasticsearchService;
+        this._emailService = emailService;
+        this._pathProvider = pathProvider;
+        this._configuration = configuration;
+        this._logger = logger;
 
     }
 
@@ -162,6 +178,38 @@ public class TopicService : ITopicService
             topic.Supervisor = user;
             topic.Category = category;
             topic.Semester = semester;
+
+            //Email sender
+            var adminEmail = _configuration["AdminAccount:Email"];
+            if (!string.IsNullOrWhiteSpace(adminEmail))
+            {
+                try
+                {
+                    var templatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Topic", "CreateTopic.html"));
+                    var html = await File.ReadAllTextAsync(templatePath);
+
+                    var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/admin/topics/{topic.Id}";
+
+                    var body = new ContentBuilder(html)
+                        .BuildCallback(new List<ObjectReplace>
+                        {
+                new ObjectReplace { Name = "__calback_url__", Value = callbackUrl }
+                        })
+                        .GetContent();
+
+                    var mail = new EmailModel(new[] { adminEmail }, $"Chủ đề mới: {topic.Title}", body)
+                    {
+                        BodyHtml = body
+                    };
+
+                    await _emailService.SendEmailAsync(mail);
+                }
+                catch (Exception ex)
+                {
+                    // avoid breaking the flow if email fails
+                    _logger.LogError(ex.Message, ex.StackTrace, "Failed to send email to admin about new topic created");
+                }
+            }
 
             return new BaseResponseModel<CreateTopicResDTO>
             {
@@ -570,6 +618,7 @@ public class TopicService : ITopicService
             throw;
         }
     }
+
     public async Task<BaseResponseModel<TopicDuplicateCheckResDTO>> CheckDuplicateByTopicIdAsync(int topicId, double threshold = 0.6)
     {
         try

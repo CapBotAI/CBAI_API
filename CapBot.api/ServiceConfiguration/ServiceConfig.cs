@@ -1,6 +1,9 @@
 using App.BLL.Implementations;
 using App.BLL.Interfaces;
 using App.BLL.Mapper;
+using App.Commons.Email.Implementations;
+using App.Commons.Email.Interfaces;
+using App.Commons.Email.Options;
 using App.BLL.Services;
 using App.Commons.Interfaces;
 using App.Commons.Services;
@@ -76,6 +79,8 @@ public class ServiceConfig
 
         //Email Service
         services.AddScoped<IEmailService, EmailService>();
+        services.Configure<EmailTemplateOptions>(configuration.GetSection("EmailTemplates"));
+        services.AddScoped<IPathProvider, PathProvider>();
 
         // Reviewer Suggestion Service
         services.AddScoped<IReviewerSuggestionService, ReviewerSuggestionService>();
