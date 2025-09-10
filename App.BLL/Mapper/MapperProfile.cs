@@ -1,3 +1,4 @@
+using App.Entities.DTOs.Accounts;
 using App.Entities.DTOs.EvaluationCriteria;
 using App.Entities.DTOs.Review;
 using App.Entities.DTOs.ReviewComment;
@@ -12,6 +13,10 @@ public class MapperProfile : Profile
 {
     public MapperProfile()
     {
+        
+        CreateMap<User, UserOverviewDTO>()
+            .ConstructUsing(src => new UserOverviewDTO(src, null));
+        
         CreateMap<ReviewerAssignment, ReviewerAssignmentResponseDTO>()
             .ForMember(dest => dest.Reviewer, opt => opt.MapFrom(src => src.Reviewer))
             .ForMember(dest => dest.AssignedByUser, opt => opt.MapFrom(src => src.AssignedByUser))

@@ -995,6 +995,15 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                     Message = "Assignment không ở trạng thái có thể bắt đầu review"
                 };
             }
+            if (assignment.Deadline.HasValue && assignment.Deadline < DateTime.UtcNow)
+            {
+                return new BaseResponseModel<ReviewerAssignmentResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Assignment đã quá hạn deadline, không thể bắt đầu review"
+                };
+            }
 
             assignment.Status = AssignmentStatus.InProgress;
             assignment.StartedAt = DateTime.UtcNow;

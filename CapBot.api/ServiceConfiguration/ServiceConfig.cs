@@ -87,7 +87,8 @@ public class ServiceConfig
         services.AddScoped<ISubmissionReviewService, SubmissionReviewService>();
         services.AddScoped<IReviewCommentService, ReviewCommentService>();
 
-        services.AddScoped<IElasticsearchService, ElasticsearchService>();
+        services.AddHostedService<DeadlineNotificationService>();
+
         // AI Service
         services.AddScoped<IAIService, GeminiService>();
         services.AddScoped<IElasticsearchService, ElasticsearchService>();
