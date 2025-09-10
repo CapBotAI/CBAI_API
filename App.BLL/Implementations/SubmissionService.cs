@@ -831,7 +831,7 @@ public class SubmissionService : ISubmissionService
             var qb = new QueryBuilder<Submission>()
                 .WithPredicate(predicate)
                 .WithInclude(x => x.SubmittedByUser)
-                 .WithInclude(x => x.Topic)
+                .WithInclude(x => x.Topic)
                 .WithTracking(false);
 
             // Lọc theo SemesterId qua join Phase.SemesterId nếu có
@@ -911,7 +911,7 @@ public class SubmissionService : ISubmissionService
                 };
             }
 
-            if (submission.Status == SubmissionStatus.UnderReview || submission.Status == SubmissionStatus.Completed)
+            if (submission.Status == SubmissionStatus.UnderReview || submission.Status == SubmissionStatus.Approved)
             {
                 return new BaseResponseModel
                 {

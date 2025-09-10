@@ -204,7 +204,7 @@ public class SubmissionReviewService : ISubmissionReviewService
                     }
                     else
                     {
-                        submission.Status = SubmissionStatus.Completed; // Approved
+                        submission.Status = SubmissionStatus.Approved;
                     }
                 }
                 else if ((approveCount > 0 && rejectCount > 0) || 
@@ -394,7 +394,7 @@ public class SubmissionReviewService : ISubmissionReviewService
             switch (moderatorDTO.FinalRecommendation)
             {
                 case ReviewRecommendations.Approve:
-                    submission.Status = SubmissionStatus.Completed;
+                    submission.Status = SubmissionStatus.Approved; 
                     break;
                 case ReviewRecommendations.MinorRevision:
                 case ReviewRecommendations.MajorRevision:
