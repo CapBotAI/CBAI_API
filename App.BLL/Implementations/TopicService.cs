@@ -187,15 +187,17 @@ public class TopicService : ITopicService
                 {
                     var templatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Topic", "CreateTopic.html"));
                     var html = await File.ReadAllTextAsync(templatePath);
+                    _logger.LogInformation("Email template path: {path}", templatePath);
+                    _logger.LogInformation("Email template content: {html}", html);
 
-                    // var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/admin/topics/{topic.Id}";
-
-                    var callbackUrl = $"https://www.facebook.com/";
+                    var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/topic/detail/{topic.Id}";
 
                     var body = new ContentBuilder(html)
                         .BuildCallback(new List<ObjectReplace>
                         {
-                            new ObjectReplace { Name = "__calback_url__", Value = callbackUrl }
+                            new ObjectReplace { Name = "__calback_url__", Value = callbackUrl },
+                            new ObjectReplace { Name = "__user_name__", Value = user.UserName },
+                            new ObjectReplace { Name = "__topic_title__", Value = topic.Title }
                         })
                         .GetContent();
 
@@ -203,6 +205,7 @@ public class TopicService : ITopicService
                     {
                         BodyHtml = body
                     };
+
 
                     await _emailService.SendEmailAsync(mail);
                 }

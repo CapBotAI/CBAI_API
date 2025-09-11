@@ -1,5 +1,6 @@
 using App.Commons.Interfaces;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 using MimeKit;
 
 namespace App.Commons.Services;
@@ -7,10 +8,14 @@ namespace App.Commons.Services;
 public class EmailService : IEmailService
 {
     private readonly IConfiguration _configuration;
+    private readonly ILogger<EmailService> _logger;
 
-    public EmailService(IConfiguration configuration)
+
+    public EmailService(IConfiguration configuration, ILogger<EmailService> logger)
     {
         this._configuration = configuration;
+        this._logger = logger;
+
     }
     public async Task<bool> SendEmailAsync(EmailModel emailModel)
     {
@@ -33,18 +38,29 @@ public class EmailService : IEmailService
         }
 
         var email = CreateEmailMessage(emailModel);
-        var client = new MailKit.Net.Smtp.SmtpClient();
+        using var client = new MailKit.Net.Smtp.SmtpClient
+        {
+            Timeout = 10000
+        };
+        using var cts = new CancellationTokenSource(TimeSpan.FromSeconds(10));
         try
         {
-            await client.ConnectAsync(smtpServer, port, true);
+            await client.ConnectAsync(smtpServer, port, MailKit.Security.SecureSocketOptions.SslOnConnect, cts.Token);
             client.AuthenticationMechanisms.Remove("XOAUTH2");
-            await client.AuthenticateAsync(userName, password);
-            await client.SendAsync(email);
+            await client.AuthenticateAsync(userName, password, cts.Token);
+            await client.SendAsync(email, cts.Token);
             return true;
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            _logger.LogError(ex.Message, ex.StackTrace, "Error occurred while sending email.");
+            return false; // không throw để tránh làm fail logic gọi
+        }
+        finally
+        {
+            if (client.IsConnected)
+                await client.DisconnectAsync(true, CancellationToken.None);
+            client.Dispose();
         }
     }
 
@@ -59,7 +75,8 @@ public class EmailService : IEmailService
     private MimeMessage CreateEmailMessage(EmailModel emailModel)
     {
         var emailMessage = new MimeMessage();
-        emailMessage.From.Add(new MailboxAddress("LERM System", _configuration["EmailConfiguration:From"]));
+        var displayName = _configuration["EmailConfiguration:DisplayName"] ?? "CapBot Team";
+        emailMessage.From.Add(new MailboxAddress(displayName, _configuration["EmailConfiguration:From"]));
         emailMessage.To.AddRange(emailModel.To);
         emailMessage.Subject = emailModel.Subject;
         emailMessage.Body = new TextPart(MimeKit.Text.TextFormat.Html) { Text = emailModel.BodyHtml };
