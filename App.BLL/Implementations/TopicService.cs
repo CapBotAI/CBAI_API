@@ -188,12 +188,14 @@ public class TopicService : ITopicService
                     var templatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Topic", "CreateTopic.html"));
                     var html = await File.ReadAllTextAsync(templatePath);
 
-                    var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/admin/topics/{topic.Id}";
+                    // var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/admin/topics/{topic.Id}";
+
+                    var callbackUrl = $"https://www.facebook.com/";
 
                     var body = new ContentBuilder(html)
                         .BuildCallback(new List<ObjectReplace>
                         {
-                new ObjectReplace { Name = "__calback_url__", Value = callbackUrl }
+                            new ObjectReplace { Name = "__calback_url__", Value = callbackUrl }
                         })
                         .GetContent();
 
