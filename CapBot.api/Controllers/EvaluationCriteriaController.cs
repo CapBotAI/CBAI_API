@@ -197,5 +197,58 @@ namespace CapBot.api.Controllers
                 return Error(ConstantModel.ErrorMessage);
             }
         }
+        
+
+        /// <summary>
+        /// Lấy tiêu chí đánh giá theo semester hiện tại
+        /// </summary>
+        /// <returns>Danh sách tiêu chí đánh giá của semester hiện tại</returns>
+        [HttpGet("current-semester")]
+        [SwaggerOperation(
+            Summary = "Lấy tiêu chí đánh giá theo semester hiện tại",
+            Description = "Lấy danh sách tiêu chí đánh giá áp dụng cho semester hiện tại"
+        )]
+        [SwaggerResponse(200, "Lấy danh sách thành công")]
+        [SwaggerResponse(404, "Không tìm thấy semester hiện tại")]
+        [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
+        public async Task<IActionResult> GetCurrentSemesterCriteria()
+        {
+            try
+            {
+                var result = await _evaluationCriteriaService.GetCurrentSemesterCriteriaAsync();
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting current semester criteria");
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
+
+        /// <summary>
+        /// Lấy tiêu chí đánh giá theo semester ID
+        /// </summary>
+        /// <param name="semesterId">ID của semester (null = tiêu chí chung)</param>
+        /// <returns>Danh sách tiêu chí đánh giá</returns>
+        [HttpGet("by-semester/{semesterId?}")]
+        [SwaggerOperation(
+            Summary = "Lấy tiêu chí đánh giá theo semester",
+            Description = "Lấy danh sách tiêu chí đánh giá của semester cụ thể"
+        )]
+        [SwaggerResponse(200, "Lấy danh sách thành công")]
+        [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
+        public async Task<IActionResult> GetBySemester(int? semesterId = null)
+        {
+            try
+            {
+                var result = await _evaluationCriteriaService.GetBySemesterAsync(semesterId);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while getting criteria by semester {SemesterId}", semesterId);
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
     }
 }

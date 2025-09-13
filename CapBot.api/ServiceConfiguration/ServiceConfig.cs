@@ -1,8 +1,12 @@
 using App.BLL.Implementations;
 using App.BLL.Interfaces;
 using App.BLL.Mapper;
+using App.Commons.Email.Implementations;
+using App.Commons.Email.Interfaces;
+using App.Commons.Email.Options;
 using App.BLL.Services;
 using App.Commons.Interfaces;
+using App.Commons.Services;
 using App.DAL.Implementations;
 using App.DAL.Interfaces;
 using App.DAL.UnitOfWork;
@@ -73,6 +77,11 @@ public class ServiceConfig
         //Data Seeder Service
         services.AddScoped<IDataSeederService, DataSeederService>();
 
+        //Email Service
+        services.AddScoped<IEmailService, EmailService>();
+        services.Configure<EmailTemplateOptions>(configuration.GetSection("EmailTemplates"));
+        services.AddScoped<IPathProvider, PathProvider>();
+
         // Reviewer Suggestion Service
         services.AddScoped<IReviewerSuggestionService, ReviewerSuggestionService>();
         services.AddScoped<IReviewerAssignmentService, ReviewerAssignmentService>();
@@ -87,7 +96,8 @@ public class ServiceConfig
         services.AddScoped<ISubmissionReviewService, SubmissionReviewService>();
         services.AddScoped<IReviewCommentService, ReviewCommentService>();
 
-        services.AddScoped<IElasticsearchService, ElasticsearchService>();
+        services.AddHostedService<DeadlineNotificationService>();
+
         // AI Service
         services.AddScoped<IAIService, GeminiService>();
         services.AddScoped<IElasticsearchService, ElasticsearchService>();

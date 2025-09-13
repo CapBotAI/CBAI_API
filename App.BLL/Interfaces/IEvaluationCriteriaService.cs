@@ -12,4 +12,7 @@ public interface IEvaluationCriteriaService
     Task<BaseResponseModel<EvaluationCriteriaResponseDTO>> GetByIdAsync(int id);
     Task<BaseResponseModel<PagingDataModel<EvaluationCriteriaResponseDTO>>> GetAllAsync(PagingModel pagingModel);
     Task<BaseResponseModel<List<EvaluationCriteriaResponseDTO>>> GetAllActiveAsync();
+
+    Task<BaseResponseModel<List<EvaluationCriteriaResponseDTO>>> GetBySemesterAsync(int? semesterId);
+    Task<BaseResponseModel<List<EvaluationCriteriaResponseDTO>>> GetCurrentSemesterCriteriaAsync();
 }

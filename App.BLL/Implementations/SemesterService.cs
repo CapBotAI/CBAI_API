@@ -205,4 +205,42 @@ public class SemesterService : ISemesterService
             throw;
         }
     }
+    public async Task<BaseResponseModel<SemesterOverviewResDTO>> GetCurrentSemesterAsync()
+    {
+        try
+        {
+            var semesterRepo = _unitOfWork.GetRepo<App.Entities.Entities.App.Semester>();
+            var currentDate = DateTime.Now;
+
+            var currentSemester = await semesterRepo.GetSingleAsync(new QueryBuilder<Semester>()
+                .WithPredicate(x => x.IsActive &&
+                                    x.DeletedAt == null &&
+                                    x.StartDate <= currentDate &&
+                                    x.EndDate >= currentDate)
+                .WithTracking(false)
+                .Build());
+
+            if (currentSemester == null)
+            {
+                return new BaseResponseModel<SemesterOverviewResDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Không tìm thấy học kỳ hiện tại"
+                };
+            }
+
+            return new BaseResponseModel<SemesterOverviewResDTO>
+            {
+                Data = new SemesterOverviewResDTO(currentSemester),
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Lấy thông tin học kỳ hiện tại thành công"
+            };
+        }
+        catch (System.Exception)
+        {
+            throw;
+        }
+    }
 }

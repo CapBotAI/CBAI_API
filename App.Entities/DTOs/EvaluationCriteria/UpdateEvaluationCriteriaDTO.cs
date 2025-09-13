@@ -35,4 +35,9 @@ public class UpdateEvaluationCriteriaDTO
     /// </summary>
     [Range(0.1, 10.0, ErrorMessage = "Trọng số phải từ 0.1 đến 10.0")]
     public decimal Weight { get; set; } = 1.00m;
+
+    /// <summary>
+    /// ID của học kỳ (tùy chọn, nếu null thì áp dụng cho tất cả học kỳ)
+    /// </summary>
+    public int? SemesterId { get; set; }
 }

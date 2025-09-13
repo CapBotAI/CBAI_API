@@ -22,26 +22,50 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         _mapper = mapper;
     }
 
-    public async Task<BaseResponseModel<EvaluationCriteriaResponseDTO>> CreateAsync(CreateEvaluationCriteriaDTO createDTO)
+    public async Task<BaseResponseModel<EvaluationCriteriaResponseDTO>> CreateAsync(
+        CreateEvaluationCriteriaDTO createDTO)
     {
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-            
-            // Kiểm tra tên tiêu chí đã tồn tại chưa
+
+
+            if (createDTO.SemesterId.HasValue)
+            {
+                var semesterRepo = _unitOfWork.GetRepo<Semester>();
+                var semesterExists = await semesterRepo.AnyAsync(new QueryOptions<Semester>
+                {
+                    Predicate = x => x.Id == createDTO.SemesterId.Value && x.IsActive
+                });
+
+                if (!semesterExists)
+                {
+                    return new BaseResponseModel<EvaluationCriteriaResponseDTO>
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Học kỳ không tồn tại"
+                    };
+                }
+            }
+
+
             var existingCriteria = await repo.GetSingleAsync(new QueryOptions<EvaluationCriteria>
             {
-                Predicate = x => x.Name.ToLower() == createDTO.Name.ToLower() && x.IsActive,
+                Predicate = x => x.Name.ToLower() == createDTO.Name.ToLower() &&
+                                 x.IsActive &&
+                                 x.SemesterId == createDTO.SemesterId, // So sánh cả SemesterId
                 Tracked = false
             });
 
             if (existingCriteria != null)
             {
+                var semesterInfo = createDTO.SemesterId.HasValue ? $" trong học kỳ này" : " (áp dụng chung)";
                 return new BaseResponseModel<EvaluationCriteriaResponseDTO>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status409Conflict,
-                    Message = "Tên tiêu chí đánh giá đã tồn tại"
+                    Message = $"Tên tiêu chí đánh giá đã tồn tại{semesterInfo}"
                 };
             }
 
@@ -82,12 +106,121 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         }
     }
 
-    public async Task<BaseResponseModel<EvaluationCriteriaResponseDTO>> UpdateAsync(UpdateEvaluationCriteriaDTO updateDTO)
+
+    public async Task<BaseResponseModel<List<EvaluationCriteriaResponseDTO>>> GetBySemesterAsync(int? semesterId)
     {
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-            
+
+            var criteria = await repo.GetAllAsync(new QueryOptions<EvaluationCriteria>
+            {
+                Predicate = x => x.IsActive &&
+                                 (x.SemesterId == semesterId || (semesterId == null && x.SemesterId == null)),
+                Tracked = false,
+                OrderBy = q => q.OrderBy(x => x.Name)
+            });
+
+            var responseItems = _mapper.Map<List<EvaluationCriteriaResponseDTO>>(criteria);
+
+            return new BaseResponseModel<List<EvaluationCriteriaResponseDTO>>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Data = responseItems
+            };
+        }
+        catch (Exception ex)
+        {
+            return new BaseResponseModel<List<EvaluationCriteriaResponseDTO>>
+            {
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = $"Lỗi hệ thống: {ex.Message}"
+            };
+        }
+    }
+
+    // THÊM method này vào class EvaluationCriteriaService
+
+    public async Task<BaseResponseModel<List<EvaluationCriteriaResponseDTO>>> GetCurrentSemesterCriteriaAsync()
+    {
+        try
+        {
+            // 1. Lấy semester hiện tại
+            var semesterRepo = _unitOfWork.GetRepo<Semester>();
+            var currentDate = DateTime.Now;
+
+            var currentSemester = await semesterRepo.GetSingleAsync(new QueryOptions<Semester>
+            {
+                Predicate = x => x.IsActive &&
+                               x.DeletedAt == null &&
+                               x.StartDate <= currentDate &&
+                               x.EndDate >= currentDate,
+                Tracked = false
+            });
+
+            // 2. Lấy criteria theo semester hiện tại
+            var criteriaRepo = _unitOfWork.GetRepo<EvaluationCriteria>();
+
+            IEnumerable<EvaluationCriteria> criteriaEnumerable; // ✅ Đổi thành IEnumerable
+
+            if (currentSemester != null)
+            {
+                // Có semester hiện tại -> lấy criteria của semester này + criteria chung
+                criteriaEnumerable = await criteriaRepo.GetAllAsync(new QueryOptions<EvaluationCriteria>
+                {
+                    Predicate = x => x.IsActive &&
+                                   (x.SemesterId == currentSemester.Id || x.SemesterId == null),
+                    Tracked = false,
+                    OrderBy = q => q.OrderBy(x => x.Name)
+                });
+            }
+            else
+            {
+                // Không có semester hiện tại -> chỉ lấy criteria chung
+                criteriaEnumerable = await criteriaRepo.GetAllAsync(new QueryOptions<EvaluationCriteria>
+                {
+                    Predicate = x => x.IsActive && x.SemesterId == null,
+                    Tracked = false,
+                    OrderBy = q => q.OrderBy(x => x.Name)
+                });
+            }
+
+            // ✅ Convert sang List nếu cần
+            var criteria = criteriaEnumerable.ToList();
+
+            var responseItems = _mapper.Map<List<EvaluationCriteriaResponseDTO>>(criteria);
+
+            var message = currentSemester != null
+                ? $"Lấy tiêu chí đánh giá của học kỳ '{currentSemester.Name}' thành công"
+                : "Lấy tiêu chí đánh giá chung thành công (không có học kỳ hiện tại)";
+
+            return new BaseResponseModel<List<EvaluationCriteriaResponseDTO>>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = message,
+                Data = responseItems
+            };
+        }
+        catch (Exception ex)
+        {
+            return new BaseResponseModel<List<EvaluationCriteriaResponseDTO>>
+            {
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = $"Lỗi hệ thống: {ex.Message}"
+            };
+        }
+    }
+    public async Task<BaseResponseModel<EvaluationCriteriaResponseDTO>> UpdateAsync(
+        UpdateEvaluationCriteriaDTO updateDTO)
+    {
+        try
+        {
+            var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
+
             var criteria = await repo.GetSingleAsync(new QueryOptions<EvaluationCriteria>
             {
                 Predicate = x => x.Id == updateDTO.Id && x.IsActive
@@ -161,7 +294,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-            
+
             var criteria = await repo.GetSingleAsync(new QueryOptions<EvaluationCriteria>
             {
                 Predicate = x => x.Id == id && x.IsActive
@@ -235,7 +368,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-            
+
             var criteria = await repo.GetSingleAsync(new QueryOptions<EvaluationCriteria>
             {
                 Predicate = x => x.Id == id && x.IsActive,
@@ -271,12 +404,13 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         }
     }
 
-    public async Task<BaseResponseModel<PagingDataModel<EvaluationCriteriaResponseDTO>>> GetAllAsync(PagingModel pagingModel)
+    public async Task<BaseResponseModel<PagingDataModel<EvaluationCriteriaResponseDTO>>> GetAllAsync(
+        PagingModel pagingModel)
     {
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-            
+
             var query = repo.Get(new QueryOptions<EvaluationCriteria>
             {
                 Predicate = x => x.IsActive,
@@ -291,7 +425,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
                 .ToListAsync();
 
             var responseItems = _mapper.Map<List<EvaluationCriteriaResponseDTO>>(items);
-            
+
             pagingModel.TotalRecord = totalItems;
             var pagingData = new PagingDataModel<EvaluationCriteriaResponseDTO>(responseItems, pagingModel);
 
@@ -318,7 +452,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
         try
         {
             var repo = _unitOfWork.GetRepo<EvaluationCriteria>();
-            
+
             var criteria = await repo.GetAllAsync(new QueryOptions<EvaluationCriteria>
             {
                 Predicate = x => x.IsActive,

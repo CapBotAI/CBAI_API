@@ -1,0 +1,168 @@
+﻿<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CapBot Thông Báo Tái Nộp Đề Tài</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f5f5;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            margin: 30px auto;
+            background-color: #ffffff;
+            border-radius: 8px;
+            overflow: hidden;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .header {
+            background-color: #6b21a8;
+            /* Màu tím */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+            .header h2 {
+                margin: 0;
+                font-size: 24px;
+            }
+
+        .content {
+            padding: 20px;
+        }
+
+            .content h3 {
+                font-size: 20px;
+                margin-bottom: 12px;
+                margin-top: 12px;
+                color: #4a2566;
+                /* Tông tím đậm hơn */
+            }
+
+            .content p {
+                font-size: 14px;
+                color: #4a2566;
+                /* Tông tím đậm hơn */
+                margin: 10px 0;
+            }
+
+        .btn {
+            display: inline-block;
+            padding: 12px 25px;
+            background-color: #6b21a8;
+            /* Màu tím */
+            color: white;
+            text-decoration: none;
+            border-radius: 4px;
+            font-size: 16px;
+            margin-top: 20px;
+            text-align: center;
+        }
+
+        .footer {
+            background-color: #4a2566;
+            /* Tông tím đậm */
+            padding: 20px;
+            font-size: 14px;
+            color: #fff;
+        }
+
+            .footer .footer-info {
+                margin-bottom: 20px;
+            }
+
+        .footer-info h3 {
+            font-size: 16px;
+            font-weight: 600;
+        }
+
+        .footer-info ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        .footer-info li {
+            margin: 5px 0;
+        }
+
+        .copyright {
+            margin-top: 10px;
+            font-size: 12px;
+            color: #ddd;
+        }
+
+        .btn {
+            color: white;
+            text-decoration: none;
+        }
+
+            .btn:hover {
+                color: white;
+            }
+
+            .btn:active {
+                color: white;
+            }
+
+        .email {
+            color: white;
+            text-decoration: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="
+        max-width: 600px;
+        margin: 0 auto;
+        padding: 20px;
+        font-family: Arial, sans-serif;
+      ">
+        <h2>Xác nhận <strong>tái nộp</strong> đề tài.</h2>
+        <p>Kính gửi <strong>__user_name__</strong>,</p>
+        <p>
+            Chúng tôi đã nhận thấy bạn vừa <strong>tái nộp</strong> 1 submission đề
+            tài của mình. Hãy kiểm tra lại thông tin bên dưới.
+        </p>
+
+        <div style="margin: 20px 0">
+            <p><strong>Thông tin bài nộp:</strong></p>
+            <p>Mã bài nộp: __submission_id__</p>
+            <p>Round nộp: __submission_round__</p>
+            <p>Mã đề tài: __topic_id__</p>
+            <p>Tiêu đề của đề tài: __topic_title__</p>
+            <p>
+                <a href="__topic_url__" target="_blank" style="color: #0066cc">Xem đề tài</a>
+            </p>
+            <p>
+                <a href="__submission_url__" target="_blank" style="color: #0066cc">Xem bài nộp</a>
+            </p>
+        </div>
+
+        <div style="text-align: center; margin: 30px 0">
+            <a href="__callback_url__"
+               style="
+            background-color: #4caf50;
+            color: white;
+            padding: 12px 24px;
+            text-decoration: none;
+            border-radius: 4px;
+            font-weight: bold;
+          ">TRỞ VỀ TRANG CHỦ</a>
+        </div>
+
+        <p>Nếu bạn không thực hiện yêu cầu này, vui lòng bỏ qua email này.</p>
+        <p>Đây là email tự động vui lòng không phản hồi email này.</p>
+        <p>Xin cảm ơn,<br />CAPBOT Team</p>
+    </div>
+</body>
+</html>

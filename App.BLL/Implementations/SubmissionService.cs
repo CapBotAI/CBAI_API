@@ -1,7 +1,11 @@
 using System;
 using System.Linq.Expressions;
 using App.BLL.Interfaces;
+using App.Commons;
+using App.Commons.Email;
+using App.Commons.Email.Interfaces;
 using App.Commons.Extensions;
+using App.Commons.Interfaces;
 using App.Commons.Paging;
 using App.Commons.ResponseModel;
 using App.DAL.Interfaces;
@@ -14,6 +18,8 @@ using App.Entities.Entities.App;
 using App.Entities.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace App.BLL.Implementations;
 
@@ -24,20 +30,32 @@ public class SubmissionService : ISubmissionService
     private readonly INotificationService _notificationService;
     private readonly IAIService _aIService;
     private readonly IElasticsearchService _elasticsearchService;
+    private readonly IEmailService _emailService;
+    private readonly IPathProvider _pathProvider;
+    private readonly IConfiguration _configuration;
 
+    private readonly ILogger<SubmissionService> _logger;
 
     public SubmissionService(IUnitOfWork unitOfWork,
      IIdentityRepository identityRepository,
      INotificationService notificationService,
      IAIService aIService,
-     IElasticsearchService elasticsearchService)
+     IElasticsearchService elasticsearchService,
+     ILogger<SubmissionService> logger,
+     IEmailService emailService,
+     IPathProvider pathProvider,
+     IConfiguration configuration)
     {
         _unitOfWork = unitOfWork;
         _identityRepository = identityRepository;
         _notificationService = notificationService;
         _aIService = aIService;
         _elasticsearchService = elasticsearchService;
+        this._emailService = emailService;
+        this._pathProvider = pathProvider;
+        this._configuration = configuration;
 
+        this._logger = logger;
     }
 
     public async Task<BaseResponseModel<SubmissionDetailDTO>> CreateSubmission(CreateSubmissionDTO dto, int userId)
@@ -415,7 +433,7 @@ public class SubmissionService : ISubmissionService
             }
 
             // ===== AI duplicate check (Gemini + Elasticsearch) ngoài transaction =====
-            var title = submission.TopicVersion?.Title ?? submission.Topic.Title;
+            var title = submission.TopicVersion?.EN_Title ?? submission.Topic.EN_Title;
             var description = submission.TopicVersion?.Description ?? submission.Topic.Description;
             var keywords = await _aIService.GenerateKeywordsAsync(title, description);
 
@@ -446,6 +464,8 @@ public class SubmissionService : ISubmissionService
 
             var submissionT = await submissionRepoT.GetSingleAsync(new QueryBuilder<Submission>()
                 .WithPredicate(x => x.Id == dto.Id && x.IsActive && x.DeletedAt == null)
+                .WithInclude(x => x.Topic)
+                .WithInclude(x => x.Phase)
                 .WithInclude(x => x.TopicVersion)
                 .WithTracking(true)
                 .Build());
@@ -494,7 +514,7 @@ public class SubmissionService : ISubmissionService
                 {
                     UserIds = moderatorIds,
                     Title = "Thông báo về submission mới",
-                    Message = $"Submission #{submissionT.Id} đã được submit với chủ đề {submissionT.Topic.Title}",
+                    Message = $"Submission #{submissionT.Id} đã được submit với chủ đề {submissionT.Topic.EN_Title}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Submission.ToString(),
                     RelatedEntityId = submissionT.Id
@@ -508,6 +528,56 @@ public class SubmissionService : ISubmissionService
 
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
+
+            try
+            {
+                var adminEmail = _configuration["AdminAccount:Email"];
+                var moderatorEmails = moderators.Where(x => !string.IsNullOrEmpty(x.Email)).Select(x => x.Email!).Distinct().ToList();
+                if (moderatorEmails.Count > 0)
+                {
+                    if (moderatorEmails.Any(email => string.IsNullOrWhiteSpace(email)))
+                    {
+                        throw new Exception($"Invalid email address found in moderator emails.");
+                    }
+
+                    var templatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Submission", "submit-topic.html"));
+                    var html = await File.ReadAllTextAsync(templatePath);
+                    _logger.LogInformation("Email template path: {path}", templatePath);
+                    _logger.LogInformation("Email template content: {html}", html);
+
+                    var submissionUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/submission/detail/{submissionT.Id}";
+
+                    var topicUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/topic/detail/{submissionT.Topic.Id}";
+
+                    var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/index.html";
+
+                    var body = new ContentBuilder(html)
+                        .BuildCallback(new List<ObjectReplace>
+                        {
+                            new ObjectReplace { Name = "__submission_id__", Value = submissionT.Id.ToString() },
+                            new ObjectReplace { Name = "__submission_url__", Value = submissionUrl },
+                            new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
+                            new ObjectReplace { Name = "__topic_id__", Value = submissionT.Topic.Id.ToString() },
+                            new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
+                            new ObjectReplace { Name = "__user_name__", Value = user.UserName },
+                            new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.EN_Title }
+                        })
+                        .GetContent();
+
+                    var mail = new EmailModel(new[] { adminEmail }, $"Bài nộp mới: {submissionT.Topic.EN_Title}", body)
+                    {
+                        BodyHtml = body
+                    };
+
+
+                    await _emailService.SendEmailAsync(mail);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message, ex.StackTrace, "Failed to send notifications for submission {SubmissionId}", submissionT.Id);
+
+            }
 
             return new BaseResponseModel
             {
@@ -626,7 +696,7 @@ public class SubmissionService : ISubmissionService
 
             //? ===== AI duplicate check (Gemini + Elasticsearch) =====
             //* (1) Đọc dữ liệu cần thiết ngoài transaction (nên dùng NoTracking) và gọi AI
-            var title = topicVersion.Title ?? submission.Topic.Title;
+            var title = topicVersion.EN_Title ?? submission.Topic.EN_Title;
             var description = topicVersion.Description ?? submission.Topic.Description;
             var keywords = await _aIService.GenerateKeywordsAsync(title, description);
 
@@ -709,7 +779,7 @@ public class SubmissionService : ISubmissionService
                 {
                     UserIds = moderatorIds,
                     Title = "Thông báo về submission mới",
-                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.Title} và phiên bản đề tài {topicVersion.Title}",
+                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.EN_Title} và phiên bản đề tài {topicVersion.EN_Title}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Submission.ToString(),
                     RelatedEntityId = submission.Id
@@ -728,7 +798,7 @@ public class SubmissionService : ISubmissionService
                 {
                     UserIds = reviewerIds,
                     Title = "Thông báo về submission mới",
-                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.Title} và phiên bản đề tài {topicVersion.Title}",
+                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.EN_Title} và phiên bản đề tài {topicVersion.EN_Title}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Submission.ToString(),
                     RelatedEntityId = submission.Id
@@ -742,6 +812,57 @@ public class SubmissionService : ISubmissionService
 
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
+
+            try
+            {
+                var adminEmail = _configuration["AdminAccount:Email"];
+                var moderatorEmails = moderators.Where(x => !string.IsNullOrEmpty(x.Email)).Select(x => x.Email!).Distinct().ToList();
+                if (moderatorEmails.Count > 0)
+                {
+                    if (moderatorEmails.Any(email => string.IsNullOrWhiteSpace(email)))
+                    {
+                        throw new Exception($"Invalid email address found in moderator emails.");
+                    }
+
+                    var templatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Submission", "submit-topic.html"));
+                    var html = await File.ReadAllTextAsync(templatePath);
+                    _logger.LogInformation("Email template path: {path}", templatePath);
+                    _logger.LogInformation("Email template content: {html}", html);
+
+                    var submissionUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/submission/detail/{submissionT.Id}";
+
+                    var topicUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/topic/detail/{submissionT.Topic.Id}";
+
+                    var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/index.html";
+
+                    var body = new ContentBuilder(html)
+                        .BuildCallback(new List<ObjectReplace>
+                        {
+                            new ObjectReplace { Name = "__submission_id__", Value = submissionT.Id.ToString() },
+                            new ObjectReplace { Name = "__submission_round__", Value = submissionT.SubmissionRound.ToString() },
+                            new ObjectReplace { Name = "__submission_url__", Value = submissionUrl },
+                            new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
+                            new ObjectReplace { Name = "__topic_id__", Value = submissionT.Topic.Id.ToString() },
+                            new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
+                            new ObjectReplace { Name = "__user_name__", Value = user.UserName },
+                            new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.EN_Title }
+                        })
+                        .GetContent();
+
+                    var mail = new EmailModel(new[] { adminEmail }, $"Nộp lại bài nộp: {submissionT.Topic.EN_Title}", body)
+                    {
+                        BodyHtml = body
+                    };
+
+
+                    await _emailService.SendEmailAsync(mail);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message, ex.StackTrace, "Failed to send notifications for submission {SubmissionId}", submissionT.Id);
+
+            }
 
             return new BaseResponseModel
             {
@@ -831,7 +952,7 @@ public class SubmissionService : ISubmissionService
             var qb = new QueryBuilder<Submission>()
                 .WithPredicate(predicate)
                 .WithInclude(x => x.SubmittedByUser)
-                 .WithInclude(x => x.Topic)
+                .WithInclude(x => x.Topic)
                 .WithTracking(false);
 
             // Lọc theo SemesterId qua join Phase.SemesterId nếu có

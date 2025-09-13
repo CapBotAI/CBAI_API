@@ -48,7 +48,7 @@ public class SubmissionDetailDTO
     {
         Id = submission.Id;
         TopicId = submission.TopicId;
-        TopicTitle = submission.Topic.Title;
+        TopicTitle = submission.Topic.EN_Title;
         TopicVersionId = submission.TopicVersionId;
         PhaseId = submission.PhaseId;
         SubmittedBy = submission.SubmittedBy;

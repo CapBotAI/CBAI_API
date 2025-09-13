@@ -1,6 +1,10 @@
 using System;
 using App.BLL.Interfaces;
+using App.Commons;
+using App.Commons.Email;
+using App.Commons.Email.Interfaces;
 using App.Commons.Extensions;
+using App.Commons.Interfaces;
 using App.Commons.Paging;
 using App.Commons.ResponseModel;
 using App.DAL.Interfaces;
@@ -13,6 +17,7 @@ using App.Entities.Entities.App;
 using App.Entities.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 
 namespace App.BLL.Implementations;
@@ -24,19 +29,30 @@ public class TopicService : ITopicService
     private readonly INotificationService _notificationService;
     private readonly IAIService _aiService;
     private readonly IElasticsearchService _elasticsearchService;
-
+    private readonly IEmailService _emailService;
+    private readonly IPathProvider _pathProvider;
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<TopicService> _logger;
 
     public TopicService(IUnitOfWork unitOfWork,
-     IIdentityRepository identityRepository,
-     INotificationService notificationService,
-     IAIService aiService,
-     IElasticsearchService elasticsearchService)
+    IIdentityRepository identityRepository,
+    INotificationService notificationService,
+    IAIService aiService,
+    IElasticsearchService elasticsearchService,
+    IEmailService emailService,
+    IPathProvider pathProvider,
+    IConfiguration configuration,
+    ILogger<TopicService> logger)
     {
         this._unitOfWork = unitOfWork;
         this._identityRepository = identityRepository;
         this._notificationService = notificationService;
         this._aiService = aiService;
         this._elasticsearchService = elasticsearchService;
+        this._emailService = emailService;
+        this._pathProvider = pathProvider;
+        this._configuration = configuration;
+        this._logger = logger;
 
     }
 
@@ -131,7 +147,7 @@ public class TopicService : ITopicService
                     EntityType = EntityType.Topic,
                     FileId = createTopicDTO.FileId.Value,
                     IsPrimary = true,
-                    Caption = topic.Title,
+                    Caption = topic.EN_Title,
                     CreatedAt = DateTime.Now,
                 });
             }
@@ -144,7 +160,7 @@ public class TopicService : ITopicService
                 {
                     UserIds = moderatorIds,
                     Title = "Thông báo về chủ đề mới",
-                    Message = $"Chủ đề {topic.Title} đã được tạo bởi {user.UserName}",
+                    Message = $"Chủ đề {topic.EN_Title} đã được tạo bởi {user.UserName}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Topic.ToString(),
                     RelatedEntityId = topic.Id
@@ -162,6 +178,47 @@ public class TopicService : ITopicService
             topic.Supervisor = user;
             topic.Category = category;
             topic.Semester = semester;
+
+            //Email sender
+            var adminEmail = _configuration["AdminAccount:Email"];
+            if (!string.IsNullOrWhiteSpace(adminEmail))
+            {
+                try
+                {
+                    var templatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Topic", "CreateTopic.html"));
+                    var html = await File.ReadAllTextAsync(templatePath);
+                    _logger.LogInformation("Email template path: {path}", templatePath);
+                    _logger.LogInformation("Email template content: {html}", html);
+
+                    var topicUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/topic/detail/{topic.Id}";
+
+                    var callbackUrl = $"{_configuration["Appsettings:HomeUrl"]}/index.html";
+
+                    var body = new ContentBuilder(html)
+                        .BuildCallback(new List<ObjectReplace>
+                        {
+                            new ObjectReplace { Name = "__topic_id__", Value = topic.Id.ToString() },
+                            new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
+                            new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
+                            new ObjectReplace { Name = "__user_name__", Value = user.UserName },
+                            new ObjectReplace { Name = "__topic_title__", Value = topic.EN_Title }
+                        })
+                        .GetContent();
+
+                    var mail = new EmailModel(new[] { adminEmail }, $"Chủ đề mới: {topic.EN_Title}", body)
+                    {
+                        BodyHtml = body
+                    };
+
+
+                    await _emailService.SendEmailAsync(mail);
+                }
+                catch (Exception ex)
+                {
+                    // avoid breaking the flow if email fails
+                    _logger.LogError(ex.Message, ex.StackTrace, "Failed to send email to admin about new topic created");
+                }
+            }
 
             return new BaseResponseModel<CreateTopicResDTO>
             {
@@ -357,7 +414,12 @@ public class TopicService : ITopicService
 
             await _unitOfWork.BeginTransactionAsync();
 
-            topic.Title = updateTopicDTO.Title.Trim();
+            topic.EN_Title = updateTopicDTO.EN_Title.Trim();
+            topic.Abbreviation = updateTopicDTO.Abbreviation?.Trim();
+            topic.VN_title = updateTopicDTO.VN_title?.Trim();
+            topic.Problem = updateTopicDTO.Problem?.Trim();
+            topic.Context = updateTopicDTO.Context?.Trim();
+            topic.Content = updateTopicDTO.Content?.Trim();
             topic.Description = updateTopicDTO.Description?.Trim();
             topic.Objectives = updateTopicDTO.Objectives?.Trim();
             topic.CategoryId = updateTopicDTO.CategoryId;
@@ -378,7 +440,7 @@ public class TopicService : ITopicService
                 if (existedEntityFile != null)
                 {
                     existedEntityFile.FileId = updateTopicDTO.FileId.Value;
-                    existedEntityFile.Caption = topic.Title;
+                    existedEntityFile.Caption = topic.EN_Title;
                     existedEntityFile.CreatedAt = DateTime.Now;
                     await entityFileRepo.UpdateAsync(existedEntityFile);
                 }
@@ -390,7 +452,7 @@ public class TopicService : ITopicService
                         EntityType = EntityType.Topic,
                         FileId = updateTopicDTO.FileId.Value,
                         IsPrimary = true,
-                        Caption = topic.Title,
+                        Caption = topic.EN_Title,
                         CreatedAt = DateTime.Now,
                     });
                 }
@@ -570,6 +632,7 @@ public class TopicService : ITopicService
             throw;
         }
     }
+
     public async Task<BaseResponseModel<TopicDuplicateCheckResDTO>> CheckDuplicateByTopicIdAsync(int topicId, double threshold = 0.6)
     {
         try
@@ -590,7 +653,7 @@ public class TopicService : ITopicService
                 };
             }
 
-            var title = topic.Title;
+            var title = topic.EN_Title;
             var description = topic.Description;
             var keywords = await _aiService.GenerateKeywordsAsync(title, description);
 
@@ -625,7 +688,7 @@ public class TopicService : ITopicService
             var response = new TopicDuplicateCheckResDTO
             {
                 QueryTopicId = topic.Id,
-                QueryTopicTitle = topic.Title,
+                QueryTopicTitle = topic.EN_Title,
                 IsDuplicate = duplicates.Any(),
                 Message = duplicates.Any() ? "found duplicates" : "topic passed",
                 Duplicates = duplicates

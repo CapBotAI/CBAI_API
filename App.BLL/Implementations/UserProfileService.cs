@@ -124,8 +124,8 @@ public class UserProfileService : IUserProfileService
                 return new BaseResponseModel<UserProfileResponseDTO>
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Không tìm thấy hồ sơ"
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Hồ sơ chưa được tạo, hãy cập nhật hồ sơ."
                 };
             }
 
@@ -202,8 +202,8 @@ public class UserProfileService : IUserProfileService
                 return new BaseResponseModel
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Không tìm thấy hồ sơ"
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Hồ sơ chưa được tạo, hãy cập nhật hồ sơ."
                 };
             }
 
@@ -267,8 +267,8 @@ public class UserProfileService : IUserProfileService
                 return new BaseResponseModel<UserProfileResponseDTO>
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Không tìm thấy hồ sơ"
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Hồ sơ chưa được tạo, hãy cập nhật hồ sơ."
                 };
             }
 
@@ -306,8 +306,8 @@ public class UserProfileService : IUserProfileService
                 return new BaseResponseModel<UserProfileResponseDTO>
                 {
                     IsSuccess = false,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Không tìm thấy hồ sơ"
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Hồ sơ chưa được tạo, hãy cập nhật hồ sơ."
                 };
             }
 

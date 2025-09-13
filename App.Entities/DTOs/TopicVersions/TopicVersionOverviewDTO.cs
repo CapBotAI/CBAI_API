@@ -9,7 +9,8 @@ public class TopicVersionOverviewDTO
     public int Id { get; set; }
     public int TopicId { get; set; }
     public int VersionNumber { get; set; }
-    public string Title { get; set; } = null!;
+    public string EN_Title { get; set; } = null!;
+    public string? VN_title { get; set; }
     public string? DocumentUrl { get; set; }
     public TopicStatus Status { get; set; }
     public DateTime? SubmittedAt { get; set; }
@@ -22,7 +23,8 @@ public class TopicVersionOverviewDTO
         Id = topicVersion.Id;
         TopicId = topicVersion.TopicId;
         VersionNumber = topicVersion.VersionNumber;
-        Title = topicVersion.Title;
+        EN_Title = topicVersion.EN_Title;
+        VN_title = topicVersion.VN_title;
         DocumentUrl = topicVersion.DocumentUrl;
         Status = topicVersion.Status;
         SubmittedAt = topicVersion.SubmittedAt;

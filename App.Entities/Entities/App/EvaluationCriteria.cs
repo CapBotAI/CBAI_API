@@ -16,5 +16,9 @@ public partial class EvaluationCriteria : CommonDataModel
 
     public decimal Weight { get; set; } = 1.00m;
 
+    public int? SemesterId { get; set; }
+
+    public virtual Semester? Semester { get; set; }
+
     public virtual ICollection<ReviewCriteriaScore> ReviewCriteriaScores { get; set; } = new List<ReviewCriteriaScore>();
 }
