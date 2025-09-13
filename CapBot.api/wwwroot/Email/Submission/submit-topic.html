@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>CapBot Thông Báo Tạo Đề Tài Mới</title>
+    <title>CapBot Thông Báo Nộp Đề Tài</title>
     <style>
         body {
             font-family: Arial, sans-serif;
@@ -127,19 +127,23 @@
         padding: 20px;
         font-family: Arial, sans-serif;
       ">
-        <h2>Xác nhận tạo đề tài mới</h2>
+        <h2>Xác nhận <strong>nộp</strong> tài mới</h2>
         <p>Kính gửi <strong>__user_name__</strong>,</p>
         <p>
-            Chúng tôi đã nhận thấy có 1 đề tài mới từ bạn. Để hoàn tất quá trình tạo
-            đề tài, vui lòng xem ĐỀ TÀI và nhấn vào nút xác nhận bên dưới.
+            Chúng tôi đã nhận thấy bạn vừa submit 1 submission đề tài của mình. Hãy
+            kiểm tra lại thông tin bên dưới.
         </p>
 
         <div style="margin: 20px 0">
-            <p><strong>Thông tin đề tài:</strong></p>
+            <p><strong>Thông tin bài nộp:</strong></p>
+            <p>Mã bài nộp: __submission_id__</p>
             <p>Mã đề tài: __topic_id__</p>
-            <p>Tiêu đề: __topic_title__</p>
+            <p>Tiêu đề của đề tài: __topic_title__</p>
             <p>
                 <a href="__topic_url__" target="_blank" style="color: #0066cc">Xem đề tài</a>
+            </p>
+            <p>
+                <a href="__submission_url__" target="_blank" style="color: #0066cc">Xem bài nộp</a>
             </p>
         </div>
 

@@ -190,12 +190,16 @@ public class TopicService : ITopicService
                     _logger.LogInformation("Email template path: {path}", templatePath);
                     _logger.LogInformation("Email template content: {html}", html);
 
-                    var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/topic/detail/{topic.Id}";
+                    var topicUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/topic/detail/{topic.Id}";
+
+                    var callbackUrl = $"{_configuration["Appsettings:HomeUrl"]}/index.html";
 
                     var body = new ContentBuilder(html)
                         .BuildCallback(new List<ObjectReplace>
                         {
-                            new ObjectReplace { Name = "__calback_url__", Value = callbackUrl },
+                            new ObjectReplace { Name = "__topic_id__", Value = topic.Id.ToString() },
+                            new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
+                            new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
                             new ObjectReplace { Name = "__user_name__", Value = user.UserName },
                             new ObjectReplace { Name = "__topic_title__", Value = topic.Title }
                         })
