@@ -876,8 +876,17 @@ namespace App.DAL.Migrations
 
                 SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                b.Property<string>("Abbreviation")
+                    .HasColumnType("nvarchar(max)");
+
                 b.Property<int?>("CategoryId")
                     .HasColumnType("int");
+
+                b.Property<string>("Content")
+                    .HasColumnType("nvarchar(max)");
+
+                b.Property<string>("Context")
+                    .HasColumnType("nvarchar(max)");
 
                 b.Property<DateTime>("CreatedAt")
                     .ValueGeneratedOnAdd()
@@ -892,6 +901,11 @@ namespace App.DAL.Migrations
 
                 b.Property<string>("Description")
                     .HasColumnType("nvarchar(max)");
+
+                b.Property<string>("EN_Title")
+                    .IsRequired()
+                    .HasMaxLength(500)
+                    .HasColumnType("nvarchar(500)");
 
                 b.Property<bool>("IsActive")
                     .HasColumnType("bit");
@@ -920,16 +934,17 @@ namespace App.DAL.Migrations
                 b.Property<string>("Objectives")
                     .HasColumnType("nvarchar(max)");
 
+                b.Property<string>("Problem")
+                    .HasColumnType("nvarchar(max)");
+
                 b.Property<int>("SemesterId")
                     .HasColumnType("int");
 
                 b.Property<int>("SupervisorId")
                     .HasColumnType("int");
 
-                b.Property<string>("Title")
-                    .IsRequired()
-                    .HasMaxLength(500)
-                    .HasColumnType("nvarchar(500)");
+                b.Property<string>("VN_title")
+                    .HasColumnType("nvarchar(max)");
 
                 b.HasKey("Id");
 

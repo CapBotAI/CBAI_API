@@ -94,8 +94,8 @@ public class DeadlineNotificationService : BackgroundService
             foreach (var assignment in upcomingDeadlineAssignments)
             {
                 var daysUntilDeadline = (assignment.Deadline!.Value.Date - DateTime.Today).Days;
-                var topicTitle = assignment.Submission.TopicVersion?.Topic?.Title ?? 
-                               assignment.Submission.Topic?.Title ?? "Không xác định";
+                var topicTitle = assignment.Submission.TopicVersion?.Topic?.EN_Title ?? 
+                               assignment.Submission.Topic?.EN_Title ?? "Không xác định";
 
                 await notificationService.CreateAsync(new CreateNotificationDTO
                 {
@@ -115,8 +115,8 @@ public class DeadlineNotificationService : BackgroundService
             foreach (var assignment in overdueAssignments)
             {
                 var daysOverdue = (DateTime.Today - assignment.Deadline!.Value.Date).Days;
-                var topicTitle = assignment.Submission.TopicVersion?.Topic?.Title ?? 
-                               assignment.Submission.Topic?.Title ?? "Không xác định";
+                var topicTitle = assignment.Submission.TopicVersion?.Topic?.EN_Title ?? 
+                               assignment.Submission.Topic?.EN_Title ?? "Không xác định";
 
                 await notificationService.CreateAsync(new CreateNotificationDTO
                 {

@@ -147,7 +147,7 @@ public class TopicService : ITopicService
                     EntityType = EntityType.Topic,
                     FileId = createTopicDTO.FileId.Value,
                     IsPrimary = true,
-                    Caption = topic.Title,
+                    Caption = topic.EN_Title,
                     CreatedAt = DateTime.Now,
                 });
             }
@@ -160,7 +160,7 @@ public class TopicService : ITopicService
                 {
                     UserIds = moderatorIds,
                     Title = "Thông báo về chủ đề mới",
-                    Message = $"Chủ đề {topic.Title} đã được tạo bởi {user.UserName}",
+                    Message = $"Chủ đề {topic.EN_Title} đã được tạo bởi {user.UserName}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Topic.ToString(),
                     RelatedEntityId = topic.Id
@@ -201,11 +201,11 @@ public class TopicService : ITopicService
                             new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
                             new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
                             new ObjectReplace { Name = "__user_name__", Value = user.UserName },
-                            new ObjectReplace { Name = "__topic_title__", Value = topic.Title }
+                            new ObjectReplace { Name = "__topic_title__", Value = topic.EN_Title }
                         })
                         .GetContent();
 
-                    var mail = new EmailModel(new[] { adminEmail }, $"Chủ đề mới: {topic.Title}", body)
+                    var mail = new EmailModel(new[] { adminEmail }, $"Chủ đề mới: {topic.EN_Title}", body)
                     {
                         BodyHtml = body
                     };
@@ -414,7 +414,12 @@ public class TopicService : ITopicService
 
             await _unitOfWork.BeginTransactionAsync();
 
-            topic.Title = updateTopicDTO.Title.Trim();
+            topic.EN_Title = updateTopicDTO.EN_Title.Trim();
+            topic.Abbreviation = updateTopicDTO.Abbreviation?.Trim();
+            topic.VN_title = updateTopicDTO.VN_title?.Trim();
+            topic.Problem = updateTopicDTO.Problem?.Trim();
+            topic.Context = updateTopicDTO.Context?.Trim();
+            topic.Content = updateTopicDTO.Content?.Trim();
             topic.Description = updateTopicDTO.Description?.Trim();
             topic.Objectives = updateTopicDTO.Objectives?.Trim();
             topic.CategoryId = updateTopicDTO.CategoryId;
@@ -435,7 +440,7 @@ public class TopicService : ITopicService
                 if (existedEntityFile != null)
                 {
                     existedEntityFile.FileId = updateTopicDTO.FileId.Value;
-                    existedEntityFile.Caption = topic.Title;
+                    existedEntityFile.Caption = topic.EN_Title;
                     existedEntityFile.CreatedAt = DateTime.Now;
                     await entityFileRepo.UpdateAsync(existedEntityFile);
                 }
@@ -447,7 +452,7 @@ public class TopicService : ITopicService
                         EntityType = EntityType.Topic,
                         FileId = updateTopicDTO.FileId.Value,
                         IsPrimary = true,
-                        Caption = topic.Title,
+                        Caption = topic.EN_Title,
                         CreatedAt = DateTime.Now,
                     });
                 }
@@ -648,7 +653,7 @@ public class TopicService : ITopicService
                 };
             }
 
-            var title = topic.Title;
+            var title = topic.EN_Title;
             var description = topic.Description;
             var keywords = await _aiService.GenerateKeywordsAsync(title, description);
 
@@ -683,7 +688,7 @@ public class TopicService : ITopicService
             var response = new TopicDuplicateCheckResDTO
             {
                 QueryTopicId = topic.Id,
-                QueryTopicTitle = topic.Title,
+                QueryTopicTitle = topic.EN_Title,
                 IsDuplicate = duplicates.Any(),
                 Message = duplicates.Any() ? "found duplicates" : "topic passed",
                 Duplicates = duplicates

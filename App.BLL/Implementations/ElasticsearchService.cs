@@ -92,9 +92,9 @@ public class ElasticsearchService : IElasticsearchService
         try
         {
             var document = MapTopicToDocument(topic);
-            
+
             var response = await _elasticClient.IndexAsync(document, _indexName);
-            
+
             if (!response.IsValidResponse)
             {
                 return new BaseResponseModel
@@ -128,7 +128,7 @@ public class ElasticsearchService : IElasticsearchService
         try
         {
             var documents = topics.Select(MapTopicToDocument).ToList();
-            
+
             var bulkResponse = await _elasticClient.BulkAsync(b => b
                 .Index(_indexName)
                 .IndexMany(documents)
@@ -246,7 +246,7 @@ public class ElasticsearchService : IElasticsearchService
             var result = new DuplicateDetectionResult
             {
                 QueryTopicId = topicId,
-                QueryTopicTitle = sourceTopic.Title,
+                QueryTopicTitle = sourceTopic.EN_Title,
                 SimilarTopics = similarTopics,
                 HighestSimilarity = similarTopics.FirstOrDefault()?.SimilarityScore ?? 0,
                 DetectionSummary = GenerateDetectionSummary(similarTopics)
@@ -343,7 +343,7 @@ public class ElasticsearchService : IElasticsearchService
         try
         {
             var response = await _elasticClient.DeleteAsync<TopicDocument>(topicId, d => d.Index(_indexName));
-            
+
             return new BaseResponseModel
             {
                 IsSuccess = response.IsValidResponse,
@@ -367,7 +367,7 @@ public class ElasticsearchService : IElasticsearchService
         try
         {
             var document = MapTopicToDocument(topic);
-            
+
             var response = await _elasticClient.UpdateAsync<TopicDocument, TopicDocument>(_indexName, topic.Id, u => u
                 .Doc(document)
                 .DocAsUpsert()
@@ -440,7 +440,7 @@ public class ElasticsearchService : IElasticsearchService
         return new TopicDocument
         {
             Id = topic.Id,
-            Title = topic.Title,
+            Title = topic.EN_Title,
             Description = topic.Description,
             Objectives = topic.Objectives,
             SupervisorId = topic.SupervisorId,
@@ -463,10 +463,10 @@ public class ElasticsearchService : IElasticsearchService
     private string BuildFullContent(Topic topic)
     {
         var content = new StringBuilder();
-        content.AppendLine(topic.Title);
+        content.AppendLine(topic.EN_Title);
         if (!string.IsNullOrEmpty(topic.Description)) content.AppendLine(topic.Description);
         if (!string.IsNullOrEmpty(topic.Objectives)) content.AppendLine(topic.Objectives);
-        
+
         return content.ToString();
     }
 
@@ -478,13 +478,13 @@ public class ElasticsearchService : IElasticsearchService
     private List<string> ExtractKeywords(Topic topic)
     {
         var keywords = new List<string>();
-        
+
         // Extract từ title
-        if (!string.IsNullOrEmpty(topic.Title))
+        if (!string.IsNullOrEmpty(topic.EN_Title))
         {
-            keywords.AddRange(topic.Title.Split(' ', StringSplitOptions.RemoveEmptyEntries));
+            keywords.AddRange(topic.EN_Title.Split(' ', StringSplitOptions.RemoveEmptyEntries));
         }
-        
+
         // Extract từ objectives
         if (!string.IsNullOrEmpty(topic.Objectives))
         {
@@ -499,12 +499,12 @@ public class ElasticsearchService : IElasticsearchService
     {
         var matchedFields = new List<string>();
 
-        if (IsTextSimilar(similarTopic.Title, sourceTopic.Title))
+        if (IsTextSimilar(similarTopic.Title, sourceTopic.EN_Title))
             matchedFields.Add("Title");
-        
+
         if (IsTextSimilar(similarTopic.Description, sourceTopic.Description))
             matchedFields.Add("Description");
-            
+
         if (IsTextSimilar(similarTopic.Objectives, sourceTopic.Objectives))
             matchedFields.Add("Objectives");
 
@@ -542,7 +542,7 @@ public class ElasticsearchService : IElasticsearchService
 
         var summary = new StringBuilder();
         summary.AppendLine($"Phát hiện {similarTopics.Count} đề tài tương tự:");
-        
+
         if (highSimilarity > 0)
             summary.AppendLine($"- {highSimilarity} đề tài có độ tương tự cao (>80%) - CẦN KIỂM TRA");
         if (mediumSimilarity > 0)

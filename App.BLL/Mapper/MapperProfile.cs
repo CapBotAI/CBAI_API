@@ -17,9 +17,9 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.Reviewer, opt => opt.MapFrom(src => src.Reviewer))
             .ForMember(dest => dest.AssignedByUser, opt => opt.MapFrom(src => src.AssignedByUser))
             .ForMember(dest => dest.SubmissionTitle, opt => opt.MapFrom(src =>
-                src.Submission.TopicVersion.Topic.Title))
+                src.Submission.TopicVersion.Topic.EN_Title))
             .ForMember(dest => dest.TopicTitle, opt => opt.MapFrom(src =>
-                src.Submission.TopicVersion.Topic.Title));
+                src.Submission.TopicVersion.Topic.EN_Title));
 
         CreateMap<User, AvailableReviewerDTO>()
             .ForMember(dest => dest.Skills, opt => opt.MapFrom(src =>

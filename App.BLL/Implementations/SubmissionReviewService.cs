@@ -185,8 +185,8 @@ public class SubmissionReviewService : ISubmissionReviewService
             {
                 var approveCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.Approve);
                 var rejectCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.Reject);
-                var revisionCount = submittedReviews.Count(r => 
-                    r.Recommendation == ReviewRecommendations.MinorRevision || 
+                var revisionCount = submittedReviews.Count(r =>
+                    r.Recommendation == ReviewRecommendations.MinorRevision ||
                     r.Recommendation == ReviewRecommendations.MajorRevision);
 
                 if (rejectCount == 2)
@@ -204,10 +204,10 @@ public class SubmissionReviewService : ISubmissionReviewService
                     }
                     else
                     {
-                        submission.Status = SubmissionStatus.Approved;
+                        submission.Status = SubmissionStatus.Completed; // Approved
                     }
                 }
-                else if ((approveCount > 0 && rejectCount > 0) || 
+                else if ((approveCount > 0 && rejectCount > 0) ||
                         (rejectCount > 0 && revisionCount > 0))
                 {
                     // Xung đột → cần moderator
@@ -225,7 +225,7 @@ public class SubmissionReviewService : ISubmissionReviewService
         try
         {
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
-            
+
             var submission = await submissionRepo.GetSingleAsync(new QueryOptions<Submission>
             {
                 Predicate = x => x.Id == submissionId,
@@ -251,7 +251,7 @@ public class SubmissionReviewService : ISubmissionReviewService
             var summary = new SubmissionReviewSummaryDTO
             {
                 SubmissionId = submission.Id,
-                TopicTitle = submission.TopicVersion.Topic.Title,
+                TopicTitle = submission.TopicVersion.Topic.EN_Title,
                 StudentName = submission.SubmittedByUser.UserName ?? "N/A",
                 SubmissionStatus = submission.Status,
                 RequiredReviewerCount = 2,
@@ -297,14 +297,14 @@ public class SubmissionReviewService : ISubmissionReviewService
                 var recommendations = submittedReviews.Select(r => r.Recommendation).ToList();
                 var approveCount = recommendations.Count(r => r == ReviewRecommendations.Approve);
                 var rejectCount = recommendations.Count(r => r == ReviewRecommendations.Reject);
-                
+
                 summary.IsConflicted = (approveCount > 0 && rejectCount > 0);
             }
 
             // Kiểm tra quá hạn
-            summary.IsOverdue = summary.Reviews.Any(r => 
-                r.RevisionDeadline.HasValue && 
-                r.RevisionDeadline < DateTime.UtcNow && 
+            summary.IsOverdue = summary.Reviews.Any(r =>
+                r.RevisionDeadline.HasValue &&
+                r.RevisionDeadline < DateTime.UtcNow &&
                 submission.Status == SubmissionStatus.RevisionRequired);
 
             return new BaseResponseModel<SubmissionReviewSummaryDTO>
@@ -330,7 +330,7 @@ public class SubmissionReviewService : ISubmissionReviewService
         try
         {
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
-            
+
             var submissions = await submissionRepo.GetAllAsync(new QueryOptions<Submission>
             {
                 Predicate = x => x.Status == SubmissionStatus.UnderReview, // Status cho conflict
@@ -338,7 +338,7 @@ public class SubmissionReviewService : ISubmissionReviewService
             });
 
             var summaries = new List<SubmissionReviewSummaryDTO>();
-            
+
             foreach (var submission in submissions)
             {
                 var summary = await GetSubmissionReviewSummaryAsync(submission.Id);
@@ -373,7 +373,7 @@ public class SubmissionReviewService : ISubmissionReviewService
             await _unitOfWork.BeginTransactionAsync();
 
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
-            
+
             var submission = await submissionRepo.GetSingleAsync(new QueryOptions<Submission>
             {
                 Predicate = x => x.Id == moderatorDTO.SubmissionId
@@ -394,7 +394,7 @@ public class SubmissionReviewService : ISubmissionReviewService
             switch (moderatorDTO.FinalRecommendation)
             {
                 case ReviewRecommendations.Approve:
-                    submission.Status = SubmissionStatus.Approved; 
+                    submission.Status = SubmissionStatus.Completed;
                     break;
                 case ReviewRecommendations.MinorRevision:
                 case ReviewRecommendations.MajorRevision:
@@ -447,7 +447,7 @@ public class SubmissionReviewService : ISubmissionReviewService
         try
         {
             var reviewRepo = _unitOfWork.GetRepo<Review>();
-            
+
             var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
             {
                 Predicate = x => x.Id == reviewId && x.IsActive,
@@ -469,7 +469,7 @@ public class SubmissionReviewService : ISubmissionReviewService
 
             // Lưu deadline trong Assignment
             review.Assignment.Deadline = deadline;
-            
+
             var assignmentRepo = _unitOfWork.GetRepo<ReviewerAssignment>();
             await assignmentRepo.UpdateAsync(review.Assignment);
             var result = await _unitOfWork.SaveAsync();
@@ -510,10 +510,10 @@ public class SubmissionReviewService : ISubmissionReviewService
         {
             var assignmentRepo = _unitOfWork.GetRepo<ReviewerAssignment>();
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
-            
+
             var overdueAssignments = await assignmentRepo.GetAllAsync(new QueryOptions<ReviewerAssignment>
             {
-                Predicate = x => x.Deadline.HasValue && 
+                Predicate = x => x.Deadline.HasValue &&
                                x.Deadline < DateTime.UtcNow &&
                                x.Submission.Status == SubmissionStatus.RevisionRequired,
                 IncludeProperties = new List<System.Linq.Expressions.Expression<Func<ReviewerAssignment, object>>>
@@ -529,13 +529,13 @@ public class SubmissionReviewService : ISubmissionReviewService
             }
 
             var result = await _unitOfWork.SaveAsync();
-            
+
             return new BaseResponseModel
             {
                 IsSuccess = result.IsSuccess,
                 StatusCode = result.IsSuccess ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError,
-                Message = result.IsSuccess ? 
-                    $"Xử lý {overdueAssignments.Count()} submission quá hạn" : 
+                Message = result.IsSuccess ?
+                    $"Xử lý {overdueAssignments.Count()} submission quá hạn" :
                     result.Message
             };
         }

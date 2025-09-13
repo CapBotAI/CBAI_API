@@ -433,7 +433,7 @@ public class SubmissionService : ISubmissionService
             }
 
             // ===== AI duplicate check (Gemini + Elasticsearch) ngoài transaction =====
-            var title = submission.TopicVersion?.Title ?? submission.Topic.Title;
+            var title = submission.TopicVersion?.Title ?? submission.Topic.EN_Title;
             var description = submission.TopicVersion?.Description ?? submission.Topic.Description;
             var keywords = await _aIService.GenerateKeywordsAsync(title, description);
 
@@ -514,7 +514,7 @@ public class SubmissionService : ISubmissionService
                 {
                     UserIds = moderatorIds,
                     Title = "Thông báo về submission mới",
-                    Message = $"Submission #{submissionT.Id} đã được submit với chủ đề {submissionT.Topic.Title}",
+                    Message = $"Submission #{submissionT.Id} đã được submit với chủ đề {submissionT.Topic.EN_Title}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Submission.ToString(),
                     RelatedEntityId = submissionT.Id
@@ -560,11 +560,11 @@ public class SubmissionService : ISubmissionService
                             new ObjectReplace { Name = "__topic_id__", Value = submissionT.Topic.Id.ToString() },
                             new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
                             new ObjectReplace { Name = "__user_name__", Value = user.UserName },
-                            new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.Title }
+                            new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.EN_Title }
                         })
                         .GetContent();
 
-                    var mail = new EmailModel(new[] { adminEmail }, $"Bài nộp mới: {submissionT.Topic.Title}", body)
+                    var mail = new EmailModel(new[] { adminEmail }, $"Bài nộp mới: {submissionT.Topic.EN_Title}", body)
                     {
                         BodyHtml = body
                     };
@@ -696,7 +696,7 @@ public class SubmissionService : ISubmissionService
 
             //? ===== AI duplicate check (Gemini + Elasticsearch) =====
             //* (1) Đọc dữ liệu cần thiết ngoài transaction (nên dùng NoTracking) và gọi AI
-            var title = topicVersion.Title ?? submission.Topic.Title;
+            var title = topicVersion.Title ?? submission.Topic.EN_Title;
             var description = topicVersion.Description ?? submission.Topic.Description;
             var keywords = await _aIService.GenerateKeywordsAsync(title, description);
 
@@ -779,7 +779,7 @@ public class SubmissionService : ISubmissionService
                 {
                     UserIds = moderatorIds,
                     Title = "Thông báo về submission mới",
-                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.Title} và phiên bản đề tài {topicVersion.Title}",
+                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.EN_Title} và phiên bản đề tài {topicVersion.Title}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Submission.ToString(),
                     RelatedEntityId = submission.Id
@@ -798,7 +798,7 @@ public class SubmissionService : ISubmissionService
                 {
                     UserIds = reviewerIds,
                     Title = "Thông báo về submission mới",
-                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.Title} và phiên bản đề tài {topicVersion.Title}",
+                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.EN_Title} và phiên bản đề tài {topicVersion.Title}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Submission.ToString(),
                     RelatedEntityId = submission.Id
@@ -845,11 +845,11 @@ public class SubmissionService : ISubmissionService
                             new ObjectReplace { Name = "__topic_id__", Value = submissionT.Topic.Id.ToString() },
                             new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
                             new ObjectReplace { Name = "__user_name__", Value = user.UserName },
-                            new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.Title }
+                            new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.EN_Title }
                         })
                         .GetContent();
 
-                    var mail = new EmailModel(new[] { adminEmail }, $"Nộp lại bài nộp: {submissionT.Topic.Title}", body)
+                    var mail = new EmailModel(new[] { adminEmail }, $"Nộp lại bài nộp: {submissionT.Topic.EN_Title}", body)
                     {
                         BodyHtml = body
                     };

@@ -222,7 +222,7 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.ToTable("topics");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
-            entity.Property(e => e.Title).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.EN_Title).HasMaxLength(500).IsRequired();
             entity.Property(e => e.MaxStudents).HasDefaultValue(1);
             entity.Property(e => e.IsLegacy).HasDefaultValue(false);
             entity.Property(e => e.IsApproved).HasDefaultValue(true);

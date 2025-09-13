@@ -6,7 +6,13 @@ namespace App.Entities.DTOs.Topics;
 public class UpdateTopicResDTO
 {
     public int Id { get; set; }
-    public string Title { get; set; } = null!;
+    public string EN_Title { get; set; } = null!;
+    public string? Abbreviation { get; set; }
+    public string? VN_title { get; set; }
+    public string? Problem { get; set; }
+
+    public string? Context { get; set; }
+    public string? Content { get; set; }
     public string? Description { get; set; }
     public string SupervisorName { get; set; } = null!;
     public string CategoryName { get; set; } = null!;
@@ -22,7 +28,12 @@ public class UpdateTopicResDTO
     public UpdateTopicResDTO(Topic topic, EntityFile? entityFile)
     {
         Id = topic.Id;
-        Title = topic.Title;
+        EN_Title = topic.EN_Title;
+        Abbreviation = topic.Abbreviation;
+        VN_title = topic.VN_title;
+        Problem = topic.Problem;
+        Context = topic.Context;
+        Content = topic.Content;
         Description = topic.Description;
         SupervisorName = topic.Supervisor?.UserName ?? "";
         CategoryName = topic.Category?.Name ?? "";

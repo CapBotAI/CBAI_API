@@ -6,6 +6,7 @@ namespace App.Entities.DTOs.Submissions;
 public class SubmissionOverviewResDTO
 {
     public int Id { get; set; }
+
     public int TopicId { get; set; }
 
     public string? TopicTitle { get; set; }
@@ -21,7 +22,7 @@ public class SubmissionOverviewResDTO
     {
         Id = submission.Id;
         TopicId = submission.TopicId;
-        TopicTitle = submission.Topic.Title;
+        TopicTitle = submission.Topic.EN_Title;
         SubmittedBy = submission.SubmittedBy;
         SubmittedByName = submission.SubmittedByUser.UserName;
         SubmissionRound = submission.SubmissionRound;

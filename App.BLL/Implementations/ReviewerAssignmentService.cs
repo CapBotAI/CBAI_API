@@ -586,7 +586,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
 
     private readonly ISkillMatchingService _skillMatchingService;
 
-// Update constructor
+    // Update constructor
     public ReviewerAssignmentService(IUnitOfWork unitOfWork, IMapper mapper, ISkillMatchingService skillMatchingService)
     {
         _unitOfWork = unitOfWork;
@@ -630,7 +630,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
             var result = new AutoAssignmentResult
             {
                 SubmissionId = dto.SubmissionId,
-                TopicTitle = submission.TopicVersion.Topic.Title,
+                TopicTitle = submission.TopicVersion.Topic.EN_Title,
                 TopicSkillTags = new List<string> { "Performance-Based Assignment" }, // Placeholder
                 ConsideredReviewers = matchingReviewers,
                 RequestedReviewers = dto.NumberOfReviewers,
@@ -928,7 +928,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 .Select(a => new RecentAssignmentDTO
                 {
                     AssignmentId = a.Id,
-                    TopicTitle = a.Submission.TopicVersion.Topic.Title,
+                    TopicTitle = a.Submission.TopicVersion.Topic.EN_Title,
                     StudentName = a.Submission.SubmittedByUser.UserName ?? "Unknown",
                     Status = a.Status,
                     AssignedAt = a.AssignedAt,
@@ -993,15 +993,6 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status400BadRequest,
                     Message = "Assignment không ở trạng thái có thể bắt đầu review"
-                };
-            }
-            if (assignment.Deadline.HasValue && assignment.Deadline < DateTime.UtcNow)
-            {
-                return new BaseResponseModel<ReviewerAssignmentResponseDTO>
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Assignment đã quá hạn deadline, không thể bắt đầu review"
                 };
             }
 
@@ -1090,7 +1081,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
 
                 // Topic Info
                 TopicId = assignment.Submission.TopicVersion.TopicId,
-                TopicTitle = assignment.Submission.TopicVersion.Topic.Title,
+                TopicTitle = assignment.Submission.TopicVersion.Topic.EN_Title,
                 TopicDescription = assignment.Submission.TopicVersion.Topic.Description,
                 TopicObjectives = assignment.Submission.TopicVersion.Topic.Objectives,
 
