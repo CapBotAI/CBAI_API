@@ -526,6 +526,9 @@ public class SubmissionService : ISubmissionService
                 }
             }
 
+            await _unitOfWork.SaveChangesAsync();
+            await _unitOfWork.CommitTransactionAsync();
+
             try
             {
                 var adminEmail = _configuration["AdminAccount:Email"];
@@ -575,9 +578,6 @@ public class SubmissionService : ISubmissionService
                 _logger.LogError(ex.Message, ex.StackTrace, "Failed to send notifications for submission {SubmissionId}", submissionT.Id);
 
             }
-
-            await _unitOfWork.SaveChangesAsync();
-            await _unitOfWork.CommitTransactionAsync();
 
             return new BaseResponseModel
             {
@@ -812,6 +812,57 @@ public class SubmissionService : ISubmissionService
 
             await _unitOfWork.SaveChangesAsync();
             await _unitOfWork.CommitTransactionAsync();
+
+            try
+            {
+                var adminEmail = _configuration["AdminAccount:Email"];
+                var moderatorEmails = moderators.Where(x => !string.IsNullOrEmpty(x.Email)).Select(x => x.Email!).Distinct().ToList();
+                if (moderatorEmails.Count > 0)
+                {
+                    if (moderatorEmails.Any(email => string.IsNullOrWhiteSpace(email)))
+                    {
+                        throw new Exception($"Invalid email address found in moderator emails.");
+                    }
+
+                    var templatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Submission", "submit-topic.html"));
+                    var html = await File.ReadAllTextAsync(templatePath);
+                    _logger.LogInformation("Email template path: {path}", templatePath);
+                    _logger.LogInformation("Email template content: {html}", html);
+
+                    var submissionUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/submission/detail/{submissionT.Id}";
+
+                    var topicUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/topic/detail/{submissionT.Topic.Id}";
+
+                    var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/index.html";
+
+                    var body = new ContentBuilder(html)
+                        .BuildCallback(new List<ObjectReplace>
+                        {
+                            new ObjectReplace { Name = "__submission_id__", Value = submissionT.Id.ToString() },
+                            new ObjectReplace { Name = "__submission_round__", Value = submissionT.SubmissionRound.ToString() },
+                            new ObjectReplace { Name = "__submission_url__", Value = submissionUrl },
+                            new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
+                            new ObjectReplace { Name = "__topic_id__", Value = submissionT.Topic.Id.ToString() },
+                            new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
+                            new ObjectReplace { Name = "__user_name__", Value = user.UserName },
+                            new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.Title }
+                        })
+                        .GetContent();
+
+                    var mail = new EmailModel(new[] { adminEmail }, $"Nộp lại bài nộp: {submissionT.Topic.Title}", body)
+                    {
+                        BodyHtml = body
+                    };
+
+
+                    await _emailService.SendEmailAsync(mail);
+                }
+            }
+            catch (System.Exception ex)
+            {
+                _logger.LogError(ex.Message, ex.StackTrace, "Failed to send notifications for submission {SubmissionId}", submissionT.Id);
+
+            }
 
             return new BaseResponseModel
             {
