@@ -13,7 +13,7 @@ public class CreateTopicVersionDTO : IEntity<TopicVersion>, IValidationPipeline
 
     [Required(ErrorMessage = "Tiêu đề không được để trống")]
     [StringLength(500, ErrorMessage = "Tiêu đề không được vượt quá 500 ký tự")]
-    public string Title { get; set; } = null!;
+    public string EN_Title { get; set; } = null!;
     public string? Description { get; set; }
 
     public string? Objectives { get; set; }
@@ -26,18 +26,28 @@ public class CreateTopicVersionDTO : IEntity<TopicVersion>, IValidationPipeline
 
     public string? DocumentUrl { get; set; }
 
+    public string? VN_title { get; set; }
+    public string? Problem { get; set; }
+
+    public string? Context { get; set; }
+    public string? Content { get; set; }
+
     public TopicVersion GetEntity()
     {
         return new TopicVersion
         {
             TopicId = TopicId,
-            Title = Title.Trim(),
+            EN_Title = EN_Title.Trim(),
             Description = Description?.Trim(),
             Objectives = Objectives?.Trim(),
             Methodology = Methodology?.Trim(),
             ExpectedOutcomes = ExpectedOutcomes?.Trim(),
             Requirements = Requirements?.Trim(),
             DocumentUrl = DocumentUrl?.Trim(),
+            VN_title = VN_title?.Trim(),
+            Problem = Problem?.Trim(),
+            Context = Context?.Trim(),
+            Content = Content?.Trim()
         };
     }
 
@@ -53,7 +63,7 @@ public class CreateTopicVersionDTO : IEntity<TopicVersion>, IValidationPipeline
             };
         }
 
-        if (string.IsNullOrWhiteSpace(Title))
+        if (string.IsNullOrWhiteSpace(EN_Title))
         {
             return new BaseResponseModel
             {

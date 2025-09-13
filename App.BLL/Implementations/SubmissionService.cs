@@ -433,7 +433,7 @@ public class SubmissionService : ISubmissionService
             }
 
             // ===== AI duplicate check (Gemini + Elasticsearch) ngoài transaction =====
-            var title = submission.TopicVersion?.Title ?? submission.Topic.EN_Title;
+            var title = submission.TopicVersion?.EN_Title ?? submission.Topic.EN_Title;
             var description = submission.TopicVersion?.Description ?? submission.Topic.Description;
             var keywords = await _aIService.GenerateKeywordsAsync(title, description);
 
@@ -696,7 +696,7 @@ public class SubmissionService : ISubmissionService
 
             //? ===== AI duplicate check (Gemini + Elasticsearch) =====
             //* (1) Đọc dữ liệu cần thiết ngoài transaction (nên dùng NoTracking) và gọi AI
-            var title = topicVersion.Title ?? submission.Topic.EN_Title;
+            var title = topicVersion.EN_Title ?? submission.Topic.EN_Title;
             var description = topicVersion.Description ?? submission.Topic.Description;
             var keywords = await _aIService.GenerateKeywordsAsync(title, description);
 
@@ -779,7 +779,7 @@ public class SubmissionService : ISubmissionService
                 {
                     UserIds = moderatorIds,
                     Title = "Thông báo về submission mới",
-                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.EN_Title} và phiên bản đề tài {topicVersion.Title}",
+                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.EN_Title} và phiên bản đề tài {topicVersion.EN_Title}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Submission.ToString(),
                     RelatedEntityId = submission.Id
@@ -798,7 +798,7 @@ public class SubmissionService : ISubmissionService
                 {
                     UserIds = reviewerIds,
                     Title = "Thông báo về submission mới",
-                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.EN_Title} và phiên bản đề tài {topicVersion.Title}",
+                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.EN_Title} và phiên bản đề tài {topicVersion.EN_Title}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Submission.ToString(),
                     RelatedEntityId = submission.Id

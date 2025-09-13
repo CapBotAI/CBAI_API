@@ -120,7 +120,7 @@ public class TopicVersionService : ITopicVersionService
                     EntityType = EntityType.TopicVersion,
                     EntityId = topicVersion.Id,
                     IsPrimary = true,
-                    Caption = topicVersion.Title,
+                    Caption = topicVersion.EN_Title,
                     CreatedAt = DateTime.Now,
                 });
             }
@@ -221,7 +221,7 @@ public class TopicVersionService : ITopicVersionService
 
             await _unitOfWork.BeginTransactionAsync();
 
-            topicVersion.Title = updateTopicVersionDTO.Title.Trim();
+            topicVersion.EN_Title = updateTopicVersionDTO.EN_Title.Trim();
             topicVersion.Description = updateTopicVersionDTO.Description?.Trim();
             topicVersion.Objectives = updateTopicVersionDTO.Objectives?.Trim();
             topicVersion.Methodology = updateTopicVersionDTO.Methodology?.Trim();
@@ -230,6 +230,10 @@ public class TopicVersionService : ITopicVersionService
             topicVersion.DocumentUrl = updateTopicVersionDTO.DocumentUrl?.Trim();
             topicVersion.LastModifiedBy = user.UserName;
             topicVersion.LastModifiedAt = DateTime.Now;
+            topicVersion.VN_title = updateTopicVersionDTO.VN_title?.Trim();
+            topicVersion.Problem = updateTopicVersionDTO.Problem?.Trim();
+            topicVersion.Context = updateTopicVersionDTO.Context?.Trim();
+            topicVersion.Content = updateTopicVersionDTO.Content?.Trim();
 
             await versionRepo.UpdateAsync(topicVersion);
             await _unitOfWork.SaveChangesAsync();
@@ -245,7 +249,7 @@ public class TopicVersionService : ITopicVersionService
                 if (existedEntityFile != null)
                 {
                     existedEntityFile.FileId = updateTopicVersionDTO.FileId.Value;
-                    existedEntityFile.Caption = topicVersion.Title;
+                    existedEntityFile.Caption = topicVersion.EN_Title;
                     existedEntityFile.CreatedAt = DateTime.Now;
                     await entityFileRepo.UpdateAsync(existedEntityFile);
                 }
@@ -257,7 +261,7 @@ public class TopicVersionService : ITopicVersionService
                         EntityType = EntityType.TopicVersion,
                         FileId = updateTopicVersionDTO.FileId.Value,
                         IsPrimary = true,
-                        Caption = topicVersion.Title,
+                        Caption = topicVersion.EN_Title,
                         CreatedAt = DateTime.Now,
                     });
                 }
@@ -316,7 +320,9 @@ public class TopicVersionService : ITopicVersionService
 
             if (!string.IsNullOrEmpty(query.Keyword))
             {
-                queryBuilder.WithPredicate(x => x.Title.Contains(query.Keyword));
+                queryBuilder.WithPredicate(x =>
+                    x.EN_Title.Contains(query.Keyword) ||
+                    (x.VN_title != null && x.VN_title.Contains(query.Keyword)));
             }
 
             var versionQuery = versionRepo.Get(queryBuilder.Build());

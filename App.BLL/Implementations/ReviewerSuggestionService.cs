@@ -53,7 +53,7 @@ namespace App.BLL.Implementations
 
             var topic = topicVersion.Topic;
             var topicCategory = topic?.Category;
-            var topicContext = $"{topicCategory?.Name ?? ""} {topic?.EN_Title ?? ""} {topicVersion.Title ?? ""} {topicVersion.Description ?? ""} {topicVersion.Objectives ?? ""} {topicVersion.Methodology ?? ""} {topicVersion.ExpectedOutcomes ?? ""}";
+            var topicContext = $"{topicCategory?.Name ?? ""} {topic?.EN_Title ?? ""} {topicVersion.EN_Title ?? ""} {topicVersion.Description ?? ""} {topicVersion.Objectives ?? ""} {topicVersion.Methodology ?? ""} {topicVersion.ExpectedOutcomes ?? ""}";
 
             // 2. Get reviewers: Users with Reviewer role and at least one LecturerSkill
             var userRepo = _unitOfWork.GetRepo<User>();

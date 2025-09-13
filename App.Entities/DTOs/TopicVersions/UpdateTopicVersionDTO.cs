@@ -13,7 +13,7 @@ public class UpdateTopicVersionDTO : IValidationPipeline
 
     [Required(ErrorMessage = "Tiêu đề không được để trống")]
     [StringLength(500, ErrorMessage = "Tiêu đề không được vượt quá 500 ký tự")]
-    public string Title { get; set; } = null!;
+    public string EN_Title { get; set; } = null!;
 
     [StringLength(2000, ErrorMessage = "Mô tả không được vượt quá 2000 ký tự")]
     public string? Description { get; set; }
@@ -34,6 +34,12 @@ public class UpdateTopicVersionDTO : IValidationPipeline
 
     public string? DocumentUrl { get; set; }
 
+    public string? VN_title { get; set; }
+    public string? Problem { get; set; }
+
+    public string? Context { get; set; }
+    public string? Content { get; set; }
+
     public BaseResponseModel Validate()
     {
         if (Id <= 0)
@@ -45,7 +51,7 @@ public class UpdateTopicVersionDTO : IValidationPipeline
             };
         }
 
-        if (string.IsNullOrWhiteSpace(Title))
+        if (string.IsNullOrWhiteSpace(EN_Title))
         {
             return new BaseResponseModel
             {

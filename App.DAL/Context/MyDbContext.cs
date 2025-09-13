@@ -257,7 +257,7 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.ToTable("topic_versions");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
-            entity.Property(e => e.Title).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.EN_Title).HasMaxLength(500).IsRequired();
             entity.Property(e => e.DocumentUrl).HasMaxLength(500);
             entity.Property(e => e.Status).HasDefaultValue(App.Entities.Enums.TopicStatus.Draft);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
