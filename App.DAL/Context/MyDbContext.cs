@@ -387,6 +387,12 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+            entity.HasOne(d => d.Semester)
+                .WithMany(p => p.EvaluationCriterias)
+                .HasForeignKey(d => d.SemesterId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
+
             entity.HasIndex(e => e.IsActive);
         });
 
