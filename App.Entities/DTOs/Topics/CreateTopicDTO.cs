@@ -10,7 +10,15 @@ public class CreateTopicDTO : IValidationPipeline, IEntity<Topic>
 {
     [Required(ErrorMessage = "Tiêu đề chủ đề không được để trống")]
     [StringLength(500, ErrorMessage = "Tiêu đề chủ đề không được vượt quá 500 ký tự")]
-    public string Title { get; set; } = null!;
+    public string EN_Title { get; set; } = null!;
+
+    public string? Abbreviation { get; set; }
+    public string? VN_title { get; set; }
+    public string? Problem { get; set; }
+
+    public string? Context { get; set; }
+
+    public string? Content { get; set; }
 
     public string? Description { get; set; }
 
@@ -31,19 +39,24 @@ public class CreateTopicDTO : IValidationPipeline, IEntity<Topic>
     {
         return new Topic
         {
-            Title = Title.Trim(),
+            EN_Title = EN_Title.Trim(),
             Description = Description?.Trim(),
             Objectives = Objectives?.Trim(),
             CategoryId = CategoryId,
             SemesterId = SemesterId,
             MaxStudents = MaxStudents,
+            Abbreviation = Abbreviation?.Trim(),
+            VN_title = VN_title?.Trim(),
+            Problem = Problem?.Trim(),
+            Context = Context?.Trim(),
+            Content = Content?.Trim(),
         };
     }
 
 
     public BaseResponseModel Validate()
     {
-        if (string.IsNullOrWhiteSpace(Title))
+        if (string.IsNullOrWhiteSpace(EN_Title))
         {
             return new BaseResponseModel
             {

@@ -177,7 +177,6 @@ namespace CapBot.api.Controllers
         /// <summary>
         /// Chi tiết submission
         /// </summary>
-        [Authorize]
         [HttpGet("detail/{id}")]
         [SwaggerOperation(
             Summary = "Chi tiết submission",

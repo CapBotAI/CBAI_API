@@ -16,11 +16,13 @@ public class ReviewService : IReviewService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
+    private readonly ISemesterService _semesterService;
 
-    public ReviewService(IUnitOfWork unitOfWork, IMapper mapper)
+    public ReviewService(IUnitOfWork unitOfWork, IMapper mapper, ISemesterService semesterService)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
+        _semesterService = semesterService;
     }
 
     public async Task<BaseResponseModel<ReviewResponseDTO>> CreateAsync(CreateReviewDTO createDTO)
@@ -69,14 +71,20 @@ public class ReviewService : IReviewService
                     Message = "Assignment này đã có review"
                 };
             }
-
-            // Validate criteria scores
             var criteriaIds = createDTO.CriteriaScores.Select(x => x.CriteriaId).ToList();
+
+
+            var currentSemesterResult = await _semesterService.GetCurrentSemesterAsync();
+            int? currentSemesterId = currentSemesterResult.IsSuccess ? currentSemesterResult.Data?.Id : null;
+
             var criteria = await criteriaRepo.GetAllAsync(new QueryOptions<EvaluationCriteria>
             {
-                Predicate = x => criteriaIds.Contains(x.Id) && x.IsActive,
+                Predicate = x => criteriaIds.Contains(x.Id) &&
+                                 x.IsActive &&
+                                 (x.SemesterId == currentSemesterId || x.SemesterId == null), // Filter theo semester
                 Tracked = false
             });
+
 
             if (criteria.Count() != criteriaIds.Count)
             {

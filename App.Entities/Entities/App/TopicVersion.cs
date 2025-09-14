@@ -14,7 +14,7 @@ public partial class TopicVersion : CommonDataModel
 
     public int VersionNumber { get; set; }
 
-    public string Title { get; set; } = null!;
+    public string EN_Title { get; set; } = null!;
 
     public string? Description { get; set; }
 
@@ -33,6 +33,12 @@ public partial class TopicVersion : CommonDataModel
     public DateTime? SubmittedAt { get; set; }
 
     public int? SubmittedBy { get; set; }
+
+    public string? VN_title { get; set; }
+    public string? Problem { get; set; }
+
+    public string? Context { get; set; }
+    public string? Content { get; set; }
 
     public virtual Topic Topic { get; set; } = null!;
     public virtual User? SubmittedByUser { get; set; }

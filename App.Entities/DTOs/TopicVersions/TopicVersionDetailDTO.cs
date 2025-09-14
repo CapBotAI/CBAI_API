@@ -8,7 +8,7 @@ public class TopicVersionDetailDTO
     public int Id { get; set; }
     public int TopicId { get; set; }
     public int VersionNumber { get; set; }
-    public string Title { get; set; } = null!;
+    public string EN_Title { get; set; } = null!;
     public string? Description { get; set; }
     public string? Objectives { get; set; }
     public string? Methodology { get; set; }
@@ -25,6 +25,12 @@ public class TopicVersionDetailDTO
     public DateTime? LastModifiedAt { get; set; }
     public string? LastModifiedBy { get; set; }
 
+    public string? VN_title { get; set; }
+    public string? Problem { get; set; }
+
+    public string? Context { get; set; }
+    public string? Content { get; set; }
+
     public TopicVersionDetailDTO() { }
 
     public TopicVersionDetailDTO(TopicVersion topicVersion, EntityFile? entityFile)
@@ -32,7 +38,7 @@ public class TopicVersionDetailDTO
         Id = topicVersion.Id;
         TopicId = topicVersion.TopicId;
         VersionNumber = topicVersion.VersionNumber;
-        Title = topicVersion.Title;
+        EN_Title = topicVersion.EN_Title;
         Description = topicVersion.Description;
         Objectives = topicVersion.Objectives;
         Methodology = topicVersion.Methodology;
@@ -47,5 +53,9 @@ public class TopicVersionDetailDTO
         CreatedBy = topicVersion.CreatedBy;
         LastModifiedAt = topicVersion.LastModifiedAt;
         LastModifiedBy = topicVersion.LastModifiedBy;
+        VN_title = topicVersion.VN_title;
+        Problem = topicVersion.Problem;
+        Context = topicVersion.Context;
+        Content = topicVersion.Content;
     }
 }

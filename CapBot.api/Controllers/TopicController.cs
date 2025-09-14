@@ -148,7 +148,6 @@ namespace CapBot.api.Controllers
         ///     GET /api/topic/detail/1
         ///
         /// </remarks>
-        [Authorize]
         [HttpGet("detail/{topicId}")]
         [SwaggerOperation(
             Summary = "Lấy chi tiết chủ đề",

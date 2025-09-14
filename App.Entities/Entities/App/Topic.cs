@@ -9,7 +9,7 @@ public partial class Topic : CommonDataModel
 {
     public int Id { get; set; }
 
-    public string Title { get; set; } = null!;
+    public string EN_Title { get; set; } = null!;
 
     public string? Description { get; set; }
 
@@ -26,6 +26,13 @@ public partial class Topic : CommonDataModel
     public bool IsLegacy { get; set; } = false;
 
     public bool IsApproved { get; set; } = false;
+
+    public string? Abbreviation { get; set; }
+    public string? VN_title { get; set; }
+    public string? Problem { get; set; }
+
+    public string? Context { get; set; }
+    public string? Content { get; set; }
 
     public virtual User Supervisor { get; set; } = null!;
     public virtual TopicCategory? Category { get; set; }

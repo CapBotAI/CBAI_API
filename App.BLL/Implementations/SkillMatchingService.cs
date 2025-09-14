@@ -85,9 +85,9 @@ public class SkillMatchingService : ISkillMatchingService
 
         // Extract from topic title and description
         var topic = submission.TopicVersion.Topic;
-        if (!string.IsNullOrEmpty(topic.Title))
+        if (!string.IsNullOrEmpty(topic.EN_Title))
         {
-            skillTags.AddRange(ExtractSkillsFromText(topic.Title));
+            skillTags.AddRange(ExtractSkillsFromText(topic.EN_Title));
         }
 
         if (!string.IsNullOrEmpty(topic.Description))
@@ -109,7 +109,7 @@ public class SkillMatchingService : ISkillMatchingService
         return skillTags.Distinct().ToList();
     }
 
-    
+
     public async Task<List<ReviewerMatchingResult>> FindBestMatchingReviewersAsync(
         int submissionId, AutoAssignReviewerDTO criteria)
     {

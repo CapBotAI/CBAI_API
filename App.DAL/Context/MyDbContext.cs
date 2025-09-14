@@ -222,7 +222,7 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.ToTable("topics");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
-            entity.Property(e => e.Title).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.EN_Title).HasMaxLength(500).IsRequired();
             entity.Property(e => e.MaxStudents).HasDefaultValue(1);
             entity.Property(e => e.IsLegacy).HasDefaultValue(false);
             entity.Property(e => e.IsApproved).HasDefaultValue(true);
@@ -257,7 +257,7 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.ToTable("topic_versions");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
-            entity.Property(e => e.Title).HasMaxLength(500).IsRequired();
+            entity.Property(e => e.EN_Title).HasMaxLength(500).IsRequired();
             entity.Property(e => e.DocumentUrl).HasMaxLength(500);
             entity.Property(e => e.Status).HasDefaultValue(App.Entities.Enums.TopicStatus.Draft);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
@@ -386,6 +386,12 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.Weight).HasPrecision(3, 2).HasDefaultValue(1.00m);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+            entity.HasOne(d => d.Semester)
+                .WithMany(p => p.EvaluationCriterias)
+                .HasForeignKey(d => d.SemesterId)
+                .IsRequired()
+                .OnDelete(DeleteBehavior.Restrict);
 
             entity.HasIndex(e => e.IsActive);
         });
