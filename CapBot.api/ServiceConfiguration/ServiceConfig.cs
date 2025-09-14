@@ -104,5 +104,8 @@ public class ServiceConfig
 
         //Gemini AI Service 
         services.AddSingleton<GeminiAIService>();
+
+        // AiRubric Client
+        services.AddScoped<IAiRubricClient, AiRubricClient>();
     }
 }
