@@ -16,6 +16,7 @@ using App.Entities.DTOs.Notifications;
 using App.Entities.DTOs.Submissions;
 using App.Entities.Entities.App;
 using App.Entities.Enums;
+using Elastic.Clients.Elasticsearch.Ingest;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -33,6 +34,7 @@ public class SubmissionService : ISubmissionService
     private readonly IEmailService _emailService;
     private readonly IPathProvider _pathProvider;
     private readonly IConfiguration _configuration;
+    private readonly IAiRubricClient _aiRubricClient;
 
     private readonly ILogger<SubmissionService> _logger;
 
@@ -44,7 +46,8 @@ public class SubmissionService : ISubmissionService
      ILogger<SubmissionService> logger,
      IEmailService emailService,
      IPathProvider pathProvider,
-     IConfiguration configuration)
+     IConfiguration configuration,
+     IAiRubricClient aiRubricClient)
     {
         _unitOfWork = unitOfWork;
         _identityRepository = identityRepository;
@@ -56,6 +59,7 @@ public class SubmissionService : ISubmissionService
         this._configuration = configuration;
 
         this._logger = logger;
+        _aiRubricClient = aiRubricClient;
     }
 
     public async Task<BaseResponseModel<SubmissionDetailDTO>> CreateSubmission(CreateSubmissionDTO dto, int userId)
@@ -498,6 +502,41 @@ public class SubmissionService : ISubmissionService
             submissionT.AiCheckDetails = keywords.Count > 0 ? $"AI keywords: {string.Join(", ", keywords)}" : "AI skipped/no keywords";
             submissionT.Status = SubmissionStatus.UnderReview;
             submissionT.SubmittedAt = DateTime.Now;
+            try
+            {
+                var (stream, fileName) = await GetPrimaryDocxStreamAsync(submission.Id);
+                if (stream == null)
+                {
+                    // Không chặn quy trình, nhưng set trạng thái AI = Error
+                    submissionT.AiCheckStatus = AiCheckStatus.Failed;
+                    submissionT.AiCheckScore = null;
+                    submissionT.AiCheckDetails = "Không tìm thấy file .docx primary để chấm.";
+                }
+                else
+                {
+                    // Gọi AI
+                    var titlE = submissionT.Topic.EN_Title ?? submissionT.TopicVersion?.EN_Title;
+                    var categoryId = submissionT.Topic?.CategoryId;
+                    var supervisorId = submissionT.Topic?.SupervisorId ?? userId;
+                    var semesterId = submissionT.Phase?.SemesterId ?? submission.Topic?.SemesterId ?? 0;
+                    var maxStudents = submissionT.Topic?.MaxStudents ?? 4;
+
+                    var ai = await _aiRubricClient.EvaluateDocxAsync(
+                        stream, fileName!, title, supervisorId, semesterId, categoryId, maxStudents);
+
+                    // Map kết quả: Score thang 10, Status lấy overall_rating, Details lưu full JSON
+                    submissionT.AiCheckStatus = AiCheckStatus.Passed;                         // ví dụ: Excellent/Good/Fair/Poor
+                    submissionT.AiCheckScore = (decimal)Math.Round(ai.OverallScore / 10.0, 2);     // thang 10
+                    submissionT.AiCheckDetails = ai.RawJson;                               // full rubric JSON
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AI Rubric evaluation failed for submission {SubmissionId}", submission.Id);
+                submissionT.AiCheckStatus = AiCheckStatus.Failed;
+                submissionT.AiCheckScore = null;
+                submissionT.AiCheckDetails = $"AI Rubric evaluation error: {ex.Message}";
+            }
             await submissionRepoT.UpdateAsync(submissionT);
 
             if (submissionT.TopicVersionId.HasValue && submissionT.TopicVersion != null)
@@ -762,6 +801,41 @@ public class SubmissionService : ISubmissionService
             submissionT.SubmittedAt = DateTime.Now;
             submissionT.SubmissionRound += 1;
             submissionT.TopicVersionId = topicVersion.Id;
+            try
+            {
+                var (stream, fileName) = await GetPrimaryDocxStreamAsync(dto.Id);
+                if (stream == null)
+                {
+                    // Không chặn quy trình, nhưng set trạng thái AI = Error
+                    submissionT.AiCheckStatus = AiCheckStatus.Failed;
+                    submissionT.AiCheckScore = null;
+                    submissionT.AiCheckDetails = "Không tìm thấy file .docx primary để chấm.";
+                }
+                else
+                {
+                    // Gọi AI
+                    var titlE = submissionT.TopicVersion?.EN_Title ?? submissionT.Topic?.EN_Title;
+                    var categoryId = submissionT.Topic?.CategoryId;
+                    var supervisorId = submissionT.Topic?.SupervisorId ?? userId;
+                    var semesterId = submissionT.Phase?.SemesterId ?? submissionT.Topic?.SemesterId ?? 0;
+                    var maxStudents = submissionT.Topic?.MaxStudents ?? 4;
+
+                    var ai = await _aiRubricClient.EvaluateDocxAsync(
+                        stream, fileName!, title, supervisorId, semesterId, categoryId, maxStudents);
+
+                    // Map kết quả: Score thang 10, Status lấy overall_rating, Details lưu full JSON
+                    submissionT.AiCheckStatus = AiCheckStatus.Passed;                         // ví dụ: Excellent/Good/Fair/Poor
+                    submissionT.AiCheckScore = (decimal)Math.Round(ai.OverallScore / 10.0, 2);     // thang 10
+                    submissionT.AiCheckDetails = ai.RawJson;                               // full rubric JSON
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "AI Rubric evaluation failed for submission {SubmissionId}", submission.Id);
+                submissionT.AiCheckStatus = AiCheckStatus.Failed;
+                submissionT.AiCheckScore = null;
+                submissionT.AiCheckDetails = $"AI Rubric evaluation error: {ex.Message}";
+            }
             await submissionRepoT.UpdateAsync(submissionT);
 
             var topicVersionT = await versionRepoT.GetSingleAsync(new QueryBuilder<TopicVersion>()
@@ -773,13 +847,19 @@ public class SubmissionService : ISubmissionService
 
             var moderators = await _identityRepository.GetUsersInRoleAsync(SystemRoleConstants.Moderator);
             var moderatorIds = moderators.Select(x => (int)x.Id).Distinct().ToList();
+            var topicRepo = _unitOfWork.GetRepo<Topic>();
+            var topic = await topicRepo.GetSingleAsync(new QueryBuilder<Topic>()
+                .WithPredicate(x => x.Id == submission.TopicId && x.IsActive && x.DeletedAt == null)
+                .WithTracking(true)
+                .Build());
+
             if (moderatorIds.Count > 0)
             {
                 var createBulkNotification = await _notificationService.CreateBulkAsync(new CreateBulkNotificationsDTO
                 {
                     UserIds = moderatorIds,
                     Title = "Thông báo về submission mới",
-                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.EN_Title} và phiên bản đề tài {topicVersion.EN_Title}",
+                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {topic.EN_Title} và phiên bản đề tài {topicVersion.EN_Title}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Submission.ToString(),
                     RelatedEntityId = submission.Id
@@ -798,7 +878,7 @@ public class SubmissionService : ISubmissionService
                 {
                     UserIds = reviewerIds,
                     Title = "Thông báo về submission mới",
-                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {submission.Topic.EN_Title} và phiên bản đề tài {topicVersion.EN_Title}",
+                    Message = $"Submission #{submission.Id} đã được resubmit với đề tài {topic.EN_Title} và phiên bản đề tài {topicVersion.EN_Title}",
                     Type = NotificationTypes.Info,
                     RelatedEntityType = EntityType.Submission.ToString(),
                     RelatedEntityId = submission.Id
@@ -1081,5 +1161,29 @@ public class SubmissionService : ISubmissionService
             await _unitOfWork.RollBackAsync();
             throw;
         }
+    }
+    private async Task<(Stream? stream, string? fileName)> GetPrimaryDocxStreamAsync(long submissionId)
+    {
+        var entityFileRepo = _unitOfWork.GetRepo<EntityFile>();
+        var link = await entityFileRepo.GetSingleAsync(new QueryBuilder<EntityFile>()
+            .WithPredicate(x => x.EntityId == submissionId && x.EntityType == EntityType.Submission && x.IsPrimary)
+            .WithInclude(x => x.File!)
+            .WithTracking(false)
+            .Build());
+
+        if (link?.File == null) return (null, null);
+
+        var file = link.File;
+        var path = file.FilePath; // giả định lưu local path; nếu chỉ có Url thì bạn có thể tải về bằng HttpClient
+
+        if (string.IsNullOrWhiteSpace(path) || !File.Exists(path))
+            return (null, null);
+
+        if (!path.EndsWith(".docx", StringComparison.OrdinalIgnoreCase))
+            return (null, null);
+
+        var stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+        var name = string.IsNullOrWhiteSpace(file.FileName) ? Path.GetFileName(path) : file.FileName;
+        return (stream, name);
     }
 }

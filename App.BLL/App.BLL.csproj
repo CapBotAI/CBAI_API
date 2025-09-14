@@ -19,6 +19,7 @@
       <PackageReference Include="Microsoft.AspNetCore.SignalR" Version="1.2.0" />
       <PackageReference Include="Microsoft.AspNetCore.SignalR.Common" Version="8.0.13" />
       <PackageReference Include="Microsoft.AspNetCore.SignalR.Protocols.Json" Version="8.0.13" />
+      <PackageReference Include="Microsoft.Extensions.Http" Version="9.0.9" />
       <PackageReference Include="Microsoft.Extensions.Identity.Core" Version="8.0.13" />
       <PackageReference Include="Microsoft.Extensions.Identity.Stores" Version="8.0.13" />
       <PackageReference Include="payOS" Version="1.0.9" />
