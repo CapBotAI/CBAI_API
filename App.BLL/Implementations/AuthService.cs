@@ -224,4 +224,54 @@ public class AuthService : IAuthService
         var emailModel = new EmailModel(new List<string> { email }, "Welcome to CapBot", emailContent);
         await _emailService.SendEmailAsync(emailModel);
     }
+
+    public async Task<BaseResponseModel<object>> ChangePasswordAsync(ChangePasswordDTO dto, string userId)
+    {
+        try
+        {
+            var user = await _identityRepository.GetByIdAsync(long.Parse(userId));
+            if (user == null)
+            {
+                return new BaseResponseModel<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "User not found."
+                };
+            }
+
+            var isOldPasswordValid = await _identityRepository.CheckPasswordAsync(user, dto.OldPassword);
+            if (!isOldPasswordValid)
+            {
+                return new BaseResponseModel<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Old password is incorrect."
+                };
+            }
+
+            var result = await _identityRepository.ChangePasswordAsync(user, dto.NewPassword);
+            if (!result)
+            {
+                return new BaseResponseModel<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Failed to change password."
+                };
+            }
+
+            return new BaseResponseModel<object>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Password changed successfully."
+            };
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while changing the password.", ex);
+        }
+    }
 }

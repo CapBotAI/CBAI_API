@@ -196,9 +196,39 @@ public class IdentityRepository : IIdentityRepository
         return false;
     }
 
-    public Task<bool> ChangePassword(string userId, string passwordNew)
+    public async Task<bool> ChangePasswordAsync(User user, string newPassword)
     {
-        throw new NotImplementedException();
+        if (user == null)
+        {
+            return false;
+        }
+
+        var result = await _userManager.RemovePasswordAsync(user);
+        if (!result.Succeeded)
+        {
+            return false;
+        }
+
+        result = await _userManager.AddPasswordAsync(user, newPassword);
+        return result.Succeeded;
+    }
+
+    public async Task<bool> ChangePassword(string userId, string passwordNew)
+    {
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+        {
+            return false;
+        }
+
+        var result = await _userManager.RemovePasswordAsync(user);
+        if (!result.Succeeded)
+        {
+            return false;
+        }
+
+        result = await _userManager.AddPasswordAsync(user, passwordNew);
+        return result.Succeeded;
     }
 
     public async Task<bool> CreateUpdateRoleAsync(string roleName, bool isAdmin)

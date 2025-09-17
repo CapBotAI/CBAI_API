@@ -174,4 +174,6 @@ public interface IIdentityRepository
     // Task<List<User>> GetAccounts(AccountGetListDTO dto);
 
     Task<List<User>> GetUsersInRoleAsync(string roleName);
+    
+    Task<bool> ChangePasswordAsync(User user, string newPassword);
 }

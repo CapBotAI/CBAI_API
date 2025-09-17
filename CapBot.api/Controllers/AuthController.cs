@@ -136,5 +136,60 @@ namespace CapBot.api.Controllers
                 return Error(ConstantModel.ErrorMessage);
             }
         }
+
+        /// <summary>
+        /// Đổi mật khẩu
+        /// </summary>
+        /// <param name="dto">Dữ liệu đổi mật khẩu</param>
+        /// <returns>Kết quả của thao tác đổi mật khẩu</returns>
+        /// <remarks>
+        /// Cho phép người dùng đã xác thực đổi mật khẩu của mình.
+        ///
+        /// Sample request:
+        ///
+        ///     POST /api/auth/change-password
+        ///     {
+        ///         "oldPassword": "OldSecurePass123",
+        ///         "newPassword": "NewSecurePass123"
+        ///     }
+        ///
+        /// </remarks>
+        [Authorize]
+        [HttpPost("change-password")]
+        [SwaggerOperation(
+            Summary = "Đổi mật khẩu",
+            Description = "Cho phép người dùng đã xác thực đổi mật khẩu của mình"
+        )]
+        [SwaggerResponse(200, "Đổi mật khẩu thành công")]
+        [SwaggerResponse(400, "Dữ liệu đầu vào không hợp lệ")]
+        [SwaggerResponse(401, "Truy cập không được phép")]
+        [SwaggerResponse(404, "Người dùng không tồn tại")]
+        [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        public async Task<IActionResult> ChangePassword([FromBody] ChangePasswordDTO dto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return ModelInvalid();
+            }
+
+            try
+            {
+                var userId = User.FindFirst("id")?.Value;
+                if (string.IsNullOrEmpty(userId))
+                {
+                    return Unauthorized();
+                }
+
+                var result = await _authService.ChangePasswordAsync(dto, userId);
+                return ProcessServiceResponse(result);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Error occurred while changing password for user ID {UserId}", User.FindFirst("id")?.Value);
+                return Error(ConstantModel.ErrorMessage);
+            }
+        }
     }
 }
