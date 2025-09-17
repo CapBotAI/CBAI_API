@@ -21,6 +21,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using MimeKit;
 
 namespace App.BLL.Implementations;
 
@@ -570,46 +571,68 @@ public class SubmissionService : ISubmissionService
 
             try
             {
-                var adminEmail = _configuration["AdminAccount:Email"];
-                var moderatorEmails = moderators.Where(x => !string.IsNullOrEmpty(x.Email)).Select(x => x.Email!).Distinct().ToList();
+                var moderatorEmails = moderators
+                 .Where(x => !string.IsNullOrWhiteSpace(x.Email))
+                 .Select(x => x.Email!)
+                 .Distinct()
+                 .ToList();
+                var modTemplatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Submission", "submit-topic-moderator.html"));
+                var supTemplatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Submission", "submit-topic-supervisor.html"));
+                var htmlMod = await File.ReadAllTextAsync(modTemplatePath);
+                var htmlSup = await File.ReadAllTextAsync(supTemplatePath);
+                _logger.LogInformation("Email template path (moderator): {path}", modTemplatePath);
+                _logger.LogInformation("Email template path (supervisor): {path}", supTemplatePath);
+                var submissionUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/submission/detail/{submissionT.Id}";
+                var topicUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/topic/detail/{submissionT.Topic.Id}";
+                var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/index.html";
+                var bodyMod = new ContentBuilder(htmlMod)
+                    .BuildCallback(new List<ObjectReplace>
+                    {
+                        new ObjectReplace { Name = "__submission_id__", Value = submissionT.Id.ToString() },
+                        new ObjectReplace { Name = "__submission_url__", Value = submissionUrl },
+                        new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
+                        new ObjectReplace { Name = "__topic_id__", Value = submissionT.Topic.Id.ToString() },
+                        new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
+                        new ObjectReplace { Name = "__user_name__", Value = user.UserName },
+                        new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.EN_Title }
+                    })
+                    .GetContent();
+                // Email to moderators about the new submission
                 if (moderatorEmails.Count > 0)
                 {
-                    if (moderatorEmails.Any(email => string.IsNullOrWhiteSpace(email)))
+                    var modMail = new EmailModel(moderatorEmails, $"Bài nộp mới: {submissionT.Topic.EN_Title}", bodyMod)
                     {
-                        throw new Exception($"Invalid email address found in moderator emails.");
-                    }
-
-                    var templatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Submission", "submit-topic.html"));
-                    var html = await File.ReadAllTextAsync(templatePath);
-                    _logger.LogInformation("Email template path: {path}", templatePath);
-                    _logger.LogInformation("Email template content: {html}", html);
-
-                    var submissionUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/submission/detail/{submissionT.Id}";
-
-                    var topicUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/topic/detail/{submissionT.Topic.Id}";
-
-                    var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/index.html";
-
-                    var body = new ContentBuilder(html)
-                        .BuildCallback(new List<ObjectReplace>
-                        {
-                            new ObjectReplace { Name = "__submission_id__", Value = submissionT.Id.ToString() },
-                            new ObjectReplace { Name = "__submission_url__", Value = submissionUrl },
-                            new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
-                            new ObjectReplace { Name = "__topic_id__", Value = submissionT.Topic.Id.ToString() },
-                            new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
-                            new ObjectReplace { Name = "__user_name__", Value = user.UserName },
-                            new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.EN_Title }
-                        })
-                        .GetContent();
-
-                    var mail = new EmailModel(new[] { adminEmail }, $"Bài nộp mới: {submissionT.Topic.EN_Title}", body)
-                    {
-                        BodyHtml = body
+                        BodyHtml = bodyMod
                     };
+                    await _emailService.SendEmailAsync(modMail);
+                }
 
-
-                    await _emailService.SendEmailAsync(mail);
+                // Email to supervisor confirming submit success
+                var supervisorId = submissionT.Topic?.SupervisorId;
+                if (supervisorId.HasValue)
+                {
+                    var supervisor = await _identityRepository.GetByIdAsync((long)supervisorId.Value);
+                    if (!string.IsNullOrWhiteSpace(supervisor?.Email))
+                    {
+                        var bodySup = new ContentBuilder(htmlSup)
+                            .BuildCallback(new List<ObjectReplace>
+                            {
+                                new ObjectReplace { Name = "__submission_id__", Value = submissionT.Id.ToString() },
+                                new ObjectReplace { Name = "__submission_url__", Value = submissionUrl },
+                                new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
+                                new ObjectReplace { Name = "__topic_id__", Value = submissionT.Topic.Id.ToString() },
+                                new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
+                                new ObjectReplace { Name = "__user_name__", Value = user.UserName },
+                                new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.EN_Title }
+                            })
+                            .GetContent();
+                        var supRecipients = new List<string> { supervisor!.Email! };
+                        var supMail = new EmailModel(supRecipients, $"Nộp đề tài thành công: {submissionT.Topic.EN_Title}", bodySup)
+                        {
+                            BodyHtml = bodySup
+                        };
+                        await _emailService.SendEmailAsync(supMail);
+                    }
                 }
             }
             catch (System.Exception ex)
@@ -895,47 +918,70 @@ public class SubmissionService : ISubmissionService
 
             try
             {
-                var adminEmail = _configuration["AdminAccount:Email"];
-                var moderatorEmails = moderators.Where(x => !string.IsNullOrEmpty(x.Email)).Select(x => x.Email!).Distinct().ToList();
+                var moderatorEmails = moderators
+                    .Where(x => !string.IsNullOrWhiteSpace(x.Email))
+                    .Select(x => x.Email!)
+                    .Distinct()
+                    .ToList();
+
+                var modTemplatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Submission", "submit-topic-moderator.html"));
+                var supTemplatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Submission", "submit-topic-supervisor.html"));
+                var htmlMod = await File.ReadAllTextAsync(modTemplatePath);
+                var htmlSup = await File.ReadAllTextAsync(supTemplatePath);
+                _logger.LogInformation("Email template path (moderator): {path}", modTemplatePath);
+                _logger.LogInformation("Email template path (supervisor): {path}", supTemplatePath);
+                var submissionUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/submission/detail/{submissionT.Id}";
+                var topicUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/topic/detail/{submissionT.Topic.Id}";
+                var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/index.html";
+                var bodyMod = new ContentBuilder(htmlMod)
+                    .BuildCallback(new List<ObjectReplace>
+                    {
+                        new ObjectReplace { Name = "__submission_id__", Value = submissionT.Id.ToString() },
+                        new ObjectReplace { Name = "__submission_round__", Value = submissionT.SubmissionRound.ToString() },
+                        new ObjectReplace { Name = "__submission_url__", Value = submissionUrl },
+                        new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
+                        new ObjectReplace { Name = "__topic_id__", Value = submissionT.Topic.Id.ToString() },
+                        new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
+                        new ObjectReplace { Name = "__user_name__", Value = user.UserName },
+                        new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.EN_Title }
+                    })
+                    .GetContent();
                 if (moderatorEmails.Count > 0)
                 {
-                    if (moderatorEmails.Any(email => string.IsNullOrWhiteSpace(email)))
+                    var modMail = new EmailModel(moderatorEmails, $"Nộp lại bài nộp: {submissionT.Topic.EN_Title}", bodyMod)
                     {
-                        throw new Exception($"Invalid email address found in moderator emails.");
-                    }
-
-                    var templatePath = _pathProvider.GetEmailTemplatePath(Path.Combine("Email", "Submission", "submit-topic.html"));
-                    var html = await File.ReadAllTextAsync(templatePath);
-                    _logger.LogInformation("Email template path: {path}", templatePath);
-                    _logger.LogInformation("Email template content: {html}", html);
-
-                    var submissionUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/submission/detail/{submissionT.Id}";
-
-                    var topicUrl = $"{_configuration["AppSettings:HomeUrl"]}/api/topic/detail/{submissionT.Topic.Id}";
-
-                    var callbackUrl = $"{_configuration["AppSettings:HomeUrl"]}/index.html";
-
-                    var body = new ContentBuilder(html)
-                        .BuildCallback(new List<ObjectReplace>
-                        {
-                            new ObjectReplace { Name = "__submission_id__", Value = submissionT.Id.ToString() },
-                            new ObjectReplace { Name = "__submission_round__", Value = submissionT.SubmissionRound.ToString() },
-                            new ObjectReplace { Name = "__submission_url__", Value = submissionUrl },
-                            new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
-                            new ObjectReplace { Name = "__topic_id__", Value = submissionT.Topic.Id.ToString() },
-                            new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
-                            new ObjectReplace { Name = "__user_name__", Value = user.UserName },
-                            new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.EN_Title }
-                        })
-                        .GetContent();
-
-                    var mail = new EmailModel(new[] { adminEmail }, $"Nộp lại bài nộp: {submissionT.Topic.EN_Title}", body)
-                    {
-                        BodyHtml = body
+                        BodyHtml = bodyMod
                     };
+                    await _emailService.SendEmailAsync(modMail);
+                }
 
+                var supervisorId = submissionT.Topic?.SupervisorId;
+                if (supervisorId.HasValue)
+                {
+                    var supervisor = await _identityRepository.GetByIdAsync((long)supervisorId.Value);
+                    if (!string.IsNullOrWhiteSpace(supervisor?.Email))
+                    {
+                        var bodySup = new ContentBuilder(htmlSup)
+                            .BuildCallback(new List<ObjectReplace>
+                            {
+                                new ObjectReplace { Name = "__submission_id__", Value = submissionT.Id.ToString() },
+                                new ObjectReplace { Name = "__submission_round__", Value = submissionT.SubmissionRound.ToString() },
+                                new ObjectReplace { Name = "__submission_url__", Value = submissionUrl },
+                                new ObjectReplace { Name = "__topic_url__", Value = topicUrl },
+                                new ObjectReplace { Name = "__topic_id__", Value = submissionT.Topic.Id.ToString() },
+                                new ObjectReplace { Name = "__callback_url__", Value = callbackUrl },
+                                new ObjectReplace { Name = "__user_name__", Value = user.UserName },
+                                new ObjectReplace { Name = "__topic_title__", Value = submissionT.Topic.EN_Title }
+                            })
+                            .GetContent();
 
-                    await _emailService.SendEmailAsync(mail);
+                        var supRecipients = new List<string> { supervisor!.Email! };
+                        var supMail = new EmailModel(supRecipients, $"Xác nhận nộp lại bài nộp: {submissionT.Topic.EN_Title}", bodySup)
+                        {
+                            BodyHtml = bodySup
+                        };
+                        await _emailService.SendEmailAsync(supMail);
+                    }
                 }
             }
             catch (System.Exception ex)
