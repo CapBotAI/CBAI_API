@@ -3855,3 +3855,11 @@ WHERE [s].[UserId] = @__uid_0 AND [s].[IsRead] = CAST(0 AS bit)
 2025-09-15 00:14:51.980 +07:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0065ms - processed: 0 items - remaining: 1 items
 2025-09-15 00:15:01.980 +07:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
 2025-09-15 00:15:01.981 +07:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0076ms - processed: 0 items - remaining: 1 items
+2025-09-15 00:15:11.984 +07:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-09-15 00:15:11.984 +07:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0046ms - processed: 0 items - remaining: 1 items
+2025-09-15 00:15:21.988 +07:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-09-15 00:15:21.989 +07:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0028ms - processed: 0 items - remaining: 1 items
+2025-09-15 00:15:31.997 +07:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-09-15 00:15:31.998 +07:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0064ms - processed: 0 items - remaining: 1 items
+2025-09-15 00:15:42.001 +07:00 [DBG] Starting HttpMessageHandler cleanup cycle with 1 items
+2025-09-15 00:15:42.002 +07:00 [DBG] Ending HttpMessageHandler cleanup cycle after 0.0081ms - processed: 0 items - remaining: 1 items

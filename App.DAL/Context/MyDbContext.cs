@@ -383,7 +383,7 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
             entity.Property(e => e.Name).HasMaxLength(100).IsRequired();
             entity.Property(e => e.MaxScore).HasDefaultValue(10);
-            entity.Property(e => e.Weight).HasPrecision(3, 2).HasDefaultValue(1.00m);
+            entity.Property(e => e.Weight).HasPrecision(5, 2).HasDefaultValue(1.00m);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
