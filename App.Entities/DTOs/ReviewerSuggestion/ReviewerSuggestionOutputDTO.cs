@@ -9,5 +9,9 @@ namespace App.Entities.DTOs.ReviewerSuggestion
     {
         public List<ReviewerSuggestionDTO> Suggestions { get; set; } = new();
         public string? AIExplanation { get; set; }
+        // Assignment results produced when the caller requested auto-assign
+        public List<App.Entities.DTOs.ReviewerAssignment.ReviewerAssignmentResponseDTO>? AssignmentResults { get; set; } = new();
+        // Any assignment-level error messages (one string per failed assignment)
+        public List<string>? AssignmentErrors { get; set; } = new();
     }
 }
