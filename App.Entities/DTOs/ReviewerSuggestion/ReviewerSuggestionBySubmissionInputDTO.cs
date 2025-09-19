@@ -10,7 +10,7 @@ namespace App.Entities.DTOs.ReviewerSuggestion
         [Required]
         public int SubmissionId { get; set; }
 
-        [Range(1, 100)]
+        [Range(1, 1000)]
         public int MaxSuggestions { get; set; } = 5;
 
         public bool UsePrompt { get; set; } = true;

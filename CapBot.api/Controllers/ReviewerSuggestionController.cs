@@ -40,7 +40,7 @@ namespace CapBot.api.Controllers
         [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public async Task<IActionResult> Suggest([FromBody] ReviewerSuggestionBySubmissionInputDTO input)
+        public async Task<IActionResult> Suggest([FromBody] App.Entities.DTOs.ReviewerSuggestion.ReviewerSuggestionInputDTO input)
         {
             if (!ModelState.IsValid)
                 return ModelInvalid();
@@ -50,7 +50,8 @@ namespace CapBot.api.Controllers
 
             try
             {
-                var result = await _reviewerSuggestionService.SuggestReviewersBySubmissionIdAsync(input);
+                _logger.LogInformation("Suggest called with TopicVersionId={TopicVersionId} MaxSuggestions={MaxSuggestions} UsePrompt={UsePrompt}", input.TopicVersionId, input.MaxSuggestions, input.UsePrompt);
+                var result = await _reviewerSuggestionService.SuggestReviewersAsync(input);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)
@@ -91,62 +92,6 @@ namespace CapBot.api.Controllers
             }
         }
 
-        /// <summary>
-        /// Lấy danh sách reviewer ít workload nhất cho một chủ đề sử dụng TopicId
-        /// </summary>
-        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
-        [HttpGet("top-by-topic")]
-        [SwaggerOperation(
-            Summary = "Lấy danh sách reviewer ít workload nhất cho một chủ đề",
-            Description = "Dựa trên số lượng assignment đang hoạt động, kỹ năng và hiệu suất, sử dụng TopicId"
-        )]
-        [SwaggerResponse(200, "Danh sách reviewer thành công")]
-        [Produces("application/json")]
-        public async Task<IActionResult> GetTopReviewersByTopicId([FromQuery] int topicId, [FromQuery] int count = 5)
-        {
-            try
-            {
-            var input = new ReviewerSuggestionByTopicInputDTO
-            {
-                TopicId = topicId,
-                MaxSuggestions = count,
-                UsePrompt = false
-            };
-            var result = await _reviewerSuggestionService.SuggestReviewersByTopicIdAsync(input);
-            return ProcessServiceResponse(result);
-            }
-            catch (Exception ex)
-            {
-            _logger.LogError(ex, "Error occurred while getting top reviewers");
-            return Error(ConstantModel.ErrorMessage);
-            }
-        }
-
-        /// <summary>
-        /// Kiểm tra reviewer có đủ điều kiện cho một phiên bản chủ đề không
-        /// </summary>
-        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
-        [HttpGet("check-eligibility")]
-        [SwaggerOperation(
-            Summary = "Kiểm tra reviewer có đủ điều kiện cho một phiên bản chủ đề",
-            Description = "Kiểm tra eligibility dựa trên kỹ năng, workload, hiệu suất, v.v."
-        )]
-        [SwaggerResponse(200, "Kiểm tra eligibility thành công")]
-        [SwaggerResponse(404, "Reviewer không tìm thấy")]
-        [Produces("application/json")]
-        public async Task<IActionResult> CheckEligibility([FromQuery] int reviewerId, [FromQuery] int topicVersionId)
-        {
-            try
-            {
-                var result = await _reviewerSuggestionService.CheckReviewerEligibilityAsync(reviewerId, topicVersionId);
-                return ProcessServiceResponse(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error checking reviewer eligibility");
-                return Error(ConstantModel.ErrorMessage);
-            }
-        }
 
         /// <summary>
         /// Gợi ý reviewer cho một chủ đề sử dụng TopicId
