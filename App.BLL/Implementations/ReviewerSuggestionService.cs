@@ -13,6 +13,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using System.Threading.Tasks;
 using App.BLL.Services; // For GeminiAIService and VectorMath
+using Microsoft.Extensions.Logging;
 
 namespace App.BLL.Implementations
 {
@@ -20,11 +21,13 @@ namespace App.BLL.Implementations
     {
         private readonly GeminiAIService _aiService;
         private readonly IUnitOfWork _unitOfWork;
+        private readonly ILogger<ReviewerSuggestionService> _logger;
 
-        public ReviewerSuggestionService(GeminiAIService aiService, IUnitOfWork unitOfWork)
+        public ReviewerSuggestionService(GeminiAIService aiService, IUnitOfWork unitOfWork, ILogger<ReviewerSuggestionService> logger)
         {
             _aiService = aiService;
             _unitOfWork = unitOfWork;
+            _logger = logger;
         }
 
         public async Task<BaseResponseModel<ReviewerSuggestionOutputDTO>> SuggestReviewersBySubmissionIdAsync(ReviewerSuggestionBySubmissionInputDTO input)
@@ -130,7 +133,9 @@ namespace App.BLL.Implementations
                     }
                     catch (Exception ex)
                     {
-                        aiExplanation = $"AI explanation could not be generated: {ex.Message}";
+                        // Do not return full exception or provider JSON to the client; log full details for admins
+                        _logger.LogWarning(ex, "AI explanation generation failed for SubmissionId {SubmissionId}", input.SubmissionId);
+                        aiExplanation = "Failed to generate AI explanation: a provider error occurred; full details have been logged for administrators.";
                     }
                 }
 
@@ -168,7 +173,7 @@ namespace App.BLL.Implementations
             }
 
             // Log the submission context for debugging
-            Console.WriteLine($"Generating embedding for submission context: {submissionContext}");
+            _logger.LogDebug("Generating embedding for submission context: {SubmissionContext}", submissionContext);
 
             // Get topic embedding
             float[] topicEmbedding;
@@ -178,7 +183,7 @@ namespace App.BLL.Implementations
             }
             catch (Exception ex)
             {
-                Console.WriteLine($"Error generating embedding for submission context: {ex.Message}");
+                _logger.LogError(ex, "Error generating embedding for submission context. SubmissionContext: {SubmissionContext}", submissionContext);
                 throw new InvalidOperationException("Failed to generate embedding for submission context.", ex);
             }
 
@@ -192,7 +197,7 @@ namespace App.BLL.Implementations
                     var skillText = string.Join(", ", reviewer.LecturerSkills.Select(s => $"{s.SkillTag} ({s.ProficiencyLevel})"));
                     if (string.IsNullOrWhiteSpace(skillText))
                     {
-                        Console.WriteLine($"Reviewer {reviewer.Id} has no valid skills.");
+                        _logger.LogDebug("Reviewer {ReviewerId} has no valid skills.", reviewer.Id);
                         continue;
                     }
 
@@ -203,7 +208,7 @@ namespace App.BLL.Implementations
                     }
                     catch (Exception ex)
                     {
-                        Console.WriteLine($"Error generating embedding for reviewer {reviewer.Id}: {ex.Message}");
+                        _logger.LogWarning(ex, "Error generating embedding for reviewer {ReviewerId}. Skipping reviewer.", reviewer.Id);
                         continue;
                     }
 
@@ -230,7 +235,7 @@ namespace App.BLL.Implementations
                 catch (Exception ex)
                 {
                     // Log and skip reviewers with issues
-                    Console.WriteLine($"Failed to calculate score for reviewer {reviewer.Id}: {ex.Message}");
+                    _logger.LogWarning(ex, "Failed to calculate score for reviewer {ReviewerId}.", reviewer.Id);
                 }
             }
 
@@ -255,12 +260,49 @@ namespace App.BLL.Implementations
         {
             try
             {
-                var prompt = $"Given the submission context:\n---\n{submissionContext}\n---\nand these reviewer profiles:\n{string.Join("\n", suggestions.Select((s, i) => $"Reviewer {i + 1}: {s.ReviewerName}, Score: {s.OverallScore:F2}"))}\nExplain why these reviewers are suitable.";
-                return await _aiService.GetPromptCompletionAsync(prompt);
+                // Build a compact prompt and guard its length to avoid exceeding model input limits
+                var reviewersText = string.Join("\n", suggestions.Select((s, i) => $"Reviewer {i + 1}: {s.ReviewerName}, Score: {s.OverallScore:F2}"));
+                var basePrompt = $"Given the submission context:\n---\n{submissionContext}\n---\nand these reviewer profiles:\n{reviewersText}\nExplain why these reviewers are suitable.";
+
+                // If the prompt is too long, truncate the submissionContext portion and note truncation
+                const int maxPromptLength = 3000; // conservative safe limit
+                string promptToSend = basePrompt;
+                if (basePrompt.Length > maxPromptLength)
+                {
+                    // Truncate submissionContext while preserving reviewer list and instruction
+                    var note = "[Truncated submission context to fit model limits]";
+                    var allowedContextLen = Math.Max(200, maxPromptLength - reviewersText.Length - note.Length - 200);
+                    var truncatedContext = submissionContext.Length > allowedContextLen ? submissionContext.Substring(0, allowedContextLen) + "..." : submissionContext;
+                    promptToSend = $"Given the submission context:\n---\n{truncatedContext}\n---\n{note}\n\nand these reviewer profiles:\n{reviewersText}\nExplain why these reviewers are suitable.";
+                }
+
+                return await _aiService.GetPromptCompletionAsync(promptToSend);
             }
             catch (Exception ex)
             {
-                return $"Failed to generate AI explanation: {ex.Message}";
+                // Log full exception for administrators, but return a concise, non-sensitive message to the API client
+                _logger.LogWarning(ex, "Prompt completion failed for submission context");
+
+                var full = ex.ToString();
+                var summary = ex.Message ?? "Prompt generation failed";
+
+                // Remove any JSON payload from the summary to avoid leaking provider responses
+                var idx = summary.IndexOf('{');
+                if (idx > 0)
+                {
+                    summary = summary.Substring(0, idx).Trim();
+                }
+
+                // Detect common rate-limit/quota signals from provider responses
+                var isRateLimit = full.Contains("TooManyRequests") || full.Contains("RESOURCE_EXHAUSTED") || full.Contains("Quota exceeded") || full.Contains("429");
+
+                var howToFix = isRateLimit
+                    ? "How to fix: retry after a delay (respect Retry-After header), reduce request rate or batch requests, or request a quota increase in Google Cloud Console; consider caching or background queueing."
+                    : "How to fix: check provider response and logs, implement retries/backoff for transient errors, and ensure request payloads are valid.";
+
+                // Return a concise message; full provider error is kept only in logs
+                var result = $"Failed to generate AI explanation: {summary}. {howToFix} Full provider error has been logged for administrators.";
+                return result;
             }
         }
 
