@@ -40,17 +40,17 @@ namespace CapBot.api.Controllers
         [SwaggerResponse(500, "Lỗi máy chủ nội bộ")]
         [Consumes("application/json")]
         [Produces("application/json")]
-        public async Task<IActionResult> Suggest([FromBody] ReviewerSuggestionInputDTO input)
+        public async Task<IActionResult> Suggest([FromBody] ReviewerSuggestionBySubmissionInputDTO input)
         {
             if (!ModelState.IsValid)
                 return ModelInvalid();
 
             if (input == null)
-                return Error("Dữ liệu đầu vào không hợp lệ");
+                return Error("Invalid input data");
 
             try
             {
-                var result = await _reviewerSuggestionService.SuggestReviewersAsync(input);
+                var result = await _reviewerSuggestionService.SuggestReviewersBySubmissionIdAsync(input);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)
@@ -71,23 +71,23 @@ namespace CapBot.api.Controllers
         )]
         [SwaggerResponse(200, "Danh sách reviewer thành công")]
         [Produces("application/json")]
-        public async Task<IActionResult> GetTopReviewers([FromQuery] int topicVersionId, [FromQuery] int count = 5)
+        public async Task<IActionResult> GetTopReviewers([FromQuery] int submissionId, [FromQuery] int count = 5)
         {
             try
             {
-            var input = new ReviewerSuggestionInputDTO
-            {
-                TopicVersionId = topicVersionId,
-                MaxSuggestions = count,
-                UsePrompt = false
-            };
-            var result = await _reviewerSuggestionService.SuggestReviewersAsync(input);
-            return ProcessServiceResponse(result);
+                var input = new ReviewerSuggestionBySubmissionInputDTO
+                {
+                    SubmissionId = submissionId,
+                    MaxSuggestions = count,
+                    UsePrompt = false
+                };
+                var result = await _reviewerSuggestionService.SuggestReviewersBySubmissionIdAsync(input);
+                return ProcessServiceResponse(result);
             }
             catch (Exception ex)
             {
-            _logger.LogError(ex, "Error occurred while getting top reviewers");
-            return Error(ConstantModel.ErrorMessage);
+                _logger.LogError(ex, "Error occurred while getting top reviewers");
+                return Error(ConstantModel.ErrorMessage);
             }
         }
 
@@ -123,40 +123,6 @@ namespace CapBot.api.Controllers
         }
 
         /// <summary>
-        /// Gợi ý reviewer cho nhiều phiên bản chủ đề (bulk)
-        /// </summary>
-        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
-        [HttpPost("bulk-ai-suggest")]
-        [SwaggerOperation(
-            Summary = "Gợi ý reviewer cho nhiều phiên bản chủ đề",
-            Description = "Gợi ý reviewer sử dụng AI cho nhiều TopicVersionId cùng lúc"
-        )]
-        [SwaggerResponse(200, "Bulk reviewer suggestions successful")]
-        [SwaggerResponse(400, "Invalid input")]
-        [SwaggerResponse(500, "Internal server error")]
-        [Consumes("application/json")]
-        [Produces("application/json")]
-        public async Task<IActionResult> BulkSuggest([FromBody] BulkReviewerSuggestionInputDTO input)
-        {
-            if (!ModelState.IsValid)
-                return ModelInvalid();
-
-            if (input == null || input.TopicVersionIds == null || !input.TopicVersionIds.Any())
-                return Error("Dữ liệu đầu vào không hợp lệ");
-
-            try
-            {
-                var result = await _reviewerSuggestionService.BulkSuggestReviewersAsync(input);
-                return ProcessServiceResponse(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while bulk suggesting reviewers");
-                return Error(ConstantModel.ErrorMessage);
-            }
-        }
-
-        /// <summary>
         /// Kiểm tra reviewer có đủ điều kiện cho một phiên bản chủ đề không
         /// </summary>
         [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
@@ -178,31 +144,6 @@ namespace CapBot.api.Controllers
             catch (Exception ex)
             {
                 _logger.LogError(ex, "Error checking reviewer eligibility");
-                return Error(ConstantModel.ErrorMessage);
-            }
-        }
-
-        /// <summary>
-        /// Lấy lịch sử gợi ý reviewer cho một phiên bản chủ đề
-        /// </summary>
-        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
-        [HttpGet("history")]
-        [SwaggerOperation(
-            Summary = "Lấy lịch sử gợi ý reviewer cho một phiên bản chủ đề",
-            Description = "Trả về lịch sử các lần gợi ý reviewer cho topic version"
-        )]
-        [SwaggerResponse(200, "Lấy lịch sử thành công")]
-        [Produces("application/json")]
-        public async Task<IActionResult> SuggestionHistory([FromQuery] int topicVersionId)
-        {
-            try
-            {
-                var result = await _reviewerSuggestionService.GetSuggestionHistoryAsync(topicVersionId);
-                return ProcessServiceResponse(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error getting suggestion history");
                 return Error(ConstantModel.ErrorMessage);
             }
         }
@@ -242,40 +183,6 @@ namespace CapBot.api.Controllers
         }
 
         /// <summary>
-        /// Gợi ý reviewer cho nhiều chủ đề (bulk) sử dụng TopicId
-        /// </summary>
-        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
-        [HttpPost("bulk-ai-suggest-by-topic")]
-        [SwaggerOperation(
-            Summary = "Gợi ý reviewer cho nhiều chủ đề",
-            Description = "Suggest reviewers using AI for multiple TopicIds"
-        )]
-        [SwaggerResponse(200, "Bulk reviewer suggestions successful")]
-        [SwaggerResponse(400, "Invalid input")]
-        [SwaggerResponse(500, "Internal server error")]
-        [Consumes("application/json")]
-        [Produces("application/json")]
-        public async Task<IActionResult> BulkSuggestByTopicId([FromBody] BulkReviewerSuggestionByTopicInputDTO input)
-        {
-            if (!ModelState.IsValid)
-                return ModelInvalid();
-
-            if (input == null || input.TopicIds == null || !input.TopicIds.Any())
-                return Error("Dữ liệu đầu vào không hợp lệ");
-
-            try
-            {
-                var result = await _reviewerSuggestionService.BulkSuggestReviewersByTopicIdAsync(input);
-                return ProcessServiceResponse(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while bulk suggesting reviewers by TopicId");
-                return Error(ConstantModel.ErrorMessage);
-            }
-        }
-
-        /// <summary>
         /// Kiểm tra reviewer có đủ điều kiện cho một chủ đề sử dụng TopicId không
         /// </summary>
         [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
@@ -302,26 +209,38 @@ namespace CapBot.api.Controllers
         }
 
         /// <summary>
-        /// Lấy lịch sử gợi ý reviewer cho một chủ đề sử dụng TopicId
+        /// AI agent suggests reviewers for a submission
         /// </summary>
         [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
-        [HttpGet("history-by-topic")]
+        [HttpPost("ai-suggest-by-submission")]
         [SwaggerOperation(
-            Summary = "Lấy lịch sử gợi ý reviewer cho một chủ đề",
-            Description = "Trả về lịch sử các lần gợi ý reviewer cho topic"
+            Summary = "AI agent suggests reviewers for a submission",
+            Description = "Accessible by Supervisor/Admin/Moderator"
         )]
-        [SwaggerResponse(200, "Lấy lịch sử thành công")]
+        [SwaggerResponse(200, "Reviewer suggestions generated successfully")]
+        [SwaggerResponse(400, "Invalid input data")]
+        [SwaggerResponse(500, "Internal server error")]
+        [Consumes("application/json")]
         [Produces("application/json")]
-        public async Task<IActionResult> SuggestionHistoryByTopicId([FromQuery] int topicId)
+        public async Task<IActionResult> SuggestBySubmissionId([FromBody] ReviewerSuggestionBySubmissionInputDTO input)
         {
+            if (!ModelState.IsValid)
+                return ModelInvalid();
+
+            if (input == null)
+                return Error("Invalid input data");
+
             try
             {
-                var result = await _reviewerSuggestionService.GetSuggestionHistoryByTopicIdAsync(topicId);
+                _logger.LogInformation("Processing AI suggestion for SubmissionId: {SubmissionId}", input.SubmissionId);
+                _logger.LogInformation("Received input for SuggestBySubmissionId: {@input}", input);
+                var result = await _reviewerSuggestionService.SuggestReviewersBySubmissionIdAsync(input);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)
             {
-                _logger.LogError(ex, "Error getting suggestion history by TopicId");
+                _logger.LogError(ex, "Error occurred while suggesting reviewers by SubmissionId: {SubmissionId}", input.SubmissionId);
+                _logger.LogError(ex, "Exception details: {Exception}", ex);
                 return Error(ConstantModel.ErrorMessage);
             }
         }

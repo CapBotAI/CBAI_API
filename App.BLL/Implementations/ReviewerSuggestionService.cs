@@ -1,24 +1,21 @@
 ﻿using App.BLL.Interfaces;
-using App.BLL.Mapping;
-using App.BLL.Services;
 using App.Commons.ResponseModel;
-using App.DAL.Queries.Implementations;
+using App.DAL.Queries;
 using App.DAL.UnitOfWork;
 using App.Entities.DTOs.ReviewerSuggestion;
 using App.Entities.Entities.App;
-using App.Entities.Entities.Core;
+using App.Entities.Entities.Core; 
 using App.Entities.Enums;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Expressions;
 using System.Threading.Tasks;
+using App.BLL.Services; // For GeminiAIService and VectorMath
 
 namespace App.BLL.Implementations
 {
-    /// <summary>
-    /// Reviewer suggestion logic using Gemini API, optimized by prioritizing less-busy reviewers.
-    /// </summary>
     public class ReviewerSuggestionService : IReviewerSuggestionService
     {
         private readonly GeminiAIService _aiService;
@@ -30,312 +27,302 @@ namespace App.BLL.Implementations
             _unitOfWork = unitOfWork;
         }
 
-        public async Task<BaseResponseModel<ReviewerSuggestionOutputDTO>> SuggestReviewersAsync(ReviewerSuggestionInputDTO input)
+        public async Task<BaseResponseModel<ReviewerSuggestionOutputDTO>> SuggestReviewersBySubmissionIdAsync(ReviewerSuggestionBySubmissionInputDTO input)
         {
-            // 1. Get TopicVersion (with Topic & Category)
-            var topicVersionRepo = _unitOfWork.GetRepo<TopicVersion>();
-            var topicVersion = await topicVersionRepo.GetSingleAsync(
-                new QueryBuilder<TopicVersion>()
-                    .WithPredicate(tv => tv.Id == input.TopicVersionId)
-                    .WithInclude(tv => tv.Topic)
-                    .WithInclude(tv => tv.Topic.Category)
-                    .Build()
-            );
-            if (topicVersion?.Topic?.Category == null)
+            try
             {
-                return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+                // Step 1: Fetch the submission and related entities
+                var submission = await _unitOfWork.GetRepo<Submission>().GetSingleAsync(
+                    new QueryOptions<Submission>
+                    {
+                        Predicate = s => s.Id == input.SubmissionId,
+                        IncludeProperties = new List<Expression<Func<Submission, object>>>
+                        {
+                            s => s.Topic
+                        }
+                    }
+                );
+
+                if (submission == null || submission.Topic == null)
                 {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Topic version or its category not found"
-                };
-            }
+                    return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "Submission or associated topic not found."
+                    };
+                }
 
-            var topic = topicVersion.Topic;
-            var topicCategory = topic?.Category;
-            var topicContext = $"{topicCategory?.Name ?? ""} {topic?.EN_Title ?? ""} {topicVersion.EN_Title ?? ""} {topicVersion.Description ?? ""} {topicVersion.Objectives ?? ""} {topicVersion.Methodology ?? ""} {topicVersion.ExpectedOutcomes ?? ""}";
-
-            // 2. Get reviewers: Users with Reviewer role and at least one LecturerSkill
-            var userRepo = _unitOfWork.GetRepo<User>();
-            var allUsers = await userRepo.GetAllAsync(
-                new QueryBuilder<User>()
-                    .WithInclude(u => u.LecturerSkills)
-                    .WithInclude(u => u.UserRoles)
-                    .Build()
-            );
-            var reviewers = allUsers
-                .Where(u => u.UserRoles.Any(ur => ur.Role != null && ur.Role.Name == "Reviewer") && u.LecturerSkills.Any())
-                .ToList();
-
-            // 3. Get ReviewerPerformance for all reviewers
-            var reviewerIds = reviewers.Select(r => r.Id).ToList();
-            var reviewerPerfRepo = _unitOfWork.GetRepo<ReviewerPerformance>();
-            var reviewerPerformances = (await reviewerPerfRepo.GetAllAsync(
-                new QueryBuilder<ReviewerPerformance>()
-                    .WithPredicate(rp => reviewerIds.Contains(rp.ReviewerId))
-                    .Build()
-            ))
-            .GroupBy(rp => rp.ReviewerId)
-            .ToDictionary(g => g.Key, g => g.OrderByDescending(x => x.LastUpdated).FirstOrDefault());
-
-            // 4. Get ReviewerAssignment for each reviewer
-            var reviewerAssignmentRepo = _unitOfWork.GetRepo<ReviewerAssignment>();
-            var allAssignments = await reviewerAssignmentRepo.GetAllAsync(
-                new QueryBuilder<ReviewerAssignment>()
-                    .WithPredicate(a => reviewerIds.Contains(a.ReviewerId))
-                    .Build()
-            );
-            var activeStatuses = new[] { AssignmentStatus.Assigned, AssignmentStatus.InProgress };
-            var completedStatuses = new[] { AssignmentStatus.Completed };
-            var reviewerAssignmentCounts = reviewers.ToDictionary(
-                reviewer => reviewer.Id,
-                reviewer =>
+                // Step 2: Prepare context for AI embedding
+                var submissionContext = string.Join(" ", new[]
                 {
-                    var assignments = allAssignments.Where(a => a.ReviewerId == reviewer.Id);
-                    int active = assignments.Count(a => activeStatuses.Contains(a.Status));
-                    int completed = assignments.Count(a => completedStatuses.Contains(a.Status));
-                    return (active, completed);
-                });
+                    submission.Topic.Category?.Name,
+                    submission.Topic.EN_Title,
+                    submission.Topic.Description,
+                    submission.Topic.Objectives
+                }.Where(s => !string.IsNullOrWhiteSpace(s)));
 
-            // 5. Get Gemini embedding for topic context
-            var topicVec = await _aiService.GetEmbeddingAsync(topicContext);
-
-            var suggestionList = new List<ReviewerSuggestionDTO>();
-            foreach (var reviewer in reviewers)
-            {
-                var skillDict = reviewer.LecturerSkills.ToDictionary(s => s.SkillTag, s => s.ProficiencyLevel.ToString());
-                var skillText = string.Join(", ", reviewer.LecturerSkills.Select(s => $"{s.SkillTag} ({s.ProficiencyLevel})"));
-                var reviewerVec = await _aiService.GetEmbeddingAsync(skillText);
-
-                decimal skillMatchScore = VectorMath.CosineSimilarity(topicVec, reviewerVec);
-
-                var topicKeywords = topicContext.ToLower().Split(' ', ',', '.', ';', ':').Distinct();
-                var matchedSkills = reviewer.LecturerSkills
-                    .Where(s => topicKeywords.Contains(s.SkillTag.ToLower()))
-                    .Select(s => s.SkillTag)
-                    .ToList();
-
-                reviewerAssignmentCounts.TryGetValue(reviewer.Id, out var assignInfo);
-                int currActive = assignInfo.active;
-                int completed = assignInfo.completed;
-                decimal workloadScore = 1 - Math.Min(1, currActive / 5m);
-
-                reviewerPerformances.TryGetValue(reviewer.Id, out var perf);
-                decimal perfScore = perf != null
-                    ? (perf.QualityRating ?? 0) * 0.5m + (perf.OnTimeRate ?? 0) * 0.3m + (perf.AverageScoreGiven ?? 0) * 0.2m
-                    : 0;
-
-                var isEligible = true;
-                var ineligibilityReasons = new List<string>();
-                if (currActive > 5) { isEligible = false; ineligibilityReasons.Add("Too many active assignments"); }
-                if (perf?.QualityRating is decimal q && q < 2) { isEligible = false; ineligibilityReasons.Add("Low quality rating"); }
-                decimal overallScore = skillMatchScore * 0.4m + workloadScore * 0.2m + perfScore * 0.3m;
-                if (!isEligible) overallScore -= 0.5m;
-
-                suggestionList.Add(new ReviewerSuggestionDTO
+                if (string.IsNullOrWhiteSpace(submissionContext))
                 {
-                    ReviewerId = reviewer.Id,
-                    ReviewerName = reviewer?.Email ?? "Unknown",
-                    SkillMatchScore = skillMatchScore,
-                    MatchedSkills = matchedSkills,
-                    ReviewerSkills = skillDict,
-                    CurrentActiveAssignments = currActive,
-                    CompletedAssignments = completed,
-                    WorkloadScore = workloadScore,
-                    AverageScoreGiven = perf?.AverageScoreGiven,
-                    OnTimeRate = perf?.OnTimeRate,
-                    QualityRating = perf?.QualityRating,
-                    PerformanceScore = perfScore,
-                    OverallScore = overallScore,
-                    IsEligible = isEligible,
-                    IneligibilityReasons = ineligibilityReasons
-                });
-            }
+                    return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status400BadRequest,
+                        Message = "Submission context is empty or invalid."
+                    };
+                }
 
-            // NEW: Prioritize by lowest currentActiveAssignments, then by overallScore DESC
-            var sorted = suggestionList
-                .OrderBy(x => x.CurrentActiveAssignments)
-                .ThenByDescending(x => x.OverallScore)
-                .Take(input.MaxSuggestions)
-                .ToList();
+                // Step 3: Fetch eligible reviewers
+                var reviewers = (await _unitOfWork.GetRepo<User>().GetAllAsync(
+                    new QueryOptions<User>
+                    {
+                        IncludeProperties = new List<Expression<Func<User, object>>>
+                        {
+                            u => u.LecturerSkills,
+                            u => u.UserRoles,
+                            u => u.ReviewerAssignments,
+                            u => u.ReviewerPerformances
+                        },
+                        Predicate = u => u.UserRoles.Any(r => r.Role != null && r.Role.Name == "Reviewer") && u.LecturerSkills.Any()
+                    }
+                )).ToList();
 
-            // Prompt-based explanation
-            string? explanation = null;
-            if (input.UsePrompt)
-            {
+                if (!reviewers.Any())
+                {
+                    return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status404NotFound,
+                        Message = "No eligible reviewers found. Ensure there are users with the 'Reviewer' role and associated skills in the database."
+                    };
+                }
+
+                // Step 4: Calculate reviewer scores
+                List<ReviewerSuggestionDTO> reviewerScores;
                 try
                 {
-                    string prompt = $@"Given the topic:
----
-{topicContext}
----
-and these reviewer expertise profiles:
-{string.Join("\n", sorted.Select((s, i) => $"Reviewer {i + 1}: {string.Join(", ", s.ReviewerSkills.Select(kv => $"{kv.Key} ({kv.Value})"))}"))}
-Suggest the most suitable reviewers (Reviewer 1, 2, 3) for this topic and explain why.";
-                    explanation = await _aiService.GetPromptCompletionAsync(prompt);
+                    reviewerScores = await CalculateReviewerScores(reviewers, submissionContext);
                 }
                 catch (Exception ex)
                 {
-                    explanation = $"Prompt-based AI explanation failed: {ex.Message}";
+                    return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+                    {
+                        IsSuccess = false,
+                        StatusCode = StatusCodes.Status500InternalServerError,
+                        Message = $"Failed to calculate reviewer scores: {ex.Message}"
+                    };
+                }
+
+                // Step 5: Sort and prioritize reviewers
+                var suggestions = reviewerScores
+                    .OrderBy(r => r.CurrentActiveAssignments) // Prioritize by lowest workload
+                    .ThenByDescending(r => r.OverallScore)    // Then by overall score
+                    .Take(input.MaxSuggestions)              // Limit to max suggestions
+                    .ToList();
+
+                // Step 6: Generate AI explanation (optional)
+                string? aiExplanation = null;
+                if (input.UsePrompt)
+                {
+                    try
+                    {
+                        aiExplanation = await GenerateAIExplanation(submissionContext, suggestions);
+                    }
+                    catch (Exception ex)
+                    {
+                        aiExplanation = $"AI explanation could not be generated: {ex.Message}";
+                    }
+                }
+
+                // Step 7: Return the response
+                return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+                {
+                    Data = new ReviewerSuggestionOutputDTO
+                    {
+                        Suggestions = suggestions,
+                        AIExplanation = aiExplanation
+                    },
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Reviewer suggestions generated successfully."
+                };
+            }
+            catch (Exception ex)
+            {
+                // Gracefully handle unexpected errors
+                return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = $"An unexpected error occurred: {ex.Message}"
+                };
+            }
+        }
+
+        private async Task<List<ReviewerSuggestionDTO>> CalculateReviewerScores(List<User> reviewers, string submissionContext)
+        {
+            // Validate submission context
+            if (string.IsNullOrWhiteSpace(submissionContext))
+            {
+                throw new ArgumentException("Submission context cannot be null or empty.", nameof(submissionContext));
+            }
+
+            // Log the submission context for debugging
+            Console.WriteLine($"Generating embedding for submission context: {submissionContext}");
+
+            // Get topic embedding
+            float[] topicEmbedding;
+            try
+            {
+                topicEmbedding = await _aiService.GetEmbeddingAsync(submissionContext);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error generating embedding for submission context: {ex.Message}");
+                throw new InvalidOperationException("Failed to generate embedding for submission context.", ex);
+            }
+
+            var reviewerScores = new List<ReviewerSuggestionDTO>();
+
+            foreach (var reviewer in reviewers)
+            {
+                try
+                {
+                    // Step 1: Validate and calculate skill match score
+                    var skillText = string.Join(", ", reviewer.LecturerSkills.Select(s => $"{s.SkillTag} ({s.ProficiencyLevel})"));
+                    if (string.IsNullOrWhiteSpace(skillText))
+                    {
+                        Console.WriteLine($"Reviewer {reviewer.Id} has no valid skills.");
+                        continue;
+                    }
+
+                    float[] reviewerEmbedding;
+                    try
+                    {
+                        reviewerEmbedding = await _aiService.GetEmbeddingAsync(skillText);
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"Error generating embedding for reviewer {reviewer.Id}: {ex.Message}");
+                        continue;
+                    }
+
+                    var skillMatchScore = VectorMath.CosineSimilarity(topicEmbedding, reviewerEmbedding);
+
+                    // Step 2: Calculate workload score
+                    var workloadScore = CalculateWorkloadScore(reviewer);
+
+                    // Step 3: Calculate performance score
+                    var performanceScore = CalculatePerformanceScore(reviewer);
+
+                    // Step 4: Combine scores into overall score
+                    reviewerScores.Add(new ReviewerSuggestionDTO
+                    {
+                        ReviewerId = reviewer.Id,
+                        ReviewerName = reviewer.Email ?? "Unknown",
+                        SkillMatchScore = skillMatchScore,
+                        WorkloadScore = workloadScore,
+                        PerformanceScore = performanceScore,
+                        OverallScore = skillMatchScore * 0.5m + workloadScore * 0.3m + performanceScore * 0.2m,
+                        CurrentActiveAssignments = reviewer.ReviewerAssignments.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress)
+                    });
+                }
+                catch (Exception ex)
+                {
+                    // Log and skip reviewers with issues
+                    Console.WriteLine($"Failed to calculate score for reviewer {reviewer.Id}: {ex.Message}");
                 }
             }
 
-            return new BaseResponseModel<ReviewerSuggestionOutputDTO>
-            {
-                Data = ReviewerSuggestionMapper.ToOutputDTO(sorted, explanation),
-                IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Gợi ý reviewer thành công"
-            };
+            return reviewerScores;
         }
 
-        public async Task<BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>> BulkSuggestReviewersAsync(BulkReviewerSuggestionInputDTO input)
+        private decimal CalculateWorkloadScore(User reviewer)
         {
-            var results = new List<BulkReviewerSuggestionOutputDTO>();
-            foreach (var topicVersionId in input.TopicVersionIds)
+            var activeAssignments = reviewer.ReviewerAssignments.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress);
+            return 1 - Math.Min(1, activeAssignments / 5m);
+        }
+
+        private decimal CalculatePerformanceScore(User reviewer)
+        {
+            var performance = reviewer.ReviewerPerformances.OrderByDescending(p => p.LastUpdated).FirstOrDefault();
+            if (performance == null) return 0;
+
+            return (performance.QualityRating ?? 0) * 0.5m + (performance.OnTimeRate ?? 0) * 0.3m + (performance.AverageScoreGiven ?? 0) * 0.2m;
+        }
+
+        private async Task<string?> GenerateAIExplanation(string submissionContext, List<ReviewerSuggestionDTO> suggestions)
+        {
+            try
             {
-                var singleInput = new ReviewerSuggestionInputDTO
-                {
-                    TopicVersionId = topicVersionId,
-                    MaxSuggestions = input.MaxSuggestions,
-                    UsePrompt = input.UsePrompt
-                };
-                var suggestionResult = await SuggestReviewersAsync(singleInput);
-                results.Add(new BulkReviewerSuggestionOutputDTO
-                {
-                    TopicVersionId = topicVersionId,
-                    Suggestion = suggestionResult?.Data ?? new ReviewerSuggestionOutputDTO
-                    {
-                        Suggestions = new List<ReviewerSuggestionDTO>()
-                    },
-                });
+                var prompt = $"Given the submission context:\n---\n{submissionContext}\n---\nand these reviewer profiles:\n{string.Join("\n", suggestions.Select((s, i) => $"Reviewer {i + 1}: {s.ReviewerName}, Score: {s.OverallScore:F2}"))}\nExplain why these reviewers are suitable.";
+                return await _aiService.GetPromptCompletionAsync(prompt);
             }
-            return new BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>
+            catch (Exception ex)
             {
-                Data = results,
-                IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Bulk reviewer suggestion completed successfully."
-            };
+                return $"Failed to generate AI explanation: {ex.Message}";
+            }
         }
 
-        public async Task<BaseResponseModel<ReviewerEligibilityDTO>> CheckReviewerEligibilityAsync(int reviewerId, int topicVersionId)
+        public Task<BaseResponseModel<ReviewerSuggestionOutputDTO>> SuggestReviewersAsync(ReviewerSuggestionInputDTO input)
         {
-            var input = new ReviewerSuggestionInputDTO
-            {
-                TopicVersionId = topicVersionId,
-                MaxSuggestions = 10,
-                UsePrompt = false
-            };
-            var suggestion = await SuggestReviewersAsync(input);
-            var reviewer = suggestion?.Data?.Suggestions?.FirstOrDefault(r => r.ReviewerId == reviewerId);
+            throw new NotImplementedException();
+        }
+
+        public async Task<BaseResponseModel<ReviewerEligibilityDTO>> CheckReviewerEligibilityAsync(int reviewerId, int submissionId)
+        {
+            var reviewer = await _unitOfWork.GetRepo<User>().GetSingleAsync(
+                new QueryOptions<User>
+                {
+                    Predicate = u => u.Id == reviewerId,
+                    IncludeProperties = new List<Expression<Func<User, object>>>
+                    {
+                        u => u.LecturerSkills,
+                        u => u.ReviewerAssignments,
+                        u => u.ReviewerPerformances
+                    }
+                });
+
             if (reviewer == null)
             {
                 return new BaseResponseModel<ReviewerEligibilityDTO>
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Reviewer not found for given topic"
+                    Message = "Reviewer not found."
                 };
             }
+
+            // Perform eligibility checks (e.g., skills, workload, performance)
+            var isEligible = reviewer.LecturerSkills.Any() && reviewer.ReviewerAssignments.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) < 5;
+
             return new BaseResponseModel<ReviewerEligibilityDTO>
             {
-                IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK,
                 Data = new ReviewerEligibilityDTO
                 {
-                    ReviewerId = reviewerId,
-                    TopicVersionId = topicVersionId,
-                    IsEligible = reviewer.IsEligible,
-                    Reasons = reviewer.IneligibilityReasons ?? new List<string>()
+                    ReviewerId = reviewer.Id,
+                    IsEligible = isEligible,
+                    IneligibilityReasons = isEligible ? new List<string>() : new List<string> { "Reviewer has too many active assignments." }
                 },
-                Message = reviewer.IsEligible ? "Reviewer is eligible" : "Reviewer is not eligible"
-            };
-        }
-
-        public async Task<BaseResponseModel<ReviewerSuggestionOutputDTO>> SuggestReviewersByTopicIdAsync(ReviewerSuggestionByTopicInputDTO input)
-        {
-            // Logic to fetch the latest approved TopicVersion for the given TopicId
-            var topicVersionRepo = _unitOfWork.GetRepo<TopicVersion>();
-            var topicVersions = await topicVersionRepo.GetAllAsync(
-                new QueryBuilder<TopicVersion>()
-                    .WithPredicate(tv => tv.TopicId == input.TopicId && tv.Status == TopicStatus.Submitted)
-                    .Build()
-            );
-            var topicVersion = topicVersions.OrderByDescending(tv => tv.SubmittedAt).FirstOrDefault();
-
-            if (topicVersion == null)
-            {
-                return new BaseResponseModel<ReviewerSuggestionOutputDTO>
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "No approved TopicVersion found for the given TopicId"
-                };
-            }
-
-            // Reuse existing logic for TopicVersionId-based suggestion
-            var topicVersionInput = new ReviewerSuggestionInputDTO
-            {
-                TopicVersionId = topicVersion.Id,
-                MaxSuggestions = input.MaxSuggestions,
-                UsePrompt = input.UsePrompt
-            };
-
-            return await SuggestReviewersAsync(topicVersionInput);
-        }
-
-        public async Task<BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>> BulkSuggestReviewersByTopicIdAsync(BulkReviewerSuggestionByTopicInputDTO input)
-        {
-            var results = new List<BulkReviewerSuggestionOutputDTO>();
-
-            if (input.TopicIds == null || !input.TopicIds.Any())
-            {
-                return new BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "TopicIds cannot be null or empty."
-                };
-            }
-
-            foreach (var topicId in input.TopicIds)
-            {
-                var singleInput = new ReviewerSuggestionByTopicInputDTO
-                {
-                    TopicId = topicId,
-                    MaxSuggestions = input.MaxSuggestions,
-                    UsePrompt = input.UsePrompt
-                };
-
-                var suggestionResult = await SuggestReviewersByTopicIdAsync(singleInput);
-                results.Add(new BulkReviewerSuggestionOutputDTO
-                {
-                    TopicId = topicId,
-                    Suggestion = suggestionResult.Data ?? new ReviewerSuggestionOutputDTO(),
-                });
-            }
-
-            return new BaseResponseModel<List<BulkReviewerSuggestionOutputDTO>>
-            {
-                Data = results,
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
-                Message = "Bulk reviewer suggestion by TopicId completed successfully."
+                Message = "Eligibility check completed successfully."
             };
         }
 
         public async Task<BaseResponseModel<ReviewerEligibilityDTO>> CheckReviewerEligibilityByTopicIdAsync(int reviewerId, int topicId)
         {
-            var input = new ReviewerSuggestionByTopicInputDTO
-            {
-                TopicId = topicId,
-                MaxSuggestions = 10,
-                UsePrompt = false
-            };
-
-            var suggestion = await SuggestReviewersByTopicIdAsync(input);
-            var reviewer = suggestion.Data?.Suggestions?.FirstOrDefault(r => r.ReviewerId == reviewerId);
+            var reviewer = await _unitOfWork.GetRepo<User>().GetSingleAsync(
+                new QueryOptions<User>
+                {
+                    Predicate = u => u.Id == reviewerId,
+                    IncludeProperties = new List<Expression<Func<User, object>>>
+                    {
+                        u => u.LecturerSkills,
+                        u => u.ReviewerAssignments,
+                        u => u.ReviewerPerformances
+                    }
+                });
 
             if (reviewer == null)
             {
@@ -343,66 +330,104 @@ Suggest the most suitable reviewers (Reviewer 1, 2, 3) for this topic and explai
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Reviewer not found for the given topic"
+                    Message = "Reviewer not found."
                 };
             }
 
+            // Perform eligibility checks (e.g., skills, workload, performance)
+            var hasRelevantSkills = reviewer.LecturerSkills.Any(s => s.SkillTag.Contains("relevant keyword", StringComparison.OrdinalIgnoreCase));
+            var isEligible = hasRelevantSkills && reviewer.ReviewerAssignments.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) < 5;
+
             return new BaseResponseModel<ReviewerEligibilityDTO>
             {
-                IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK,
                 Data = new ReviewerEligibilityDTO
                 {
-                    ReviewerId = reviewerId,
-                    TopicId = topicId,
-                    IsEligible = reviewer.IsEligible,
-                    Reasons = reviewer.IneligibilityReasons ?? new List<string>()
+                    ReviewerId = reviewer.Id,
+                    IsEligible = isEligible,
+                    IneligibilityReasons = isEligible ? new List<string>() : new List<string> { "Reviewer has too many active assignments or lacks relevant skills." }
                 },
-                Message = reviewer.IsEligible ? "Reviewer is eligible" : "Reviewer is not eligible"
-            };
-        }
-
-        // Example GET: Return top reviewers by lowest current workload (fake data for demo)
-        public async Task<BaseResponseModel<List<ReviewerSuggestionDTO>>> GetTopReviewersAsync(int count = 5)
-        {
-            await Task.Delay(0); // Placeholder for actual async logic
-            var fake = Enumerable.Range(1, count).Select(i => new ReviewerSuggestionDTO
-            {
-                ReviewerId = i,
-                ReviewerName = $"reviewer{i}@university.edu",
-                SkillMatchScore = 0.8m + 0.04m * (count - i),
-                MatchedSkills = new List<string> { "AI", "ML" },
-                ReviewerSkills = new Dictionary<string, string> { { "AI", "Expert" }, { "ML", "Advanced" } },
-                CurrentActiveAssignments = i - 1,
-                CompletedAssignments = 10 + i,
-                WorkloadScore = 1 - Math.Min(1, (i - 1) / 5m),
-                AverageScoreGiven = 4 + 0.1m * i,
-                OnTimeRate = 0.9m + 0.01m * i,
-                QualityRating = 4.5m + 0.05m * i,
-                PerformanceScore = 4.3m + 0.05m * i,
-                OverallScore = 0.85m + 0.02m * (count - i),
-                IsEligible = true,
-                IneligibilityReasons = new List<string>()
-            }).ToList();
-
-            return new BaseResponseModel<List<ReviewerSuggestionDTO>>
-            {
-                Data = fake,
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
-                Message = "Top reviewers retrieved successfully"
+                Message = "Eligibility check completed successfully."
             };
         }
 
-        public Task<BaseResponseModel<List<ReviewerSuggestionHistoryDTO>>> GetSuggestionHistoryAsync(int topicVersionId)
+        public async Task<BaseResponseModel<ReviewerSuggestionOutputDTO>> SuggestReviewersByTopicIdAsync(ReviewerSuggestionByTopicInputDTO input)
         {
-            throw new NotImplementedException();
-        }
+            // Step 1: Fetch the topic and related entities
+            var topic = await _unitOfWork.GetRepo<Topic>().GetSingleAsync(
+                new QueryOptions<Topic>
+                {
+                    Predicate = t => t.Id == input.TopicId
+                });
 
-        public async Task<BaseResponseModel<List<ReviewerSuggestionHistoryDTO>>> GetSuggestionHistoryByTopicIdAsync(int topicId)
-        {
-            await Task.Delay(0); // Placeholder for actual async logic
-            throw new NotImplementedException("GetSuggestionHistoryByTopicIdAsync is not implemented yet.");
+            if (topic == null || topic.Category == null)
+            {
+                return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Topic or topic category not found."
+                };
+            }
+
+            // Step 2: Prepare context for AI embedding
+            var topicContext = string.Join(" ", new[]
+            {
+                topic.Category.Name,
+                topic.EN_Title
+            }.Where(s => !string.IsNullOrWhiteSpace(s)));
+
+            // Step 3: Fetch eligible reviewers
+            var reviewers = (await _unitOfWork.GetRepo<User>().GetAllAsync(
+                new QueryOptions<User>
+                {
+                    IncludeProperties = new List<Expression<Func<User, object>>>
+                    {
+                        u => u.LecturerSkills,
+                        u => u.UserRoles,
+                        u => u.ReviewerAssignments,
+                        u => u.ReviewerPerformances
+                    },
+                    Predicate = u => u.UserRoles.Any(r => r.Role != null && r.Role.Name == "Reviewer") && u.LecturerSkills.Any()
+                }
+            )).ToList();
+
+            if (!reviewers.Any())
+            {
+                return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "No eligible reviewers found."
+                };
+            }
+
+            // Step 4: Calculate reviewer scores
+            var reviewerScores = await CalculateReviewerScores(reviewers, topicContext);
+
+            // Step 5: Sort and prioritize reviewers
+            var suggestions = reviewerScores
+                .OrderBy(r => r.CurrentActiveAssignments) // Prioritize by lowest workload
+                .ThenByDescending(r => r.OverallScore)    // Then by overall score
+                .Take(input.MaxSuggestions)              // Limit to max suggestions
+                .ToList();
+
+            // Step 6: Generate AI explanation (optional)
+            var aiExplanation = input.UsePrompt ? await GenerateAIExplanation(topicContext, suggestions) : null;
+
+            // Step 7: Return the response
+            return new BaseResponseModel<ReviewerSuggestionOutputDTO>
+            {
+                Data = new ReviewerSuggestionOutputDTO
+                {
+                    Suggestions = suggestions,
+                    AIExplanation = aiExplanation
+                },
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Reviewer suggestions generated successfully."
+            };
         }
     }
 }

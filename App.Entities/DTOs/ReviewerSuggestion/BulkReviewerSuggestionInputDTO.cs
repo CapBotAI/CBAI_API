@@ -6,10 +6,5 @@ using System.Threading.Tasks;
 
 namespace App.Entities.DTOs.ReviewerSuggestion
 {
-    public class BulkReviewerSuggestionInputDTO
-    {
-        public List<int> TopicVersionIds { get; set; }
-        public int MaxSuggestions { get; set; }
-        public bool UsePrompt { get; set; }
-    }
+    // File removed as it is no longer needed.
 }
