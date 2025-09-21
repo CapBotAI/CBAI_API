@@ -13,5 +13,7 @@ namespace App.Entities.DTOs.ReviewerSuggestion
         public List<App.Entities.DTOs.ReviewerAssignment.ReviewerAssignmentResponseDTO>? AssignmentResults { get; set; } = new();
         // Any assignment-level error messages (one string per failed assignment)
         public List<string>? AssignmentErrors { get; set; } = new();
+        // Messages produced when skipping reviewers (e.g., too many active assignments)
+        public List<string>? SkipMessages { get; set; } = new();
     }
 }

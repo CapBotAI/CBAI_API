@@ -2,6 +2,7 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using App.BLL.Interfaces;
+using System.ComponentModel.DataAnnotations;
 using App.Commons;
 using App.Commons.Interfaces;
 using App.Entities.DTOs.Notifications;
@@ -47,6 +48,20 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
     {
         try
         {
+            // Validate DTO (important for programmatic calls that bypass controller model validation)
+            var validationResults = new List<ValidationResult>();
+            var validationContext = new ValidationContext(dto);
+            if (!Validator.TryValidateObject(dto, validationContext, validationResults, true))
+            {
+                var messages = string.Join("; ", validationResults.Select(v => v.ErrorMessage));
+                return new BaseResponseModel<ReviewerAssignmentResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = messages
+                };
+            }
+
             // Validate submission exists
             var submissionOptions = new QueryOptions<Submission>
             {

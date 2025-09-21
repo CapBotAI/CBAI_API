@@ -28,112 +28,6 @@ namespace CapBot.api.Controllers
         }
 
         /// <summary>
-        /// Auto-assign all eligible reviewers from a suggestion output JSON
-        /// </summary>
-        [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
-        [HttpPost("auto-assign-from-suggestions")]
-        [SwaggerOperation(
-            Summary = "Tự động phân công các reviewer được gợi ý",
-            Description = "Nhận JSON suggestions và tạo assignment cho tất cả reviewer phù hợp"
-        )]
-        [SwaggerResponse(201, "Auto assign thành công")]
-        [SwaggerResponse(400, "Dữ liệu không hợp lệ")]
-        public async Task<IActionResult> AutoAssignFromSuggestions([FromBody] App.Entities.DTOs.ReviewerSuggestion.ReviewerSuggestionOutputDTO suggestionOutput, [FromQuery] int submissionId)
-        {
-            if (!ModelState.IsValid)
-                return ModelInvalid();
-
-            if (suggestionOutput == null || suggestionOutput.Suggestions == null || !suggestionOutput.Suggestions.Any())
-                return Error("Không có reviewer được gợi ý để phân công");
-
-            try
-            {
-                var assignments = suggestionOutput.Suggestions
-                    .Where(s => s.IsEligible)
-                    .Select(s => new App.Entities.DTOs.ReviewerAssignment.AssignReviewerDTO
-                    {
-                        SubmissionId = submissionId,
-                        ReviewerId = s.ReviewerId,
-                        AssignmentType = App.Entities.Enums.AssignmentTypes.Primary,
-                        SkillMatchScore = s.SkillMatchScore
-                    })
-                    .ToList();
-
-                if (!assignments.Any())
-                    return Error("Không có reviewer phù hợp để phân công");
-
-                var bulkDto = new App.Entities.DTOs.ReviewerAssignment.BulkAssignReviewerDTO
-                {
-                    Assignments = assignments
-                };
-
-                var reviewerAssignmentService = HttpContext.RequestServices.GetService(typeof(App.BLL.Interfaces.IReviewerAssignmentService)) as App.BLL.Interfaces.IReviewerAssignmentService;
-                if (reviewerAssignmentService == null)
-                    return Error(ConstantModel.ErrorMessage);
-
-                var result = await reviewerAssignmentService.BulkAssignReviewersAsync(bulkDto, (int)UserId);
-                if (result == null)
-                    return Error(ConstantModel.ErrorMessage);
-
-                return ProcessServiceResponse(result);
-            }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex, "Error occurred while auto assigning reviewers from suggestions");
-                return Error(ConstantModel.ErrorMessage);
-            }
-        }
-
-            /// <summary>
-            /// Assign suggested reviewers (from suggestion output) to a submission
-            /// </summary>
-            [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
-            [HttpPost("assign-from-suggestions")]
-            [SwaggerOperation(
-                Summary = "Gán các reviewer được gợi ý cho submission",
-                Description = "Nhận một danh sách reviewer được gợi ý và tạo các ReviewerAssignment tương ứng"
-            )]
-            [SwaggerResponse(201, "Phân công thành công")]
-            [SwaggerResponse(400, "Dữ liệu không hợp lệ")]
-            public async Task<IActionResult> AssignFromSuggestions([FromBody] App.Entities.DTOs.ReviewerAssignment.AssignFromSuggestionDTO dto)
-            {
-                if (!ModelState.IsValid)
-                    return ModelInvalid();
-
-                if (dto == null || dto.Reviewers == null || !dto.Reviewers.Any())
-                    return Error("Không có reviewer để phân công");
-
-                try
-                {
-                    // Map to BulkAssignReviewerDTO
-                    var bulkDto = new App.Entities.DTOs.ReviewerAssignment.BulkAssignReviewerDTO
-                    {
-                        Assignments = dto.Reviewers.Select(r => new App.Entities.DTOs.ReviewerAssignment.AssignReviewerDTO
-                        {
-                            SubmissionId = dto.SubmissionId,
-                            ReviewerId = r.ReviewerId,
-                            AssignmentType = r.AssignmentType ?? App.Entities.Enums.AssignmentTypes.Primary,
-                            Deadline = r.Deadline,
-                            SkillMatchScore = r.SkillMatchScore
-                        }).ToList()
-                    };
-
-                    // Resolve service via DI
-                    var reviewerAssignmentService = HttpContext.RequestServices.GetService(typeof(App.BLL.Interfaces.IReviewerAssignmentService)) as App.BLL.Interfaces.IReviewerAssignmentService;
-                    if (reviewerAssignmentService == null)
-                        return Error(ConstantModel.ErrorMessage);
-
-                    var result = await reviewerAssignmentService.BulkAssignReviewersAsync(bulkDto, (int)UserId);
-                    return ProcessServiceResponse(result);
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogError(ex, "Error occurred while assigning reviewers from suggestions");
-                    return Error(ConstantModel.ErrorMessage);
-                }
-            }
-
-        /// <summary>
         /// Gợi ý reviewer phù hợp cho phiên bản chủ đề
         /// </summary>
         [Authorize(Roles = SystemRoleConstants.Supervisor + "," + SystemRoleConstants.Administrator + "," + SystemRoleConstants.Moderator)]
@@ -276,7 +170,7 @@ namespace CapBot.api.Controllers
         [SwaggerResponse(500, "Internal server error")]
         [Consumes("application/json")]
         [Produces("application/json")]
-    public async Task<IActionResult> SuggestBySubmissionId([FromBody] ReviewerSuggestionBySubmissionInputDTO input, [FromQuery] bool assign = false)
+        public async Task<IActionResult> SuggestBySubmissionId([FromBody] ReviewerSuggestionBySubmissionInputDTO input, [FromQuery] bool assign = false)
         {
             if (!ModelState.IsValid)
                 return ModelInvalid();
@@ -288,22 +182,40 @@ namespace CapBot.api.Controllers
             {
                 _logger.LogInformation("Processing AI suggestion for SubmissionId: {SubmissionId}", input.SubmissionId);
                 _logger.LogInformation("Received input for SuggestBySubmissionId: {@input}", input);
+
+                // If caller wants auto-assign, validate assignment-related input first (e.g., Deadline)
+                if (assign && input.Deadline.HasValue)
+                {
+                    // normalize to UTC for comparison
+                    var deadlineUtc = input.Deadline.Value.Kind == DateTimeKind.Utc
+                        ? input.Deadline.Value
+                        : input.Deadline.Value.ToUniversalTime();
+
+                    if (deadlineUtc <= DateTime.UtcNow)
+                    {
+                        return Error("Deadline phải ở tương lai");
+                    }
+                }
+
                 var result = await _reviewerSuggestionService.SuggestReviewersBySubmissionIdAsync(input);
 
-                // If caller requested auto-assign, map eligible suggestions to assignments and use the assignment service
+                // If caller requested auto-assign, map eligible suggestions to assignments and use the bulk assignment service.
+                // If any assignment fails, return that error (do not expose the suggestion JSON in that case).
                 if (assign && result != null && result.IsSuccess && result.Data != null && result.Data.Suggestions != null && result.Data.Suggestions.Any())
                 {
                     try
                     {
-                        // Attempt to assign every suggested reviewer (UI expects all ids to be processed)
-                        var assignments = result.Data.Suggestions.Select(s => new App.Entities.DTOs.ReviewerAssignment.AssignReviewerDTO
-                        {
-                            SubmissionId = input.SubmissionId,
-                            ReviewerId = s.ReviewerId,
-                            AssignmentType = App.Entities.Enums.AssignmentTypes.Primary,
-                            SkillMatchScore = s.SkillMatchScore,
-                            Deadline = input.Deadline
-                        }).ToList();
+                        var assignments = result.Data.Suggestions
+                            .Where(s => s.IsEligible)
+                            .Select(s => new App.Entities.DTOs.ReviewerAssignment.AssignReviewerDTO
+                            {
+                                SubmissionId = input.SubmissionId,
+                                ReviewerId = s.ReviewerId,
+                                AssignmentType = App.Entities.Enums.AssignmentTypes.Primary,
+                                SkillMatchScore = s.SkillMatchScore,
+                                Deadline = input.Deadline
+                            })
+                            .ToList();
 
                         // Perform assignments one-by-one to ensure each suggested reviewer is attempted
                         var assignResults = new List<App.Entities.DTOs.ReviewerAssignment.ReviewerAssignmentResponseDTO>();
@@ -342,7 +254,7 @@ namespace CapBot.api.Controllers
                     catch (Exception ex)
                     {
                         _logger.LogError(ex, "Error while auto-assigning reviewers after suggestion");
-                        result.Message += "; Auto-assign failed";
+                        return Error(ConstantModel.ErrorMessage);
                     }
                 }
 

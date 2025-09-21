@@ -107,6 +107,7 @@ namespace App.BLL.Implementations
 
                 // Step 4: Calculate reviewer scores
                 List<ReviewerSuggestionDTO> reviewerScores;
+                var skipMessages = new List<string>();
                 try
                 {
                     var topicFields = new Dictionary<string, string>
@@ -119,7 +120,7 @@ namespace App.BLL.Implementations
                         { "Context", string.Empty }
                     };
 
-                    reviewerScores = await CalculateReviewerScores(reviewers, topicFields, submissionContext);
+                    reviewerScores = await CalculateReviewerScores(reviewers, topicFields, submissionContext, skipMessages);
                 }
                 catch (Exception ex)
                 {
@@ -161,6 +162,7 @@ namespace App.BLL.Implementations
                     {
                         Suggestions = suggestions,
                         AIExplanation = aiExplanation
+                        ,SkipMessages = skipMessages
                     },
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
@@ -179,7 +181,7 @@ namespace App.BLL.Implementations
             }
         }
 
-    private Task<List<ReviewerSuggestionDTO>> CalculateReviewerScores(List<User> reviewers, Dictionary<string, string> topicFields, string submissionContext)
+    private Task<List<ReviewerSuggestionDTO>> CalculateReviewerScores(List<User> reviewers, Dictionary<string, string> topicFields, string submissionContext, List<string> skipMessages)
         {
             // Validate submission context
             if (string.IsNullOrWhiteSpace(submissionContext))
@@ -213,6 +215,15 @@ namespace App.BLL.Implementations
             {
                 try
                 {
+                    // Skip reviewers who currently have too many active assignments (Assigned/InProgress >= 5)
+                    var activeCount = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) ?? 0;
+                    if (activeCount >= 5)
+                    {
+                        var msg = $"Reviewer {reviewer.Id} skipped because current active assignments ({activeCount}) >= 5";
+                        _logger.LogDebug(msg);
+                        skipMessages?.Add(msg);
+                        continue;
+                    }
                     // Reviewer skills -> tokens and TF
                     var skills = reviewer.LecturerSkills ?? Enumerable.Empty<LecturerSkill>();
                     if (!(skills?.Any() ?? false))
@@ -320,7 +331,7 @@ namespace App.BLL.Implementations
                     var performanceScore = CalculatePerformanceScore(reviewer);
 
                     // Completed assignments count
-                    var completedAssignments = reviewer.ReviewerAssignments.Count(a => a.Status == AssignmentStatus.Completed);
+                    var completedAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Completed) ?? 0;
 
                     var overallScore = skillMatchScore * 0.5m + workloadScore * 0.3m + performanceScore * 0.2m;
 
@@ -336,7 +347,7 @@ namespace App.BLL.Implementations
                         WorkloadScore = Decimal.Round(workloadScore, 4),
                         PerformanceScore = Decimal.Round(performanceScore, 4),
                         OverallScore = Decimal.Round(overallScore, 4),
-                        CurrentActiveAssignments = reviewer.ReviewerAssignments.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress),
+                        CurrentActiveAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) ?? 0,
                         CompletedAssignments = completedAssignments,
                         IsEligible = matchedSkills.Any() && (reviewer.LecturerSkills?.Any() ?? false),
                         IneligibilityReasons = matchedSkills.Any() ? new List<string>() : new List<string> { "No matching skills with topic" }
@@ -546,7 +557,7 @@ namespace App.BLL.Implementations
 
         private decimal CalculateWorkloadScore(User reviewer)
         {
-            var activeAssignments = reviewer.ReviewerAssignments.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress);
+            var activeAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) ?? 0;
             return 1 - Math.Min(1, activeAssignments / 5m);
         }
 
@@ -718,7 +729,8 @@ Respond in JSON with schema: {jsonSchema}";
                     { "Context", topicVersion.Context ?? string.Empty }
                 };
 
-                var reviewerScores = await CalculateReviewerScores(reviewers, topicFields, topicContext);
+                var skipMessages = new List<string>();
+                var reviewerScores = await CalculateReviewerScores(reviewers, topicFields, topicContext, skipMessages);
 
                 var max = input.MaxSuggestions <= 0 ? 5 : input.MaxSuggestions;
 
@@ -736,6 +748,7 @@ Respond in JSON with schema: {jsonSchema}";
                     {
                         Suggestions = suggestions,
                         AIExplanation = aiExplanation
+                        ,SkipMessages = skipMessages
                     },
                     IsSuccess = true,
                     StatusCode = StatusCodes.Status200OK,
@@ -799,7 +812,7 @@ Respond in JSON with schema: {jsonSchema}";
             // Perform eligibility checks (skills, workload, performance)
             var reasons = new List<string>();
 
-            var activeAssignments = reviewer.ReviewerAssignments.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress);
+                var activeAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) ?? 0;
             if (activeAssignments >= 5)
             {
                 reasons.Add("Reviewer has too many active assignments.");
@@ -865,7 +878,7 @@ Respond in JSON with schema: {jsonSchema}";
             }
 
             var reasons = new List<string>();
-            var activeAssignments = reviewer.ReviewerAssignments.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress);
+            var activeAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) ?? 0;
             if (activeAssignments >= 5)
             {
                 reasons.Add("Reviewer has too many active assignments.");
@@ -956,7 +969,8 @@ Respond in JSON with schema: {jsonSchema}";
                     { "Context", string.Empty }
                 };
 
-                var reviewerScores = await CalculateReviewerScores(reviewers, topicFields, topicContext);
+                var skipMessages = new List<string>();
+                var reviewerScores = await CalculateReviewerScores(reviewers, topicFields, topicContext, skipMessages);
 
             // Step 5: Sort and prioritize reviewers
             var suggestions = reviewerScores
@@ -975,6 +989,7 @@ Respond in JSON with schema: {jsonSchema}";
                 {
                     Suggestions = suggestions,
                     AIExplanation = aiExplanation
+                    ,SkipMessages = skipMessages
                 },
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
