@@ -32,6 +32,5 @@ public class CreateReviewDTO
     /// <summary>
     /// Thời gian dành để review (phút)
     /// </summary>
-    [Range(1, 600, ErrorMessage = "Thời gian review phải từ 1 đến 600 phút")]
-    public int? TimeSpentMinutes { get; set; }
+    // TimeSpentMinutes is set server-side by the ReviewService; clients should not provide it on create.
 }

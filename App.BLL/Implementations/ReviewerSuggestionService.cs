@@ -120,7 +120,8 @@ namespace App.BLL.Implementations
                         { "Context", string.Empty }
                     };
 
-                    reviewerScores = await CalculateReviewerScores(reviewers, topicFields, submissionContext, skipMessages);
+                    int? semesterId = submission.Topic?.SemesterId;
+                    reviewerScores = await CalculateReviewerScores(reviewers, topicFields, submissionContext, skipMessages, semesterId);
                 }
                 catch (Exception ex)
                 {
@@ -181,7 +182,7 @@ namespace App.BLL.Implementations
             }
         }
 
-    private Task<List<ReviewerSuggestionDTO>> CalculateReviewerScores(List<User> reviewers, Dictionary<string, string> topicFields, string submissionContext, List<string> skipMessages)
+    private Task<List<ReviewerSuggestionDTO>> CalculateReviewerScores(List<User> reviewers, Dictionary<string, string> topicFields, string submissionContext, List<string> skipMessages, int? semesterId)
         {
             // Validate submission context
             if (string.IsNullOrWhiteSpace(submissionContext))
@@ -326,12 +327,43 @@ namespace App.BLL.Implementations
                         if (tagTokens.Any(tok => topicTf.ContainsKey(tok))) matchedSkills.Add(tag);
                     }
 
-                    // Workload and performance
-                    var workloadScore = CalculateWorkloadScore(reviewer);
-                    var performanceScore = CalculatePerformanceScore(reviewer);
+                    // Prefer DB-stored ReviewerPerformance values for semester-scoped metrics when available
+                    int currentActiveAssignments;
+                    int completedAssignments;
+                    decimal performanceScore;
 
-                    // Completed assignments count
-                    var completedAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Completed) ?? 0;
+                    ReviewerPerformance? perf = null;
+                    try
+                    {
+                        if (semesterId.HasValue)
+                        {
+                            perf = reviewer.ReviewerPerformances?.FirstOrDefault(p => p.SemesterId == semesterId.Value);
+                        }
+                    }
+                    catch { perf = null; }
+
+                    if (perf != null)
+                    {
+                        // Derive current active from TotalAssignments - CompletedAssignments (ensure non-negative)
+                        var active = perf.TotalAssignments - perf.CompletedAssignments;
+                        currentActiveAssignments = Math.Max(0, active);
+                        completedAssignments = perf.CompletedAssignments;
+                        // Build a performance score using QualityRating, OnTimeRate and AverageScoreGiven (fallbacks to 0)
+                        var quality = perf.QualityRating ?? 0m;
+                        var onTime = perf.OnTimeRate ?? 0m;
+                        var avgScore = perf.AverageScoreGiven ?? 0m;
+                        performanceScore = quality * 0.5m + onTime * 0.3m + avgScore * 0.2m;
+                    }
+                    else
+                    {
+                        // Fallback: compute from in-memory reviewer record
+                        currentActiveAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) ?? 0;
+                        completedAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Completed) ?? 0;
+                        performanceScore = CalculatePerformanceScore(reviewer);
+                    }
+
+                    // Workload score (lower is better) - invert so higher is better (0..1)
+                    var workloadScore = 1 - Math.Min(1, currentActiveAssignments / 5m);
 
                     var overallScore = skillMatchScore * 0.5m + workloadScore * 0.3m + performanceScore * 0.2m;
 
@@ -347,8 +379,12 @@ namespace App.BLL.Implementations
                         WorkloadScore = Decimal.Round(workloadScore, 4),
                         PerformanceScore = Decimal.Round(performanceScore, 4),
                         OverallScore = Decimal.Round(overallScore, 4),
-                        CurrentActiveAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) ?? 0,
+                        CurrentActiveAssignments = currentActiveAssignments,
                         CompletedAssignments = completedAssignments,
+                        // Populate performance fields (prefer DB values when available)
+                        AverageScoreGiven = perf?.AverageScoreGiven,
+                        OnTimeRate = perf?.OnTimeRate,
+                        QualityRating = perf?.QualityRating,
                         IsEligible = matchedSkills.Any() && (reviewer.LecturerSkills?.Any() ?? false),
                         IneligibilityReasons = matchedSkills.Any() ? new List<string>() : new List<string> { "No matching skills with topic" }
                     };
@@ -574,40 +610,67 @@ namespace App.BLL.Implementations
             try
             {
                 // Build a structured, professional prompt including per-field match details
-                var reviewersText = string.Join("\n\n", suggestions.Select((s, i) =>
+                // Build a compact JSON input describing reviewers and submission context
+                var reviewersJsonItems = suggestions.Select((s, i) =>
                 {
-                    var fieldsInfo = string.Join("; ", s.SkillMatchFieldScores.Select(kv => $"{kv.Key}:{kv.Value:F2}"));
-                    var topTokensInfo = string.Join(",", s.SkillMatchTopTokens.SelectMany(kv => kv.Value.Select(t => $"{kv.Key}:{t}")));
-                    return $"Reviewer {i + 1}: {s.ReviewerName} (ID:{s.ReviewerId})\nOverallScore: {s.OverallScore:F3}\nSkillMatchScore: {s.SkillMatchScore:F3}\nFieldScores: {fieldsInfo}\nTopTokens: {topTokensInfo}\nWorkload: {s.WorkloadScore:F3}\nPerformance: {s.PerformanceScore:F3}\nMatchedSkills: {string.Join(",", s.MatchedSkills)}";
-                }));
+                    // Safely truncate long lists/tokens
+                    string safeTokens = string.Join(",", s.SkillMatchTopTokens.SelectMany(kv => kv.Value).Take(10));
+                    string safeMatchedSkills = string.Join(",", (s.MatchedSkills ?? new List<string>()).Take(6));
 
-                var jsonSchema = "{\"reviewers\": [{ \"id\": number, \"recommendation\": \"string\", \"reasons\": [\"string\"], \"concerns\": [\"string\"], \"top_matching_tokens\": [\"string\"] }], \"overall_recommendation\": \"string\" }";
+                    // Include performance fields explicitly
+                    var perfObj = new
+                    {
+                        averageScoreGiven = s.AverageScoreGiven ?? 0m,
+                        onTimeRate = s.OnTimeRate ?? 0m,
+                        qualityRating = s.QualityRating ?? 0m,
+                        performanceScore = s.PerformanceScore
+                    };
 
-                var basePrompt = $@"You are an expert academic reviewer recommender. Given the submission context and the compiled reviewer profiles below, produce a concise, professional explanation (3-5 bullet points each) why each reviewer is suitable. Include any potential concerns (workload, missing skill coverage) and suggest the top 1-2 best matches.
+                    return new
+                    {
+                        id = s.ReviewerId,
+                        name = s.ReviewerName,
+                        overallScore = s.OverallScore,
+                        skillMatchScore = s.SkillMatchScore,
+                        fieldScores = s.SkillMatchFieldScores,
+                        topTokens = safeTokens,
+                        matchedSkills = safeMatchedSkills,
+                        workload = s.WorkloadScore,
+                        currentActiveAssignments = s.CurrentActiveAssignments,
+                        completedAssignments = s.CompletedAssignments,
+                        performance = perfObj
+                    };
+                }).ToList();
 
-Submission context:
----
-{submissionContext}
----
-
-Reviewer summaries:
-{reviewersText}
-
-Respond in JSON with schema: {jsonSchema}";
-
-                // If the prompt is too long, truncate the submissionContext portion and note truncation
-                const int maxPromptLength = 3000; // conservative safe limit
-                string promptToSend = basePrompt;
-                if (basePrompt.Length > maxPromptLength)
+                var payload = new
                 {
-                    // Truncate submissionContext while preserving reviewer list and instruction
-                    var note = "[Truncated submission context to fit model limits]";
-                    var allowedContextLen = Math.Max(200, maxPromptLength - reviewersText.Length - note.Length - 200);
-                    var truncatedContext = submissionContext.Length > allowedContextLen ? submissionContext.Substring(0, allowedContextLen) + "..." : submissionContext;
-                    promptToSend = $"Given the submission context:\n---\n{truncatedContext}\n---\n{note}\n\nand these reviewer profiles:\n{reviewersText}\nExplain why these reviewers are suitable.";
+                    instructions = "Return a JSON object with keys: reviewers (array), overall_recommendation (string). For each reviewer return id, recommendation (" +
+                                   "'strong_yes'|'yes'|'no'|'uncertain'), reasons (array of short strings), concerns (array), top_matching_tokens (array of strings). Keep answers concise.",
+                    submission = submissionContext.Length > 1000 ? submissionContext.Substring(0, 1000) + "..." : submissionContext,
+                    reviewers = reviewersJsonItems
+                };
+
+                // Build a short system prompt that forces JSON-only response
+                var jsonOnlyPrompt = "You are an assistant that must respond ONLY with JSON. Do not include any extra text. Follow the instructions exactly.";
+                var userPrompt = System.Text.Json.JsonSerializer.Serialize(payload);
+
+                var finalPrompt = jsonOnlyPrompt + "\n" + userPrompt;
+
+                // Send to AI service
+                var aiResult = await _aiService.GetPromptCompletionAsync(finalPrompt);
+
+                // Attempt to detect and trim non-JSON prefixes/suffixes from response
+                if (string.IsNullOrWhiteSpace(aiResult)) return null;
+                var firstBrace = aiResult.IndexOf('{');
+                var lastBrace = aiResult.LastIndexOf('}');
+                if (firstBrace >= 0 && lastBrace > firstBrace)
+                {
+                    var json = aiResult.Substring(firstBrace, lastBrace - firstBrace + 1);
+                    return json;
                 }
 
-                return await _aiService.GetPromptCompletionAsync(promptToSend);
+                // Fallback: return raw result (already logged by caller on failure)
+                return aiResult;
             }
             catch (Exception ex)
             {
@@ -730,7 +793,8 @@ Respond in JSON with schema: {jsonSchema}";
                 };
 
                 var skipMessages = new List<string>();
-                var reviewerScores = await CalculateReviewerScores(reviewers, topicFields, topicContext, skipMessages);
+                int? semesterId = topicVersion.Topic?.SemesterId;
+                var reviewerScores = await CalculateReviewerScores(reviewers, topicFields, topicContext, skipMessages, semesterId);
 
                 var max = input.MaxSuggestions <= 0 ? 5 : input.MaxSuggestions;
 
@@ -970,7 +1034,8 @@ Respond in JSON with schema: {jsonSchema}";
                 };
 
                 var skipMessages = new List<string>();
-                var reviewerScores = await CalculateReviewerScores(reviewers, topicFields, topicContext, skipMessages);
+                int? semesterId = topic.SemesterId;
+                var reviewerScores = await CalculateReviewerScores(reviewers, topicFields, topicContext, skipMessages, semesterId);
 
             // Step 5: Sort and prioritize reviewers
             var suggestions = reviewerScores

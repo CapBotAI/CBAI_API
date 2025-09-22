@@ -17,10 +17,23 @@ public class MapperProfile : Profile
         CreateMap<ReviewerAssignment, ReviewerAssignmentResponseDTO>()
             .ForMember(dest => dest.Reviewer, opt => opt.MapFrom(src => src.Reviewer))
             .ForMember(dest => dest.AssignedByUser, opt => opt.MapFrom(src => src.AssignedByUser))
+            // Make mapping null-safe: some navigation properties may be missing in certain DB states
             .ForMember(dest => dest.SubmissionTitle, opt => opt.MapFrom(src =>
-                src.Submission.TopicVersion.Topic.EN_Title))
+                src.Submission != null
+                    ? (src.Submission.TopicVersion != null
+                        ? (src.Submission.TopicVersion.Topic != null
+                            ? src.Submission.TopicVersion.Topic.EN_Title
+                            : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+                        : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+                    : null))
             .ForMember(dest => dest.TopicTitle, opt => opt.MapFrom(src =>
-                src.Submission.TopicVersion.Topic.EN_Title));
+                src.Submission != null
+                    ? (src.Submission.TopicVersion != null
+                        ? (src.Submission.TopicVersion.Topic != null
+                            ? src.Submission.TopicVersion.Topic.EN_Title
+                            : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+                        : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+                    : null));
 
         CreateMap<User, AvailableReviewerDTO>()
             .ForMember(dest => dest.Skills, opt => opt.MapFrom(src =>
@@ -61,8 +74,8 @@ public class MapperProfile : Profile
         CreateMap<User, UserOverviewDTO>()
             .ConstructUsing((src, context) => 
             {
-                // Lấy roles từ UserRoles navigation property
-                var roles = src.UserRoles?.Select(ur => ur.Role).Where(r => r != null).ToList() ?? new List<Role>();
+                // Lấy roles từ UserRoles navigation property and ensure non-nullable Role list
+                var roles = src.UserRoles?.Select(ur => ur.Role).Where(r => r != null).Select(r => r!).ToList() ?? new List<Role>();
                 return new UserOverviewDTO(src, roles);
             });
     }

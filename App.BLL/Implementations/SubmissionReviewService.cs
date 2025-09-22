@@ -58,7 +58,6 @@ public class SubmissionReviewService : ISubmissionReviewService
                 AssignmentId = createDTO.AssignmentId,
                 OverallComment = createDTO.OverallComment,
                 Recommendation = createDTO.Recommendation,
-                TimeSpentMinutes = createDTO.TimeSpentMinutes,
                 Status = ReviewStatus.Draft,
                 CreatedAt = DateTime.UtcNow,
                 LastModifiedAt = DateTime.UtcNow,
