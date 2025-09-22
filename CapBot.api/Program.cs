@@ -167,7 +167,7 @@ public class Program
                     factory: partition => new FixedWindowRateLimiterOptions
                     {
                         AutoReplenishment = true,
-                        PermitLimit = 10,
+                        PermitLimit = 100,
                         Window = TimeSpan.FromMinutes(1)
                     }));
         });
