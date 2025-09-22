@@ -1,3 +1,4 @@
+using App.Entities.DTOs.Accounts;
 using App.Entities.DTOs.EvaluationCriteria;
 using App.Entities.DTOs.Review;
 using App.Entities.DTOs.ReviewComment;
@@ -56,5 +57,13 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.IsActive, opt => opt.MapFrom(src => true))
             .ForMember(dest => dest.CreatedAt, opt => opt.MapFrom(src => DateTime.UtcNow))
             .ForMember(dest => dest.LastModifiedAt, opt => opt.MapFrom(src => DateTime.UtcNow));
+        
+        CreateMap<User, UserOverviewDTO>()
+            .ConstructUsing((src, context) => 
+            {
+                // Lấy roles từ UserRoles navigation property
+                var roles = src.UserRoles?.Select(ur => ur.Role).Where(r => r != null).ToList() ?? new List<Role>();
+                return new UserOverviewDTO(src, roles);
+            });
     }
 }

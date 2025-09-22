@@ -1,10 +1,11 @@
 using System.ComponentModel.DataAnnotations;
+using System.Collections.Generic;
 using App.Commons;
 using App.Entities.Enums;
 
 namespace App.Entities.DTOs.ReviewerAssignment;
 
-public class AssignReviewerDTO
+public class AssignReviewerDTO : IValidatableObject
 {
    
     [Required(ErrorMessage = ConstantModel.Required)]
@@ -27,4 +28,12 @@ public class AssignReviewerDTO
     
     [StringLength(500, ErrorMessage = "Ghi chú không được vượt quá 500 ký tự")]
     public string? Notes { get; set; }
+
+    public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
+    {
+        if (Deadline.HasValue && Deadline.Value <= DateTime.UtcNow)
+        {
+            yield return new ValidationResult("Deadline phải ở tương lai", new[] { nameof(Deadline) });
+        }
+    }
 }

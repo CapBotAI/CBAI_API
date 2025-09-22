@@ -6,7 +6,7 @@ namespace App.BLL.Interfaces;
 
 public interface IReviewService
 {
-    Task<BaseResponseModel<ReviewResponseDTO>> CreateAsync(CreateReviewDTO createDTO);
+    Task<BaseResponseModel<ReviewResponseDTO>> CreateAsync(CreateReviewDTO createDTO, int currentUserId);
     Task<BaseResponseModel<ReviewResponseDTO>> UpdateAsync(UpdateReviewDTO updateDTO);
     Task<BaseResponseModel> DeleteAsync(int id);
     Task<BaseResponseModel<ReviewResponseDTO>> GetByIdAsync(int id);

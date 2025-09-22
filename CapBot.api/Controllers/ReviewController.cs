@@ -1,3 +1,4 @@
+using System.Security.Claims;
 using Microsoft.AspNetCore.Mvc;
 using App.BLL.Interfaces;
 using App.Entities.DTOs.Review;
@@ -49,7 +50,8 @@ namespace CapBot.api.Controllers
 
             try
             {
-                var result = await _reviewService.CreateAsync(createDTO);
+                var currentUserId = int.Parse(User.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? "0");
+                var result = await _reviewService.CreateAsync(createDTO, currentUserId);
                 return ProcessServiceResponse(result);
             }
             catch (Exception ex)

@@ -2,6 +2,10 @@ using AutoMapper;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using App.BLL.Interfaces;
+using System.ComponentModel.DataAnnotations;
+using App.Commons;
+using App.Commons.Interfaces;
+using App.Entities.DTOs.Notifications;
 using App.Commons.ResponseModel;
 using App.DAL.UnitOfWork;
 using App.DAL.Queries;
@@ -11,6 +15,7 @@ using App.Entities.Entities.Core;
 using App.Entities.Enums;
 using App.Entities.Constants;
 using System.Linq.Expressions;
+using Microsoft.Extensions.Logging;
 
 namespace App.BLL.Implementations;
 
@@ -19,16 +24,23 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IMapper _mapper;
     private readonly IPerformanceMatchingService _performanceMatchingService;
-    private readonly ISkillMatchingService skillMatchingService;
+    private readonly ISkillMatchingService _skillMatchingService;
+    private readonly INotificationService _notificationService;
+    private readonly IEmailService _emailService;
+    private readonly ILogger<ReviewerAssignmentService> _logger;
 
     public ReviewerAssignmentService(IUnitOfWork unitOfWork, IMapper mapper,
-        IPerformanceMatchingService performanceMatchingService, ISkillMatchingService skillMatchingService)
+        IPerformanceMatchingService performanceMatchingService, ISkillMatchingService skillMatchingService,
+        INotificationService notificationService, IEmailService emailService,
+        ILogger<ReviewerAssignmentService> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _performanceMatchingService = performanceMatchingService;
-        this.skillMatchingService = skillMatchingService;
         _skillMatchingService = skillMatchingService;
+        _notificationService = notificationService;
+        _emailService = emailService;
+        _logger = logger;
     }
 
     public async Task<BaseResponseModel<ReviewerAssignmentResponseDTO>> AssignReviewerAsync(AssignReviewerDTO dto,
@@ -36,6 +48,20 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
     {
         try
         {
+            // Validate DTO (important for programmatic calls that bypass controller model validation)
+            var validationResults = new List<ValidationResult>();
+            var validationContext = new ValidationContext(dto);
+            if (!Validator.TryValidateObject(dto, validationContext, validationResults, true))
+            {
+                var messages = string.Join("; ", validationResults.Select(v => v.ErrorMessage));
+                return new BaseResponseModel<ReviewerAssignmentResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = messages
+                };
+            }
+
             // Validate submission exists
             var submissionOptions = new QueryOptions<Submission>
             {
@@ -165,12 +191,91 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 await _unitOfWork.GetRepo<ReviewerAssignment>().GetSingleAsync(createdAssignmentOptions);
 
             var response = _mapper.Map<ReviewerAssignmentResponseDTO>(createdAssignment);
+            string extraNotes = string.Empty;
+
+            // Ensure a system notification row exists for the assigned reviewer. Use NotificationService first; if it fails, fall back to direct DB insert.
+            try
+            {
+                var topicTitle = createdAssignment.Submission?.TopicVersion?.Topic?.EN_Title ?? createdAssignment.Submission?.Topic?.EN_Title ?? "(Không xác định)";
+                var title = $"Bạn được phân công review: {topicTitle}";
+                var message = $"Bạn vừa được phân công review đề tài '{topicTitle}'. Vui lòng kiểm tra assignment và hoàn thành trước deadline.";
+
+                var notifDto = new App.Entities.DTOs.Notifications.CreateNotificationDTO
+                {
+                    UserId = createdAssignment.ReviewerId,
+                    Title = title,
+                    Message = message,
+                    Type = App.Entities.Enums.NotificationTypes.Info,
+                    RelatedEntityType = "ReviewerAssignment",
+                    RelatedEntityId = createdAssignment.Id
+                };
+
+                var notifResult = await _notificationService.CreateAsync(notifDto);
+
+                // If notification service failed (or returned null), create the notification directly to ensure DB persistence
+                if (notifResult == null || !notifResult.IsSuccess)
+                {
+                    var repo = _unitOfWork.GetRepo<SystemNotification>();
+                    var fallback = new SystemNotification
+                    {
+                        UserId = notifDto.UserId,
+                        Title = notifDto.Title,
+                        Message = notifDto.Message,
+                        Type = notifDto.Type,
+                        RelatedEntityType = notifDto.RelatedEntityType,
+                        RelatedEntityId = notifDto.RelatedEntityId,
+                        IsRead = false,
+                        CreatedAt = DateTime.Now
+                    };
+
+                    await repo.CreateAsync(fallback);
+                    await _unitOfWork.SaveChangesAsync();
+                }
+
+                // Attempt to send email if reviewer has email. If send fails or throws, append a message but don't throw.
+                var reviewerEmail = createdAssignment.Reviewer?.Email;
+                if (!string.IsNullOrWhiteSpace(reviewerEmail))
+                {
+                    try
+                    {
+                        var emailBody = $@"Xin chào {createdAssignment.Reviewer?.UserName ?? "Reviewer"},
+\n\nBạn vừa được phân công review đề tài: {topicTitle}.
+\nDeadline: {(createdAssignment.Deadline.HasValue ? createdAssignment.Deadline.Value.ToString("dd/MM/yyyy HH:mm") : "Không có")}
+\nVui lòng đăng nhập vào hệ thống để xem chi tiết và bắt đầu review.
+\n\nTrân trọng,\nCapBot";
+
+                        var emailModel = new EmailModel(
+                            new[] { reviewerEmail },
+                            $"[CapBot] Phân công review: {topicTitle}",
+                            emailBody
+                        );
+
+                        var emailSent = await _emailService.SendEmailAsync(emailModel);
+                        if (!emailSent)
+                        {
+                            // append info to response message so client can see email wasn't sent
+                            extraNotes += " Notification created but email not sent (EmailService returned false).";
+                        }
+                    }
+                    catch (Exception)
+                    {
+                        // Email failure should not break assignment; inform caller via message
+                        extraNotes += " Notification created but email send threw an exception.";
+                    }
+                }
+            }
+            catch
+            {
+                // Fail silently for notification/email but do not block the main assignment success
+            }
+
+            var baseMessage = "Phân công reviewer thành công" + extraNotes;
 
             return new BaseResponseModel<ReviewerAssignmentResponseDTO>
             {
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status201Created,
-                Message = "Phân công reviewer thành công",
+                Message = baseMessage,
                 Data = response
             };
         }
@@ -582,19 +687,6 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
             throw;
         }
     }
-    // Thêm methods mới vào class ReviewerAssignmentService
-
-    private readonly ISkillMatchingService _skillMatchingService;
-
-    // Update constructor
-    public ReviewerAssignmentService(IUnitOfWork unitOfWork, IMapper mapper, ISkillMatchingService skillMatchingService)
-    {
-        _unitOfWork = unitOfWork;
-        _mapper = mapper;
-        this.skillMatchingService = skillMatchingService;
-        _skillMatchingService = skillMatchingService;
-    }
-
     public async Task<BaseResponseModel<AutoAssignmentResult>> AutoAssignReviewersAsync(AutoAssignReviewerDTO dto,
         int assignedById)
     {

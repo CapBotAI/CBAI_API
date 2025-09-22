@@ -16,6 +16,13 @@ namespace App.BLL.Services
                 magA += (decimal)a[i] * (decimal)a[i];
                 magB += (decimal)b[i] * (decimal)b[i];
             }
+
+            if (magA == 0 || magB == 0)
+            {
+                // Return 0 similarity if either vector has zero magnitude
+                return 0;
+            }
+
             return dot / (decimal)(Math.Sqrt((double)magA) * Math.Sqrt((double)magB));
         }
     }

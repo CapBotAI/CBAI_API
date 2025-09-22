@@ -6,10 +6,5 @@ using System.Threading.Tasks;
 
 namespace App.Entities.DTOs.ReviewerSuggestion
 {
-    public class BulkReviewerSuggestionOutputDTO
-    {
-        public int TopicVersionId { get; set; }
-        public int TopicId { get; set; }
-        public ReviewerSuggestionOutputDTO? Suggestion { get; set; }
-    }
+    // File removed as it is no longer needed.
 }
