@@ -269,6 +269,53 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 // Fail silently for notification/email but do not block the main assignment success
             }
 
+            // Update ReviewerPerformance.TotalAssignments for the reviewer and semester (best-effort)
+            try
+            {
+                // Determine semester from the created assignment's submission -> topicVersion -> topic or submission.topic
+                var semesterIdNullable = createdAssignment.Submission?.TopicVersion?.Topic?.SemesterId
+                                         ?? createdAssignment.Submission?.Topic?.SemesterId;
+                if (semesterIdNullable.HasValue)
+                {
+                    var semesterId = semesterIdNullable.Value;
+                    var perfRepo = _unitOfWork.GetRepo<ReviewerPerformance>();
+                    var perfOptions = new QueryOptions<ReviewerPerformance>
+                    {
+                        Predicate = rp => rp.ReviewerId == createdAssignment.ReviewerId && rp.SemesterId == semesterId
+                    };
+
+                    var perf = await perfRepo.GetSingleAsync(perfOptions);
+                    if (perf == null)
+                    {
+                        perf = new ReviewerPerformance
+                        {
+                            ReviewerId = createdAssignment.ReviewerId,
+                            SemesterId = semesterId,
+                            TotalAssignments = 1,
+                            CompletedAssignments = 0,
+                            AverageTimeMinutes = 0,
+                            AverageScoreGiven = 0,
+                            OnTimeRate = 0,
+                            QualityRating = 0,
+                            LastUpdated = DateTime.UtcNow
+                        };
+                        await perfRepo.CreateAsync(perf);
+                    }
+                    else
+                    {
+                        perf.TotalAssignments += 1;
+                        perf.LastUpdated = DateTime.UtcNow;
+                        await perfRepo.UpdateAsync(perf);
+                    }
+
+                    await _unitOfWork.SaveChangesAsync();
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to update ReviewerPerformance after assignment for reviewer {ReviewerId} assignment {AssignmentId}", createdAssignment.ReviewerId, createdAssignment.Id);
+            }
+
             var baseMessage = "Phân công reviewer thành công" + extraNotes;
 
             return new BaseResponseModel<ReviewerAssignmentResponseDTO>
@@ -1053,19 +1100,14 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
     {
         try
         {
+            // Load assignment as a tracked entity but DO NOT include navigation props here.
+            // We'll update the tracked entity's simple properties and SaveChanges so EF only writes changed fields.
             var assignmentOptions = new QueryOptions<ReviewerAssignment>
             {
                 Predicate = ra => ra.Id == assignmentId && ra.ReviewerId == reviewerId,
-                IncludeProperties = new List<Expression<Func<ReviewerAssignment, object>>>
-                {
-                    ra => ra.Submission,
-                    ra => ra.Submission.TopicVersion,
-                    ra => ra.Submission.TopicVersion.Topic,
-                    ra => ra.Submission.SubmittedByUser,
-                    ra => ra.Reviewer,
-                    ra => ra.AssignedByUser
-                }
+                Tracked = true
             };
+
             var assignment = await _unitOfWork.GetRepo<ReviewerAssignment>().GetSingleAsync(assignmentOptions);
 
             if (assignment == null)
@@ -1088,14 +1130,36 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 };
             }
 
+            // Update the tracked entity's scalar properties. This avoids attaching navigation properties
+            // and prevents unintended overwrites of other columns.
             assignment.Status = AssignmentStatus.InProgress;
-            assignment.StartedAt = DateTime.UtcNow;
+            if (assignment.StartedAt == null)
+            {
+                assignment.StartedAt = DateTime.Now;
+            }
 
+            // Persist changes on the tracked entity
             await _unitOfWork.GetRepo<ReviewerAssignment>().UpdateAsync(assignment);
             await _unitOfWork.SaveChangesAsync();
 
-            // Map updated assignment to response DTO
-            var response = _mapper.Map<ReviewerAssignmentResponseDTO>(assignment);
+            // Reload full assignment for response mapping (no-tracking to keep change tracker clean)
+            var updatedAssignmentOptions = new QueryOptions<ReviewerAssignment>
+            {
+                Predicate = ra => ra.Id == assignmentId,
+                IncludeProperties = new List<Expression<Func<ReviewerAssignment, object>>>
+                {
+                    ra => ra.Submission,
+                    ra => ra.Submission.TopicVersion,
+                    ra => ra.Submission.TopicVersion.Topic,
+                    ra => ra.Submission.SubmittedByUser,
+                    ra => ra.Reviewer,
+                    ra => ra.AssignedByUser
+                },
+                Tracked = false
+            };
+
+            var updatedAssignment = await _unitOfWork.GetRepo<ReviewerAssignment>().GetSingleAsync(updatedAssignmentOptions);
+            var response = _mapper.Map<ReviewerAssignmentResponseDTO>(updatedAssignment);
 
             return new BaseResponseModel<ReviewerAssignmentResponseDTO>
             {

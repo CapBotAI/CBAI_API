@@ -123,6 +123,17 @@ public class ReviewService : IReviewService
                         Message = $"Điểm cho tiêu chí '{criteriaItem.Name}' không được vượt quá {criteriaItem.MaxScore}"
                     };
                 }
+                // // Additional validation: ensure score fits DB decimal(4,2) (max 99.99)
+                // if (scoreDTO.Score > 99.99m)
+                // {
+                //     await _unitOfWork.RollBackAsync();
+                //     return new BaseResponseModel<ReviewResponseDTO>
+                //     {
+                //         IsSuccess = false,
+                //         StatusCode = StatusCodes.Status400BadRequest,
+                //         Message = $"Điểm cho tiêu chí '{criteriaItem.Name}' không thể lớn hơn 99.99 (giá trị nhận được: {scoreDTO.Score})"
+                //     };
+                // }
             }
 
             // Create review
@@ -131,7 +142,6 @@ public class ReviewService : IReviewService
                 AssignmentId = createDTO.AssignmentId,
                 OverallComment = createDTO.OverallComment,
                 Recommendation = createDTO.Recommendation,
-                TimeSpentMinutes = createDTO.TimeSpentMinutes,
                 Status = ReviewStatus.Draft,
                 CreatedAt = DateTime.UtcNow,
                 LastModifiedAt = DateTime.UtcNow,
@@ -295,13 +305,24 @@ public class ReviewService : IReviewService
                         Message = $"Điểm cho tiêu chí '{criteriaItem.Name}' không được vượt quá {criteriaItem.MaxScore}"
                     };
                 }
+                // // Additional validation: ensure score fits DB decimal(4,2) (max 99.99)
+                // if (scoreDTO.Score > 99.99m)
+                // {
+                //     await _unitOfWork.RollBackAsync();
+                //     return new BaseResponseModel<ReviewResponseDTO>
+                //     {
+                //         IsSuccess = false,
+                //         StatusCode = StatusCodes.Status400BadRequest,
+                //         Message = $"Điểm cho tiêu chí '{criteriaItem.Name}' không thể lớn hơn 99.99 (giá trị nhận được: {scoreDTO.Score})"
+                //     };
+                // }
             }
 
-            // Update review
+            // Update review (do not accept TimeSpentMinutes from client; it's server-computed on submit)
             review.OverallComment = updateDTO.OverallComment;
             review.Recommendation = updateDTO.Recommendation;
-            review.TimeSpentMinutes = updateDTO.TimeSpentMinutes;
-            review.LastModifiedAt = DateTime.UtcNow;
+            // review.TimeSpentMinutes is server-authoritative; do not overwrite here
+            review.LastModifiedAt = DateTime.Now;
 
             // Calculate new overall score
             decimal totalWeightedScore = 0;
@@ -661,6 +682,69 @@ public class ReviewService : IReviewService
             review.SubmittedAt = DateTime.UtcNow;
             review.LastModifiedAt = DateTime.UtcNow;
 
+            // If TimeSpentMinutes is not provided, try to compute it from assignment timestamps
+            try
+            {
+                if (!review.TimeSpentMinutes.HasValue || review.TimeSpentMinutes.Value <= 0)
+                {
+                    var assignmentRepo = _unitOfWork.GetRepo<ReviewerAssignment>();
+                    var assignment = await assignmentRepo.GetSingleAsync(new QueryOptions<ReviewerAssignment>
+                    {
+                        Predicate = a => a.Id == review.AssignmentId,
+                        Tracked = false
+                    });
+
+                    DateTime? startTime = null;
+
+                    if (assignment != null)
+                    {
+                        // Prefer StartedAt (when reviewer explicitly started), then AssignedAt
+                        if (assignment.StartedAt.HasValue)
+                        {
+                            startTime = assignment.StartedAt.Value;
+                        }
+                        else if (assignment.AssignedAt != default(DateTime))
+                        {
+                            startTime = assignment.AssignedAt;
+                        }
+                    }
+
+                    // Fallback to review.CreatedAt if available
+                    if (!startTime.HasValue && review.CreatedAt != default(DateTime))
+                    {
+                        startTime = review.CreatedAt;
+                    }
+
+                    // If we have a startTime, compute minutes; otherwise set a safe minimum (best-effort)
+                    if (startTime.HasValue)
+                    {
+                        var endTime = review.SubmittedAt ?? DateTime.UtcNow;
+                        var minutes = (int)Math.Round((endTime.ToUniversalTime() - startTime.Value.ToUniversalTime()).TotalMinutes);
+                        // clamp to reasonable range (1-600)
+                        minutes = Math.Max(1, Math.Min(600, minutes));
+                        review.TimeSpentMinutes = minutes;
+                    }
+                    else
+                    {
+                        // As a last resort, set a minimal positive time so averages are not skewed by null/zero
+                        review.TimeSpentMinutes = 1;
+                    }
+                }
+            }
+            catch
+            {
+                // best-effort: do not block submit if computation fails
+                try
+                {
+                    // ensure at least a minimal positive value
+                    if (!review.TimeSpentMinutes.HasValue || review.TimeSpentMinutes.Value <= 0)
+                    {
+                        review.TimeSpentMinutes = 1;
+                    }
+                }
+                catch { }
+            }
+
             await reviewRepo.UpdateAsync(review);
             var result = await _unitOfWork.SaveAsync();
 
@@ -673,6 +757,13 @@ public class ReviewService : IReviewService
                     Message = result.Message
                 };
             }
+
+            // After successful submit, update reviewer performance metrics (best-effort)
+            try
+            {
+                await UpdateReviewerPerformanceForAssignmentAsync(review.AssignmentId);
+            }
+            catch { /* don't block submit if perf update fails */ }
 
             var updatedReview = await GetByIdAsync(reviewId);
             return new BaseResponseModel<ReviewResponseDTO>
@@ -728,6 +819,140 @@ public class ReviewService : IReviewService
                 StatusCode = StatusCodes.Status500InternalServerError,
                 Message = $"Lỗi hệ thống: {ex.Message}"
             };
+        }
+    }
+
+    /// <summary>
+    /// Recalculate and persist ReviewerPerformance for the reviewer of the given assignment.
+    /// This aggregates assignments and submitted reviews within the same semester as the submission/topic.
+    /// Best-effort: failures are logged by callers; do not throw to block user actions.
+    /// </summary>
+    public async Task UpdateReviewerPerformanceForAssignmentAsync(int assignmentId)
+    {
+        // caller does not need the specific review instance; load assignment and recompute
+        var assignmentRepo = _unitOfWork.GetRepo<ReviewerAssignment>();
+        var assignment = await assignmentRepo.GetSingleAsync(new QueryOptions<ReviewerAssignment>
+        {
+            Predicate = a => a.Id == assignmentId,
+            IncludeProperties = new List<System.Linq.Expressions.Expression<Func<ReviewerAssignment, object>>>
+            {
+                a => a.Submission,
+                a => a.Submission.TopicVersion,
+                a => a.Submission.TopicVersion.Topic,
+                a => a.Submission.Topic,
+                a => a.Reviewer,
+                a => a.Reviews
+            },
+            Tracked = false
+        });
+
+        if (assignment == null) return;
+
+        // Reuse the same aggregation logic below by calling the private implementation
+        await UpdateReviewerPerformanceAfterReviewAsync_Internal(assignment);
+    }
+
+    // Internal helper that accepts a loaded assignment
+    private async Task UpdateReviewerPerformanceAfterReviewAsync_Internal(ReviewerAssignment assignment)
+    {
+        try
+        {
+            var reviewerId = assignment.ReviewerId;
+
+            // Determine semester id from available navigation properties
+            int? semesterId = assignment.Submission?.TopicVersion?.Topic?.SemesterId
+                              ?? assignment.Submission?.Topic?.SemesterId;
+            if (!semesterId.HasValue) return;
+            var semId = semesterId.Value;
+
+            // Fetch all assignments for the reviewer (EF sometimes struggles with deep nested predicates)
+            var assignmentRepo = _unitOfWork.GetRepo<ReviewerAssignment>();
+            var allAssignments = await assignmentRepo.GetAllAsync(new QueryOptions<ReviewerAssignment>
+            {
+                Predicate = ra => ra.ReviewerId == reviewerId,
+                IncludeProperties = new List<System.Linq.Expressions.Expression<Func<ReviewerAssignment, object>>>
+                {
+                    ra => ra.Reviews,
+                    ra => ra.Submission,
+                    ra => ra.Submission.TopicVersion,
+                    ra => ra.Submission.TopicVersion.Topic,
+                    ra => ra.Submission.Topic
+                },
+                Tracked = false
+            });
+
+            // Filter by semester in-memory to avoid EF translation issues
+            var assignmentsInSemester = allAssignments.Where(ra =>
+                (ra.Submission?.TopicVersion?.Topic?.SemesterId == semId) ||
+                (ra.Submission?.Topic?.SemesterId == semId)
+            ).ToList();
+
+            var totalAssignments = assignmentsInSemester.Count;
+            var completedAssignments = assignmentsInSemester.Count(a => a.Status == AssignmentStatus.Completed || a.Reviews.Any(r => r.Status == ReviewStatus.Submitted));
+
+            // Collect submitted reviews from these assignments
+            var submittedReviews = assignmentsInSemester
+                .SelectMany(a => a.Reviews ?? new List<Review>())
+                .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted)
+                .ToList();
+
+            // Compute average only from reviews that have a positive TimeSpentMinutes (server-computed on submit)
+            var timeValues = submittedReviews.Where(r => r.TimeSpentMinutes.HasValue && r.TimeSpentMinutes.Value > 0)
+                .Select(r => r.TimeSpentMinutes!.Value).ToList();
+            var avgTime = timeValues.Any() ? (int)Math.Round(timeValues.Average()) : 0;
+            var avgScore = submittedReviews.Any() ? (decimal?)submittedReviews.Where(r => r.OverallScore.HasValue).Average(r => r.OverallScore!.Value) : null;
+
+            // Compute on-time rate by matching review.AssignmentId -> assignment.Deadline
+            int onTimeCount = 0;
+            foreach (var r in submittedReviews)
+            {
+                var parentAssignment = assignmentsInSemester.FirstOrDefault(a => a.Id == r.AssignmentId);
+                if (parentAssignment != null && r.SubmittedAt.HasValue && parentAssignment.Deadline.HasValue && r.SubmittedAt.Value <= parentAssignment.Deadline.Value)
+                {
+                    onTimeCount++;
+                }
+            }
+
+            var onTimeRate = submittedReviews.Any() ? (decimal?)((decimal)onTimeCount / submittedReviews.Count) : null;
+
+            // Update or create ReviewerPerformance
+            var perfRepo = _unitOfWork.GetRepo<ReviewerPerformance>();
+            var perf = await perfRepo.GetSingleAsync(new QueryOptions<ReviewerPerformance>
+            {
+                Predicate = rp => rp.ReviewerId == reviewerId && rp.SemesterId == semId
+            });
+
+            if (perf == null)
+            {
+                perf = new ReviewerPerformance
+                {
+                    ReviewerId = reviewerId,
+                    SemesterId = semId,
+                    TotalAssignments = totalAssignments,
+                    CompletedAssignments = completedAssignments,
+                    AverageTimeMinutes = avgTime,
+                    AverageScoreGiven = avgScore,
+                    OnTimeRate = onTimeRate,
+                    LastUpdated = DateTime.UtcNow
+                };
+                await perfRepo.CreateAsync(perf);
+            }
+            else
+            {
+                perf.TotalAssignments = totalAssignments;
+                perf.CompletedAssignments = completedAssignments;
+                perf.AverageTimeMinutes = avgTime;
+                perf.AverageScoreGiven = avgScore;
+                perf.OnTimeRate = onTimeRate;
+                perf.LastUpdated = DateTime.UtcNow;
+                await perfRepo.UpdateAsync(perf);
+            }
+
+            await _unitOfWork.SaveChangesAsync();
+        }
+        catch
+        {
+            // swallow exceptions - best-effort update
         }
     }
 }
