@@ -155,19 +155,25 @@ namespace CapBot.api.Controllers
                 await file.CopyToAsync(memoryStream);
                 var bytes = memoryStream.ToArray();
 
-                var guidFileName = Path.GetRandomFileName();
+                // Use original file name (sanitized)
+                var originalFileName = Path.GetFileNameWithoutExtension(file.FileName);
+                var sanitizedName = SanitizeFileName(originalFileName);
                 var isSvg = extension.Equals(".svg", StringComparison.OrdinalIgnoreCase);
 
-                var guildStringPath = new string[] { "images", isAdmin ? string.Empty : "entities", $"{guidFileName}{extension}" };
+                var targetFileName = sanitizedName + extension;
+                var guildStringPath = new string[] { "images", isAdmin ? string.Empty : "entities", targetFileName };
                 var path = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot", Helpers.PathCombine(guildStringPath));
 
-                string directory = Path.GetDirectoryName(path);
+                // Ensure uniqueness if file exists
+                path = EnsureUniqueFilePath(path, ref guildStringPath);
+
+                string directory = Path.GetDirectoryName(path) ?? _hostEnvironment.ContentRootPath;
                 if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
                 await System.IO.File.WriteAllBytesAsync(path, bytes);
 
-                string cdnhost = _configuration.GetSection("AppSettings").GetValue<string>("CdnUrl");
+                string cdnhost = _configuration.GetSection("AppSettings").GetValue<string>("CdnUrl") ?? string.Empty;
                 string url = $"{cdnhost}{Helpers.UrlCombine(guildStringPath)}";
 
                 // Tạo thumbnail
@@ -183,7 +189,7 @@ namespace CapBot.api.Controllers
 
                 return new UploadedFileInfo
                 {
-                    FileName = $"{guidFileName}{extension}",
+                    FileName = Path.GetFileName(path),
                     FilePath = path,
                     Url = url,
                     ThumbnailUrl = thumbnailUrl,
@@ -217,23 +223,29 @@ namespace CapBot.api.Controllers
                 await file.CopyToAsync(memoryStream);
                 var bytes = memoryStream.ToArray();
 
-                var guidFileName = Path.GetRandomFileName();
+                // Use original file name (sanitized)
+                var originalFileName = Path.GetFileNameWithoutExtension(file.FileName);
+                var sanitizedName = SanitizeFileName(originalFileName);
 
-                var guildStringPath = new string[] { "files", isAdmin ? string.Empty : "entities", $"{guidFileName}{extension}" };
+                var targetFileName = sanitizedName + extension;
+                var guildStringPath = new string[] { "files", isAdmin ? string.Empty : "entities", targetFileName };
                 var path = Path.Combine(_hostEnvironment.ContentRootPath, "wwwroot", Helpers.PathCombine(guildStringPath));
 
-                string directory = Path.GetDirectoryName(path);
+                // Ensure uniqueness if file exists
+                path = EnsureUniqueFilePath(path, ref guildStringPath);
+
+                string directory = Path.GetDirectoryName(path) ?? _hostEnvironment.ContentRootPath;
                 if (!Directory.Exists(directory))
                     Directory.CreateDirectory(directory);
 
                 await System.IO.File.WriteAllBytesAsync(path, bytes);
 
-                string cdnhost = _configuration.GetSection("AppSettings").GetValue<string>("CdnUrl");
+                string cdnhost = _configuration.GetSection("AppSettings").GetValue<string>("CdnUrl") ?? string.Empty;
                 string url = $"{cdnhost}{Helpers.UrlCombine(guildStringPath)}";
 
                 return new UploadedFileInfo
                 {
-                    FileName = $"{guidFileName}{extension}",
+                    FileName = Path.GetFileName(path),
                     FilePath = path,
                     Url = url,
                     ThumbnailUrl = null,
@@ -245,6 +257,50 @@ namespace CapBot.api.Controllers
                     Checksum = ComputeChecksum(bytes)
                 };
             }
+        }
+
+        // Sanitize original filename to remove invalid chars and trim length
+        private static string SanitizeFileName(string name)
+        {
+            if (string.IsNullOrWhiteSpace(name))
+                name = "file";
+
+            // Remove invalid path chars
+            foreach (var c in Path.GetInvalidFileNameChars())
+            {
+                name = name.Replace(c, '-');
+            }
+
+            // Collapse multiple hyphens
+            while (name.Contains("--"))
+                name = name.Replace("--", "-");
+
+            // Trim to reasonable length (keep room for suffixes/extensions)
+            var maxLen = 100;
+            if (name.Length > maxLen)
+                name = name.Substring(0, maxLen);
+
+            return name;
+        }
+
+        // If the target path already exists, append a timestamp to filename and update guildStringPath accordingly
+        private string EnsureUniqueFilePath(string path, ref string[] guildStringPath)
+        {
+            var directory = Path.GetDirectoryName(path) ?? _hostEnvironment.ContentRootPath;
+            var fileName = Path.GetFileName(path);
+
+            if (!System.IO.File.Exists(path))
+                return path;
+
+            var name = Path.GetFileNameWithoutExtension(fileName);
+            var ext = Path.GetExtension(fileName);
+            var timestamp = DateTime.UtcNow.ToString("yyyyMMddHHmmssfff");
+            var newFileName = $"{name}_{timestamp}{ext}";
+
+            guildStringPath[guildStringPath.Length - 1] = newFileName;
+
+            var newPath = Path.Combine(directory, newFileName);
+            return newPath;
         }
 
         private FileType DetermineFileType(string extension, string? mime)
@@ -291,7 +347,7 @@ namespace CapBot.api.Controllers
             var thumbnailPhysicalPath = Path.Combine(Directory.GetCurrentDirectory(), "wwwroot",
                 Helpers.PathCombine(thumbnailGuildStringPath));
 
-            string directory = Path.GetDirectoryName(thumbnailPhysicalPath);
+            string directory = Path.GetDirectoryName(thumbnailPhysicalPath) ?? _hostEnvironment.ContentRootPath;
             if (!Directory.Exists(directory))
                 Directory.CreateDirectory(directory);
 
@@ -312,13 +368,13 @@ namespace CapBot.api.Controllers
         // Model hỗ trợ cho việc lưu thông tin upload
         private class UploadedFileInfo
         {
-            public string FileName { get; set; }
-            public string FilePath { get; set; }
-            public string Url { get; set; }
+            public string FileName { get; set; } = string.Empty;
+            public string FilePath { get; set; } = string.Empty;
+            public string Url { get; set; } = string.Empty;
             public string? ThumbnailUrl { get; set; }
             public long FileSize { get; set; }
-            public string MimeType { get; set; }
-            public string Alt { get; set; }
+            public string MimeType { get; set; } = string.Empty;
+            public string Alt { get; set; } = string.Empty;
             public int? Width { get; set; }
             public int? Height { get; set; }
             public string? Checksum { get; set; }
