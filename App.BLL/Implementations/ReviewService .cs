@@ -25,7 +25,7 @@ public class ReviewService : IReviewService
         _semesterService = semesterService;
     }
 
-    public async Task<BaseResponseModel<ReviewResponseDTO>> CreateAsync(CreateReviewDTO createDTO)
+    public async Task<BaseResponseModel<ReviewResponseDTO>> CreateAsync(CreateReviewDTO createDTO , int currentUserId)
     {
         try
         {
@@ -39,7 +39,7 @@ public class ReviewService : IReviewService
             // Kiểm tra assignment tồn tại
             var assignment = await assignmentRepo.GetSingleAsync(new QueryOptions<ReviewerAssignment>
             {
-                Predicate = x => x.Id == createDTO.AssignmentId,
+                Predicate = x => x.Id == createDTO.AssignmentId && x.ReviewerId == currentUserId,
                 Tracked = false
             });
 
@@ -50,7 +50,19 @@ public class ReviewService : IReviewService
                 {
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Không tìm thấy assignment"
+                    Message = "Không tìm thấy assignment hoặc bạn không có quyền review"
+                };
+            }
+
+            // THÊM: Kiểm tra deadline
+            if (assignment.Deadline.HasValue && assignment.Deadline < DateTime.UtcNow)
+            {
+                await _unitOfWork.RollBackAsync();
+                return new BaseResponseModel<ReviewResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Assignment đã quá hạn deadline, không thể tạo review"
                 };
             }
 
@@ -79,12 +91,12 @@ public class ReviewService : IReviewService
 
             var criteria = await criteriaRepo.GetAllAsync(new QueryOptions<EvaluationCriteria>
             {
-                Predicate = x => criteriaIds.Contains(x.Id) &&
+                Predicate = x => criteriaIds.Contains(x.Id) && 
                                  x.IsActive &&
                                  (x.SemesterId == currentSemesterId || x.SemesterId == null), // Filter theo semester
                 Tracked = false
             });
-
+            
 
             if (criteria.Count() != criteriaIds.Count)
             {
@@ -142,7 +154,7 @@ public class ReviewService : IReviewService
 
             await reviewRepo.CreateAsync(review);
             var saveResult = await _unitOfWork.SaveAsync();
-
+            
             if (!saveResult.IsSuccess)
             {
                 await _unitOfWork.RollBackAsync();
@@ -375,7 +387,7 @@ public class ReviewService : IReviewService
         try
         {
             var reviewRepo = _unitOfWork.GetRepo<Review>();
-
+            
             var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
             {
                 Predicate = x => x.Id == id && x.IsActive
@@ -436,81 +448,81 @@ public class ReviewService : IReviewService
         }
     }
     public async Task<BaseResponseModel<ReviewResponseDTO>> WithdrawReviewAsync(int reviewId)
+{
+    try
     {
-        try
+        var reviewRepo = _unitOfWork.GetRepo<Review>();
+        
+        var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
         {
-            var reviewRepo = _unitOfWork.GetRepo<Review>();
+            Predicate = x => x.Id == reviewId && x.IsActive
+        });
 
-            var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
-            {
-                Predicate = x => x.Id == reviewId && x.IsActive
-            });
-
-            if (review == null)
-            {
-                return new BaseResponseModel<ReviewResponseDTO>
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status404NotFound,
-                    Message = "Không tìm thấy đánh giá"
-                };
-            }
-
-            if (review.Status != ReviewStatus.Submitted)
-            {
-                return new BaseResponseModel<ReviewResponseDTO>
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status400BadRequest,
-                    Message = "Chỉ có thể rút lại đánh giá đã submit"
-                };
-            }
-
-            // Chuyển về trạng thái Draft
-            review.Status = ReviewStatus.Draft;
-            review.SubmittedAt = null;
-            review.LastModifiedAt = DateTime.UtcNow;
-
-            await reviewRepo.UpdateAsync(review);
-            var result = await _unitOfWork.SaveAsync();
-
-            if (!result.IsSuccess)
-            {
-                return new BaseResponseModel<ReviewResponseDTO>
-                {
-                    IsSuccess = false,
-                    StatusCode = StatusCodes.Status500InternalServerError,
-                    Message = result.Message
-                };
-            }
-
-            // Get updated review
-            var updatedReview = await GetByIdAsync(review.Id);
+        if (review == null)
+        {
             return new BaseResponseModel<ReviewResponseDTO>
             {
-                IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK,
-                Message = "Rút lại đánh giá thành công",
-                Data = updatedReview.Data
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status404NotFound,
+                Message = "Không tìm thấy đánh giá"
             };
         }
-        catch (Exception ex)
+
+        if (review.Status != ReviewStatus.Submitted)
+        {
+            return new BaseResponseModel<ReviewResponseDTO>
+            {
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status400BadRequest,
+                Message = "Chỉ có thể rút lại đánh giá đã submit"
+            };
+        }
+
+        // Chuyển về trạng thái Draft
+        review.Status = ReviewStatus.Draft;
+        review.SubmittedAt = null;
+        review.LastModifiedAt = DateTime.UtcNow;
+
+        await reviewRepo.UpdateAsync(review);
+        var result = await _unitOfWork.SaveAsync();
+
+        if (!result.IsSuccess)
         {
             return new BaseResponseModel<ReviewResponseDTO>
             {
                 IsSuccess = false,
                 StatusCode = StatusCodes.Status500InternalServerError,
-                Message = $"Lỗi hệ thống: {ex.Message}"
+                Message = result.Message
             };
         }
+
+        // Get updated review
+        var updatedReview = await GetByIdAsync(review.Id);
+        return new BaseResponseModel<ReviewResponseDTO>
+        {
+            IsSuccess = true,
+            StatusCode = StatusCodes.Status200OK,
+            Message = "Rút lại đánh giá thành công",
+            Data = updatedReview.Data
+        };
     }
+    catch (Exception ex)
+    {
+        return new BaseResponseModel<ReviewResponseDTO>
+        {
+            IsSuccess = false,
+            StatusCode = StatusCodes.Status500InternalServerError,
+            Message = $"Lỗi hệ thống: {ex.Message}"
+        };
+    }
+}
 
     public async Task<BaseResponseModel<ReviewResponseDTO>> GetByIdAsync(int id)
     {
         try
         {
             var reviewRepo = _unitOfWork.GetRepo<Review>();
-
+            
             var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
             {
                 Predicate = x => x.Id == id && x.IsActive,
@@ -555,7 +567,7 @@ public class ReviewService : IReviewService
         try
         {
             var reviewRepo = _unitOfWork.GetRepo<Review>();
-
+            
             var query = reviewRepo.Get(new QueryOptions<Review>
             {
                 Predicate = x => x.IsActive,
@@ -574,7 +586,7 @@ public class ReviewService : IReviewService
                 .ToListAsync();
 
             var responseItems = _mapper.Map<List<ReviewResponseDTO>>(items);
-
+            
             pagingModel.TotalRecord = totalItems;
             var pagingData = new PagingDataModel<ReviewResponseDTO>(responseItems, pagingModel);
 
@@ -601,7 +613,7 @@ public class ReviewService : IReviewService
         try
         {
             var reviewRepo = _unitOfWork.GetRepo<Review>();
-
+            
             var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
             {
                 Predicate = x => x.Id == reviewId && x.IsActive
@@ -669,7 +681,7 @@ public class ReviewService : IReviewService
         try
         {
             var reviewRepo = _unitOfWork.GetRepo<Review>();
-
+            
             var reviews = await reviewRepo.GetAllAsync(new QueryOptions<Review>
             {
                 Predicate = x => x.AssignmentId == assignmentId && x.IsActive,
