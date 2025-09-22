@@ -317,34 +317,52 @@ public class ReviewService : IReviewService
 
             review.OverallScore = totalWeight > 0 ? totalWeightedScore / totalWeight : 0;
 
-            // Deactivate existing scores
+            // Thay vì deactivate và tạo mới, hãy cập nhật trực tiếp
             var existingScores = review.ReviewCriteriaScores.Where(x => x.IsActive).ToList();
-            foreach (var score in existingScores)
+
+            // Cập nhật hoặc tạo mới scores
+            foreach (var scoreDTO in updateDTO.CriteriaScores)
+            {
+                var existingScore = existingScores.FirstOrDefault(x => x.CriteriaId == scoreDTO.CriteriaId);
+                
+                if (existingScore != null)
+                {
+                    // Cập nhật bản ghi hiện có
+                    existingScore.Score = scoreDTO.Score;
+                    existingScore.Comment = scoreDTO.Comment;
+                    existingScore.LastModifiedAt = DateTime.UtcNow;
+                }
+                else
+                {
+                    // Tạo mới nếu chưa có
+                    var newScore = new ReviewCriteriaScore
+                    {
+                        ReviewId = review.Id,
+                        CriteriaId = scoreDTO.CriteriaId,
+                        Score = scoreDTO.Score,
+                        Comment = scoreDTO.Comment,
+                        CreatedAt = DateTime.UtcNow,
+                        LastModifiedAt = DateTime.UtcNow,
+                        IsActive = true
+                    };
+                    await scoreRepo.CreateAsync(newScore);
+                }
+            }
+
+            // Xóa các scores không còn được sử dụng
+            var scoresToRemove = existingScores
+                .Where(x => !updateDTO.CriteriaScores.Any(dto => dto.CriteriaId == x.CriteriaId))
+                .ToList();
+
+            foreach (var score in scoresToRemove)
             {
                 score.IsActive = false;
                 score.DeletedAt = DateTime.UtcNow;
                 score.LastModifiedAt = DateTime.UtcNow;
             }
 
-            // Create new scores
-            var newScores = new List<ReviewCriteriaScore>();
-            foreach (var scoreDTO in updateDTO.CriteriaScores)
-            {
-                var score = new ReviewCriteriaScore
-                {
-                    ReviewId = review.Id,
-                    CriteriaId = scoreDTO.CriteriaId,
-                    Score = scoreDTO.Score,
-                    Comment = scoreDTO.Comment,
-                    CreatedAt = DateTime.UtcNow,
-                    LastModifiedAt = DateTime.UtcNow,
-                    IsActive = true
-                };
-                newScores.Add(score);
-            }
-
             await reviewRepo.UpdateAsync(review);
-            await scoreRepo.CreateAllAsync(newScores);
+            // Không cần CreateAllAsync vì đã cập nhật trực tiếp
 
             var result = await _unitOfWork.SaveAsync();
             if (!result.IsSuccess)
