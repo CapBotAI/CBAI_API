@@ -33,7 +33,8 @@ public class IdentityRepository : IIdentityRepository
 
     public Task<User> GetByEmailAsync(string email)
     {
-        throw new NotImplementedException();
+        // Try exact email first, then a dot-insensitive match similar to GetByEmailOrUserNameAsync
+        return _userManager.FindByEmailAsync(email);
     }
 
     public async Task<BaseResponseModel> AddUserAsync(User user, string password, string role)
@@ -325,12 +326,28 @@ public class IdentityRepository : IIdentityRepository
 
     public Task<string> GeneratePasswordResetTokenAsync(User user)
     {
-        throw new NotImplementedException();
+        // Delegate to UserManager to generate a password reset token
+        return _userManager.GeneratePasswordResetTokenAsync(user);
     }
 
     public Task<bool> ResetPasswordAsync(string userId, string token, string newPassword)
     {
-        throw new NotImplementedException();
+        // Decode token (URL-decoded tokens may have spaces instead of '+') and perform reset
+        return ResetPasswordInternalAsync(userId, token, newPassword);
+    }
+
+    private async Task<bool> ResetPasswordInternalAsync(string userId, string token, string newPassword)
+    {
+        if (string.IsNullOrEmpty(userId) || string.IsNullOrEmpty(token) || string.IsNullOrEmpty(newPassword))
+            return false;
+
+        var user = await _userManager.FindByIdAsync(userId);
+        if (user == null)
+            return false;
+
+        var decodedToken = HttpUtility.UrlDecode(token)?.Replace(" ", "+");
+        var result = await _userManager.ResetPasswordAsync(user, decodedToken ?? token, newPassword);
+        return result.Succeeded;
     }
 
     public Task<bool> IsUserInRole(User user, string role)

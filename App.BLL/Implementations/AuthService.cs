@@ -274,4 +274,116 @@ public class AuthService : IAuthService
             throw new Exception("An error occurred while changing the password.", ex);
         }
     }
+
+    public async Task<BaseResponseModel<object>> ForgotPasswordAsync(ForgotPasswordRequestDTO dto)
+    {
+        try
+        {
+            var user = await _identityRepository.GetByEmailAsync(dto.Email);
+            if (user == null)
+            {
+                return new BaseResponseModel<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Email không tồn tại trong hệ thống"
+                };
+            }
+
+            // Generate password reset token
+            var token = await _identityRepository.GeneratePasswordResetTokenAsync(user);
+
+                // build reset link pointing to the API GET handler so clicking from Swagger/browser reaches the form
+                var encodedToken = System.Net.WebUtility.UrlEncode(token);
+                var resetLink = $"/api/auth/reset-password?userId={user.Id}&token={encodedToken}";
+
+                // send email with clear HTML + plain-text content showing userId and token
+                var emailBody = $@"<html>
+    <body style='font-family: Arial, sans-serif; color:#222'>
+      <h2>Yêu cầu đặt lại mật khẩu</h2>
+      <p>Xin chào <strong>{System.Net.WebUtility.HtmlEncode(user.UserName ?? "")}</strong>,</p>
+      <p>Bạn vừa yêu cầu đặt lại mật khẩu cho tài khoản của mình. Bạn có thể sử dụng đường dẫn bên dưới để đặt lại mật khẩu (mở trong trình duyệt hoặc trong Swagger):</p>
+      <p><a href='{resetLink}'>{resetLink}</a></p>
+      <p>Hoặc sao chép thông tin sau nếu cần thực hiện thủ công:</p>
+      <pre style='background:#f6f6f6;padding:10px;border-radius:4px'>UserId: {user.Id}
+    Token: {token}</pre>
+      <p>Lưu ý: token có hiệu lực trong thời gian ngắn. Nếu bạn không yêu cầu, hãy bỏ qua email này.</p>
+      <p>Trân trọng,<br/>CAPBOT Team</p>
+    </body>
+    </html>";
+
+                        // Plain-text fallback (some mail clients may strip HTML)
+                        var textBody = $"Xin chào {user.UserName},\n\n" +
+                                                     "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Dùng đường dẫn sau để đặt lại mật khẩu:\n\n" +
+                                                     resetLink + "\n\n" +
+                                                     $"UserId: {user.Id}\nToken: {token}\n\n" +
+                                                     "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n\nTrân trọng,\nCAPBOT";
+
+                        var recipients = new List<string>();
+                        if (!string.IsNullOrWhiteSpace(user.Email)) recipients.Add(user.Email);
+                        // EmailModel will set both BodyPlainText and BodyHtml to the provided body; pass HTML which is preferred
+                        var emailModel = new EmailModel(recipients, "Yêu cầu đặt lại mật khẩu", emailBody);
+                        await _emailService.SendEmailAsync(emailModel);
+
+            return new BaseResponseModel<object>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Yêu cầu đặt lại mật khẩu đã được gửi đến email nếu email tồn tại"
+            };
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while processing forgot password.", ex);
+        }
+    }
+
+    public async Task<BaseResponseModel<object>> ResetPasswordAsync(ResetPasswordDTO dto)
+    {
+        try
+        {
+            if (dto.NewPassword != dto.ConfirmPassword)
+            {
+                return new BaseResponseModel<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status422UnprocessableEntity,
+                    Message = "Mật khẩu xác nhận không khớp"
+                };
+            }
+
+            var user = await _identityRepository.GetByIdAsync(long.Parse(dto.UserId));
+            if (user == null)
+            {
+                return new BaseResponseModel<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "User not found"
+                };
+            }
+
+            var result = await _identityRepository.ResetPasswordAsync(dto.UserId, dto.Token, dto.NewPassword);
+            if (!result)
+            {
+                return new BaseResponseModel<object>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Không thể đặt lại mật khẩu. Token có thể không hợp lệ hoặc đã hết hạn"
+                };
+            }
+
+            return new BaseResponseModel<object>
+            {
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Đặt lại mật khẩu thành công"
+            };
+        }
+        catch (Exception ex)
+        {
+            throw new Exception("An error occurred while resetting the password.", ex);
+        }
+    }
 }
