@@ -244,6 +244,7 @@ public class TopicService : ITopicService
                 .WithInclude(x => x.Supervisor)
                 .WithInclude(x => x.Category)
                 .WithInclude(x => x.Semester)
+                .WithInclude(x => x.Submissions)
                 .WithInclude(x => x.TopicVersions)
                 .WithTracking(false);
 
@@ -289,6 +290,7 @@ public class TopicService : ITopicService
                 .WithInclude(x => x.Category)
                 .WithInclude(x => x.Semester)
                 .WithInclude(x => x.TopicVersions)
+                .WithInclude(x => x.Submissions)
                 .WithTracking(false)
                 .Build());
 
@@ -600,6 +602,7 @@ public class TopicService : ITopicService
                 .WithInclude(x => x.Category!)
                 .WithInclude(x => x.Semester)
                 .WithInclude(x => x.TopicVersions)
+                .WithInclude(x=>x.Submissions)
                 .WithTracking(false);
 
             if (query.SemesterId.HasValue)

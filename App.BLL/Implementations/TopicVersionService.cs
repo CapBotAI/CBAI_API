@@ -20,11 +20,13 @@ public class TopicVersionService : ITopicVersionService
 {
     private readonly IUnitOfWork _unitOfWork;
     private readonly IIdentityRepository _identityRepository;
+    private readonly ILogger<TopicVersionService> _logger;
 
-    public TopicVersionService(IUnitOfWork unitOfWork, IIdentityRepository identityRepository)
+    public TopicVersionService(IUnitOfWork unitOfWork, IIdentityRepository identityRepository, ILogger<TopicVersionService> logger)
     {
         this._unitOfWork = unitOfWork;
         this._identityRepository = identityRepository;
+        _logger = logger;
     }
 
     public async Task<BaseResponseModel<CreaterTopicVersionResDTO>> CreateTopicVersion(CreateTopicVersionDTO createTopicVersionDTO, int userId)
@@ -92,7 +94,7 @@ public class TopicVersionService : ITopicVersionService
             var versionRepo = _unitOfWork.GetRepo<TopicVersion>();
 
             var latestVersion = await versionRepo.GetSingleAsync(new QueryBuilder<TopicVersion>()
-                .WithPredicate(x => x.TopicId == createTopicVersionDTO.TopicId && x.IsActive && x.DeletedAt == null)
+                .WithPredicate(x => x.TopicId == createTopicVersionDTO.TopicId)
                 .WithOrderBy(x => x.OrderByDescending(y => y.VersionNumber))
                 .WithTracking(false)
                 .Build());
@@ -144,6 +146,7 @@ public class TopicVersionService : ITopicVersionService
         }
         catch (System.Exception)
         {
+            await _unitOfWork.RollBackAsync();
             throw;
         }
     }
