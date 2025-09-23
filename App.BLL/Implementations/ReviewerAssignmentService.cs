@@ -657,7 +657,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
     {
         try
         {
-            // Get all users with Reviewer role
+            // Get all users with Reviewer role (include useful navigation on the user)
             var userRoleOptions = new QueryOptions<UserRole>
             {
                 IncludeProperties = new List<Expression<Func<UserRole, object>>>
@@ -669,39 +669,102 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 },
                 Predicate = ur => ur.Role.Name == SystemRoleConstants.Reviewer
             };
+
             var userRoles = await _unitOfWork.GetRepo<UserRole>().GetAllAsync(userRoleOptions);
-            var reviewers = userRoles.Select(ur => ur.User).Distinct().ToList();
+            var reviewers = userRoles.Select(ur => ur.User).Where(u => u != null).Distinct().ToList();
+            var reviewerIds = reviewers.Where(r => r != null).Select(r => r!.Id).ToList();
 
-            var workloadInfo = new List<AvailableReviewerDTO>();
-
-            foreach (var reviewer in reviewers)
+            // If no reviewers found, return early
+            if (!reviewerIds.Any())
             {
-                // Get assignments for this reviewer
-                var assignmentOptions = new QueryOptions<ReviewerAssignment>
+                return new BaseResponseModel<List<AvailableReviewerDTO>>
                 {
-                    Predicate = ra => ra.ReviewerId == reviewer.Id,
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Lấy thông tin workload thành công",
+                    Data = new List<AvailableReviewerDTO>()
+                };
+            }
+
+            // Fetch all assignments for these reviewers in a single DB call. If semesterId is provided,
+            // push the semester filter into the predicate so the DB does the heavy-lifting.
+            QueryOptions<ReviewerAssignment> assignmentOptions;
+            if (semesterId.HasValue)
+            {
+                var sid = semesterId.Value;
+                assignmentOptions = new QueryOptions<ReviewerAssignment>
+                {
+                    Predicate = ra => reviewerIds.Contains(ra.ReviewerId) &&
+                                        ((ra.Submission != null && ra.Submission.Topic != null && ra.Submission.Topic.SemesterId == sid) ||
+                                         (ra.Submission != null && ra.Submission.TopicVersion != null && ra.Submission.TopicVersion.Topic != null && ra.Submission.TopicVersion.Topic.SemesterId == sid)),
                     IncludeProperties = new List<Expression<Func<ReviewerAssignment, object>>>
                     {
-                        ra => ra.Submission,
-                        ra => ra.Submission.TopicVersion,
-                        ra => ra.Submission.TopicVersion.Topic
-                    }
+                        ra => ra.Submission!,
+                        ra => ra.Submission!.Topic!,
+                        ra => ra.Submission!.TopicVersion!,
+                        ra => ra.Submission!.TopicVersion!.Topic!
+                    },
                 };
-                var assignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(assignmentOptions);
-
-                if (semesterId.HasValue)
+            }
+            else
+            {
+                assignmentOptions = new QueryOptions<ReviewerAssignment>
                 {
-                    // Filter by semester if provided
-                    assignments = assignments.Where(ra =>
-                        ra.Submission.TopicVersion.Topic.SemesterId == semesterId.Value);
-                }
+                    Predicate = ra => reviewerIds.Contains(ra.ReviewerId),
+                    IncludeProperties = new List<Expression<Func<ReviewerAssignment, object>>>
+                    {
+                        ra => ra.Submission!,
+                        ra => ra.Submission!.Topic!,
+                        ra => ra.Submission!.TopicVersion!,
+                        ra => ra.Submission!.TopicVersion!.Topic!
+                    },
+                    };
+            }
 
-                var activeAssignments = assignments.Count(ra =>
-                    ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress);
-                var completedAssignments = assignments.Count(ra => ra.Status == AssignmentStatus.Completed);
+            var assignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(assignmentOptions);
 
-                var performance = reviewer.ReviewerPerformances
-                    .FirstOrDefault(rp => !semesterId.HasValue || rp.SemesterId == semesterId.Value);
+            // Group assignments by reviewer to compute counts efficiently in-memory
+            var assignmentsByReviewer = assignments
+                .Where(ra => ra != null)
+                .GroupBy(ra => ra.ReviewerId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            // Load reviewer performances for these reviewers (filtered by semester when provided)
+            var perfOptions = new QueryOptions<ReviewerPerformance>
+            {
+                Predicate = rp => reviewerIds.Contains(rp.ReviewerId) && (!semesterId.HasValue || rp.SemesterId == semesterId.Value)
+            };
+            var performances = await _unitOfWork.GetRepo<ReviewerPerformance>().GetAllAsync(perfOptions);
+
+            // Build a lookup: if semester provided, prefer that semester's perf; otherwise pick the latest by LastUpdated or SemesterId
+            Dictionary<int, ReviewerPerformance?> performanceByReviewer;
+            if (semesterId.HasValue)
+            {
+                performanceByReviewer = performances
+                    .GroupBy(p => p.ReviewerId)
+                    .ToDictionary(g => g.Key, g => g.OrderByDescending(p => p.LastUpdated).FirstOrDefault());
+            }
+            else
+            {
+                performanceByReviewer = performances
+                    .GroupBy(p => p.ReviewerId)
+                    .ToDictionary(g => g.Key, g => g.OrderByDescending(p => p.SemesterId).FirstOrDefault());
+            }
+
+            var workloadInfo = new List<AvailableReviewerDTO>();
+            foreach (var reviewer in reviewers)
+            {
+                if (reviewer == null) continue;
+                assignmentsByReviewer.TryGetValue(reviewer.Id, out var revAssignments);
+                revAssignments ??= new List<ReviewerAssignment>();
+
+                var activeAssignments = revAssignments.Count(ra => ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress);
+                //var completedAssignments = revAssignments.Count(ra => ra.Status == AssignmentStatus.Completed);
+
+                performanceByReviewer.TryGetValue(reviewer.Id, out var perf);
+
+                // Fallback to any loaded in-memory performance if DB lookup returned nothing
+                perf ??= reviewer.ReviewerPerformances?.OrderByDescending(rp => rp.LastUpdated).FirstOrDefault();
 
                 var workload = new AvailableReviewerDTO
                 {
@@ -710,11 +773,11 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                     Email = reviewer.Email,
                     PhoneNumber = reviewer.PhoneNumber,
                     CurrentAssignments = activeAssignments,
-                    CompletedAssignments = completedAssignments,
-                    AverageScoreGiven = performance?.AverageScoreGiven,
-                    OnTimeRate = performance?.OnTimeRate,
-                    QualityRating = performance?.QualityRating,
-                    Skills = reviewer.LecturerSkills.Select(ls => ls.SkillTag).ToList(),
+                    CompletedAssignments = perf?.CompletedAssignments ?? 0,
+                    AverageScoreGiven = perf?.AverageScoreGiven,
+                    OnTimeRate = perf?.OnTimeRate,
+                    QualityRating = perf?.QualityRating,
+                    Skills = reviewer.LecturerSkills?.Select(ls => ls.SkillTag).ToList() ?? new List<string>(),
                     IsAvailable = activeAssignments < 10
                 };
 
@@ -729,9 +792,15 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 Data = workloadInfo.OrderBy(w => w.CurrentAssignments).ToList()
             };
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            _logger.LogError(ex, "Failed to get reviewers workload");
+            return new BaseResponseModel<List<AvailableReviewerDTO>>
+            {
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = $"Lỗi hệ thống: {ex.Message}"
+            };
         }
     }
     public async Task<BaseResponseModel<AutoAssignmentResult>> AutoAssignReviewersAsync(AutoAssignReviewerDTO dto,
@@ -882,8 +951,8 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
     {
         try
         {
-            // Get topic skill tags
-            var topicSkillTags = await _skillMatchingService.ExtractTopicSkillTagsAsync(submissionId);
+            // Get topic skill tags (ensure non-null)
+            var topicSkillTags = await _skillMatchingService.ExtractTopicSkillTagsAsync(submissionId) ?? new List<string>();
 
             // Get reviewer info
             var reviewerOptions = new QueryOptions<User>
@@ -910,22 +979,48 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
             var matchingResult = new ReviewerMatchingResult
             {
                 ReviewerId = reviewer.Id,
-                ReviewerName = reviewer.UserName,
-                ReviewerEmail = reviewer.Email
+                ReviewerName = reviewer.UserName ?? "Unknown",
+                ReviewerEmail = reviewer.Email ?? string.Empty
             };
 
             // Calculate scores
-            matchingResult.SkillMatchScore =
-                await _skillMatchingService.CalculateSkillMatchScoreAsync(reviewerId, topicSkillTags);
-            matchingResult.PerformanceScore = await _skillMatchingService.CalculatePerformanceScoreAsync(reviewerId);
-            matchingResult.WorkloadScore = await _skillMatchingService.CalculateWorkloadScoreAsync(reviewerId);
+            // Calculate scores (wrap external service calls defensively)
+            try
+            {
+                matchingResult.SkillMatchScore = await _skillMatchingService.CalculateSkillMatchScoreAsync(reviewerId, topicSkillTags);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Skill match calculation failed for reviewer {ReviewerId} submission {SubmissionId}", reviewerId, submissionId);
+                matchingResult.SkillMatchScore = 0;
+            }
 
-            // Get additional info
-            matchingResult.ReviewerSkills = reviewer.LecturerSkills.ToDictionary(
-                ls => ls.SkillTag,
-                ls => ls.ProficiencyLevel);
+            try
+            {
+                matchingResult.PerformanceScore = await _skillMatchingService.CalculatePerformanceScoreAsync(reviewerId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Performance score calculation failed for reviewer {ReviewerId}", reviewerId);
+                matchingResult.PerformanceScore = 0;
+            }
 
-            var performance = reviewer.ReviewerPerformances.FirstOrDefault();
+            try
+            {
+                matchingResult.WorkloadScore = await _skillMatchingService.CalculateWorkloadScoreAsync(reviewerId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Workload score calculation failed for reviewer {ReviewerId}", reviewerId);
+                matchingResult.WorkloadScore = 0;
+            }
+
+            // Get additional info (guard null collections)
+            matchingResult.ReviewerSkills = reviewer.LecturerSkills?
+                .Where(ls => !string.IsNullOrEmpty(ls.SkillTag))
+                .ToDictionary(ls => ls.SkillTag!, ls => ls.ProficiencyLevel) ?? new Dictionary<string, App.Entities.Enums.ProficiencyLevels>();
+
+            var performance = reviewer.ReviewerPerformances?.FirstOrDefault();
             if (performance != null)
             {
                 matchingResult.CompletedAssignments = performance.CompletedAssignments;
@@ -952,9 +1047,15 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 Data = matchingResult
             };
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            _logger.LogError(ex, "AnalyzeReviewerMatchAsync failed for reviewer {ReviewerId} submission {SubmissionId}", reviewerId, submissionId);
+            return new BaseResponseModel<ReviewerMatchingResult>
+            {
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = $"Lỗi hệ thống: {ex.Message}"
+            };
         }
     }
 
@@ -1190,6 +1291,8 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 IncludeProperties = new List<Expression<Func<ReviewerAssignment, object>>>
                 {
                     ra => ra.Submission,
+                    // ensure Topic navigation is loaded directly when available
+                    ra => ra.Submission.Topic,
                     ra => ra.Submission.TopicVersion,
                     ra => ra.Submission.TopicVersion.Topic,
                     ra => ra.Submission.SubmittedByUser,
@@ -1212,6 +1315,15 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 };
             }
 
+            // Defensive: guard against null navigation properties and provide safe defaults
+            var submission = assignment.Submission;
+            var topicVersion = submission?.TopicVersion;
+            // Prefer submission.Topic if it's loaded; otherwise fall back to TopicVersion.Topic
+            var topic = submission?.Topic ?? topicVersion?.Topic;
+            var submittedByUser = submission?.SubmittedByUser;
+            var phase = submission?.Phase;
+            var reviews = assignment.Reviews ?? new List<Review>();
+
             var details = new AssignmentDetailsDTO
             {
                 AssignmentId = assignment.Id,
@@ -1225,33 +1337,33 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
 
                 // Reviewer Info
                 ReviewerId = assignment.ReviewerId,
-                ReviewerName = assignment.Reviewer.UserName ?? "Unknown",
-                ReviewerEmail = assignment.Reviewer.Email ?? "",
+                ReviewerName = assignment.Reviewer?.UserName ?? "Unknown",
+                ReviewerEmail = assignment.Reviewer?.Email ?? string.Empty,
 
                 // Submission Info
                 SubmissionId = assignment.SubmissionId,
-                SubmissionStatus = assignment.Submission.Status,
-                SubmittedAt = assignment.Submission.SubmittedAt,
-                DocumentUrl = assignment.Submission.DocumentUrl,
-                AdditionalNotes = assignment.Submission.AdditionalNotes,
+                SubmissionStatus = submission?.Status ?? default,
+                SubmittedAt = submission?.SubmittedAt,
+                DocumentUrl = submission?.DocumentUrl,
+                AdditionalNotes = submission?.AdditionalNotes,
 
-                // Topic Info
-                TopicId = assignment.Submission.TopicVersion.TopicId,
-                TopicTitle = assignment.Submission.TopicVersion.Topic.EN_Title,
-                TopicDescription = assignment.Submission.TopicVersion.Topic.Description,
-                TopicObjectives = assignment.Submission.TopicVersion.Topic.Objectives,
+                // Topic Info (safe fallbacks)
+                TopicId = topic?.Id ?? topicVersion?.TopicId ?? 0,
+                TopicTitle = topic?.EN_Title ?? submission?.Topic?.EN_Title ?? "(Không xác định)",
+                TopicDescription = topic?.Description ?? string.Empty,
+                TopicObjectives = topic?.Objectives ?? string.Empty,
 
                 // Student Info
-                StudentId = assignment.Submission.SubmittedBy,
-                StudentName = assignment.Submission.SubmittedByUser.UserName ?? "Unknown",
-                StudentEmail = assignment.Submission.SubmittedByUser.Email ?? "",
+                StudentId = submission?.SubmittedBy ?? 0,
+                StudentName = submittedByUser?.UserName ?? "Unknown",
+                StudentEmail = submittedByUser?.Email ?? string.Empty,
 
                 // Phase Info
-                PhaseId = assignment.Submission.PhaseId,
-                PhaseName = assignment.Submission.Phase.Name,
+                PhaseId = submission?.PhaseId ?? 0,
+                PhaseName = phase?.Name ?? string.Empty,
 
-                // Review Info
-                Reviews = assignment.Reviews.Where(r => r.IsActive).Select(r => new ReviewSummaryDTO
+                // Review Info (guard nulls)
+                Reviews = reviews.Where(r => r != null && r.IsActive).Select(r => new ReviewSummaryDTO
                 {
                     ReviewId = r.Id,
                     Status = r.Status,
@@ -1261,10 +1373,10 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                     TimeSpentMinutes = r.TimeSpentMinutes
                 }).ToList(),
 
-                IsOverdue = assignment.Deadline.HasValue && assignment.Deadline < DateTime.UtcNow &&
+                IsOverdue = assignment.Deadline.HasValue && assignment.Deadline < DateTime.Now &&
                             assignment.Status != AssignmentStatus.Completed,
                 CanStartReview = assignment.Status == AssignmentStatus.Assigned,
-                HasActiveReview = assignment.Reviews.Any(r => r.IsActive && r.Status == ReviewStatus.Draft)
+                HasActiveReview = reviews.Any(r => r != null && r.IsActive && r.Status == ReviewStatus.Draft)
             };
 
             return new BaseResponseModel<AssignmentDetailsDTO>
