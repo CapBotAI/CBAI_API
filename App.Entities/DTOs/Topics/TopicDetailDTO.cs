@@ -28,13 +28,24 @@ public class TopicDetailDTO
     public bool IsLegacy { get; set; }
     public long? FileId { get; set; }
     public string? DocumentUrl { get; set; }
-    public TopicStatus CurrentStatus { get; set; }
+ 
     public int TotalVersions { get; set; }
-    public TopicVersionDetailDTO? CurrentVersion { get; set; }
+   
     public DateTime CreatedAt { get; set; }
     public string? CreatedBy { get; set; }
     public DateTime? LastModifiedAt { get; set; }
     public string? LastModifiedBy { get; set; }
+    public TopicVersionDetailDTO? CurrentVersion { get; set; }
+
+    public int TotalSubmissions { get; set; }
+
+    public bool HasSubmitted { get; set; }
+
+    public SubmissionStatus? LatestSubmissionStatus { get; set; }
+    public DateTime? LatestSubmittedAt { get; set; }
+
+    public List<SubmissionInTopicDetailDTO> Submissions { get; set; } = new List<SubmissionInTopicDetailDTO>();
+
 
     public TopicDetailDTO() { }
 
@@ -60,9 +71,7 @@ public class TopicDetailDTO
         IsLegacy = topic.IsLegacy;
         TotalVersions = topic.TopicVersions?.Count ?? 0;
 
-        var latestVersion = topic.TopicVersions?.OrderByDescending(v => v.VersionNumber).FirstOrDefault();
-        CurrentStatus = latestVersion?.Status ?? TopicStatus.Draft;
-        CurrentVersion = latestVersion != null ? new TopicVersionDetailDTO(latestVersion, null) : null;
+        
 
         CreatedAt = topic.CreatedAt;
         CreatedBy = topic.CreatedBy;
@@ -71,5 +80,61 @@ public class TopicDetailDTO
 
         FileId = entityFile?.FileId;
         DocumentUrl = entityFile?.File?.Url;
+
+        var latestVersion = topic.TopicVersions?.OrderByDescending(v => v.VersionNumber).FirstOrDefault();
+        CurrentVersion = latestVersion != null ? new TopicVersionDetailDTO(latestVersion, null) : null;
+
+
+        LatestSubmittedAt = topic.Submissions
+            .Where(s => s.IsActive && s.DeletedAt == null)
+            .OrderByDescending(s => s.SubmittedAt ?? s.CreatedAt)
+            .Select(s => s.SubmittedAt)
+            .FirstOrDefault();
+
+        LatestSubmissionStatus = topic.Submissions
+            .Where(s => s.IsActive && s.DeletedAt == null)
+            .OrderByDescending(s => s.SubmittedAt ?? s.CreatedAt)
+            .Select(s => (SubmissionStatus?)s.Status)
+            .FirstOrDefault();
+
+        HasSubmitted = LatestSubmittedAt.HasValue;
+
+        TotalSubmissions = topic.Submissions?.Count ?? 0;
+        Submissions = topic.Submissions?.Select(s => new SubmissionInTopicDetailDTO(s)).ToList() ?? new List<SubmissionInTopicDetailDTO>();
+    }
+}
+public class SubmissionInTopicDetailDTO
+{
+    public int Id { get; set; }
+    public int TopicId { get; set; }
+    public int? TopicVersionId { get; set; }
+    public int PhaseId { get; set; }
+    public int SubmittedBy { get; set; }
+    public int SubmissionRound { get; set; } = 1;
+    public string? DocumentUrl { get; set; }
+    public string? AdditionalNotes { get; set; }
+    public AiCheckStatus AiCheckStatus { get; set; } = AiCheckStatus.Pending;
+    public decimal? AiCheckScore { get; set; }
+    public string? AiCheckDetails { get; set; }
+    public SubmissionStatus Status { get; set; }
+    public DateTime? SubmittedAt { get; set; }
+
+    public SubmissionInTopicDetailDTO() { }
+
+    public SubmissionInTopicDetailDTO(Submission submission)
+    {
+        Id = submission.Id;
+        TopicId = submission.TopicId;
+        TopicVersionId = submission.TopicVersionId;
+        PhaseId = submission.PhaseId;
+        SubmittedBy = submission.SubmittedBy;
+        SubmissionRound = submission.SubmissionRound;
+        DocumentUrl = submission.DocumentUrl;
+        AdditionalNotes = submission.AdditionalNotes;
+        AiCheckStatus = submission.AiCheckStatus;
+        AiCheckScore = submission.AiCheckScore;
+        AiCheckDetails = submission.AiCheckDetails;
+        Status = submission.Status;
+        SubmittedAt = submission.SubmittedAt;
     }
 }
