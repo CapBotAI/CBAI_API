@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using App.BLL.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using App.Commons;
 using App.Commons.Interfaces;
 using App.Entities.DTOs.Notifications;
@@ -41,6 +42,58 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
         _notificationService = notificationService;
         _emailService = emailService;
         _logger = logger;
+    }
+
+    // Helper to build email HTML and plain-text bodies for assignment notifications
+    private (string htmlBody, string plainText) BuildAssignmentEmailBodies(ReviewerAssignment createdAssignment, string topicTitle)
+    {
+        var reviewerName = createdAssignment.Reviewer?.UserName ?? "Reviewer";
+        var deadlineText = createdAssignment.Deadline.HasValue
+            ? createdAssignment.Deadline.Value.ToString("dd/MM/yyyy HH:mm")
+            : "Không có";
+
+        var plainText = $@"Xin chào {reviewerName},
+
+Bạn vừa được phân công review đề tài: {topicTitle}.
+Deadline: {deadlineText}
+
+Vui lòng đăng nhập vào hệ thống để xem chi tiết và bắt đầu review.
+
+Trân trọng,
+CapBot";
+
+        var sb = new StringBuilder();
+        sb.AppendLine("<!doctype html>");
+        sb.AppendLine("<html lang=\"vi\"> ");
+        sb.AppendLine("  <head>");
+        sb.AppendLine("    <meta charset=\"utf-8\" />");
+        sb.AppendLine("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />");
+        sb.AppendLine("    <title>Phân công review</title>");
+        sb.AppendLine("    <style>");
+        sb.AppendLine("      body { font-family: Arial, Helvetica, sans-serif; background:#f7f7f7; color:#333; }");
+        sb.AppendLine("      .container { max-width:680px; margin:18px auto; background:#fff; padding:20px; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.08) }");
+        sb.AppendLine("      h1 { font-size:18px; margin:0 0 12px 0 }");
+        sb.AppendLine("      p { line-height:1.5; margin:8px 0 }");
+        sb.AppendLine("      .meta { background:#f0f4ff; padding:10px; border-radius:4px; margin:12px 0 }");
+        sb.AppendLine("      .footer { font-size:13px; color:#666; margin-top:18px }");
+        sb.AppendLine("      a.btn { display:inline-block; background:#0b62d6; color:#fff; padding:10px 14px; border-radius:4px; text-decoration:none }");
+        sb.AppendLine("    </style>");
+        sb.AppendLine("  </head>");
+        sb.AppendLine("  <body>");
+        sb.AppendLine("    <div class=\"container\">");
+        sb.AppendLine($"      <h1>Xin chào {System.Net.WebUtility.HtmlEncode(reviewerName)},</h1>");
+        sb.AppendLine("      <p>Bạn vừa được phân công review đề tài dưới đây. Vui lòng kiểm tra assignment trong hệ thống và hoàn thành trước hạn chót.</p>");
+        sb.AppendLine("      <div class=\"meta\">");
+        sb.AppendLine($"        <strong>Đề tài:</strong> {System.Net.WebUtility.HtmlEncode(topicTitle)}<br/>");
+        sb.AppendLine($"        <strong>Deadline:</strong> {System.Net.WebUtility.HtmlEncode(deadlineText)}");
+        sb.AppendLine("      </div>");
+        sb.AppendLine("      <p><a class=\"btn\" href=\"#\" target=\"_blank\">Xem assignment</a></p>");
+        sb.AppendLine("      <p class=\"footer\">Trân trọng,<br/>CapBot</p>");
+        sb.AppendLine("    </div>");
+        sb.AppendLine("  </body>");
+        sb.AppendLine("</html>");
+
+        return (sb.ToString(), plainText);
     }
 
     public async Task<BaseResponseModel<ReviewerAssignmentResponseDTO>> AssignReviewerAsync(AssignReviewerDTO dto,
@@ -183,6 +236,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                     ra => ra.Reviewer,
                     ra => ra.AssignedByUser,
                     ra => ra.Submission,
+                    ra => ra.Submission.Topic,
                     ra => ra.Submission.TopicVersion,
                     ra => ra.Submission.TopicVersion.Topic
                 }
@@ -196,7 +250,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
             // Ensure a system notification row exists for the assigned reviewer. Use NotificationService first; if it fails, fall back to direct DB insert.
             try
             {
-                var topicTitle = createdAssignment.Submission?.TopicVersion?.Topic?.EN_Title ?? createdAssignment.Submission?.Topic?.EN_Title ?? "(Không xác định)";
+                var topicTitle = createdAssignment.Submission?.Topic?.EN_Title ?? "(Không xác định)";
                 var title = $"Bạn được phân công review: {topicTitle}";
                 var message = $"Bạn vừa được phân công review đề tài '{topicTitle}'. Vui lòng kiểm tra assignment và hoàn thành trước deadline.";
 
@@ -238,16 +292,14 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 {
                     try
                     {
-                        var emailBody = $@"Xin chào {createdAssignment.Reviewer?.UserName ?? "Reviewer"},
-\n\nBạn vừa được phân công review đề tài: {topicTitle}.
-\nDeadline: {(createdAssignment.Deadline.HasValue ? createdAssignment.Deadline.Value.ToString("dd/MM/yyyy HH:mm") : "Không có")}
-\nVui lòng đăng nhập vào hệ thống để xem chi tiết và bắt đầu review.
-\n\nTrân trọng,\nCapBot";
+                        // Build email bodies (html + plain text) via helper to keep this method readable
+                        var (htmlBody, plainText) = BuildAssignmentEmailBodies(createdAssignment, topicTitle);
 
+                        // Prefer to send the HTML body; the EmailService implementation may include a plain-text fallback.
                         var emailModel = new EmailModel(
                             new[] { reviewerEmail },
                             $"[CapBot] Phân công review: {topicTitle}",
-                            emailBody
+                            htmlBody
                         );
 
                         var emailSent = await _emailService.SendEmailAsync(emailModel);
@@ -657,7 +709,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
     {
         try
         {
-            // Get all users with Reviewer role
+            // Get all users with Reviewer role (include useful navigation on the user)
             var userRoleOptions = new QueryOptions<UserRole>
             {
                 IncludeProperties = new List<Expression<Func<UserRole, object>>>
@@ -669,39 +721,102 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 },
                 Predicate = ur => ur.Role.Name == SystemRoleConstants.Reviewer
             };
+
             var userRoles = await _unitOfWork.GetRepo<UserRole>().GetAllAsync(userRoleOptions);
-            var reviewers = userRoles.Select(ur => ur.User).Distinct().ToList();
+            var reviewers = userRoles.Select(ur => ur.User).Where(u => u != null).Distinct().ToList();
+            var reviewerIds = reviewers.Where(r => r != null).Select(r => r!.Id).ToList();
 
-            var workloadInfo = new List<AvailableReviewerDTO>();
-
-            foreach (var reviewer in reviewers)
+            // If no reviewers found, return early
+            if (!reviewerIds.Any())
             {
-                // Get assignments for this reviewer
-                var assignmentOptions = new QueryOptions<ReviewerAssignment>
+                return new BaseResponseModel<List<AvailableReviewerDTO>>
                 {
-                    Predicate = ra => ra.ReviewerId == reviewer.Id,
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Lấy thông tin workload thành công",
+                    Data = new List<AvailableReviewerDTO>()
+                };
+            }
+
+            // Fetch all assignments for these reviewers in a single DB call. If semesterId is provided,
+            // push the semester filter into the predicate so the DB does the heavy-lifting.
+            QueryOptions<ReviewerAssignment> assignmentOptions;
+            if (semesterId.HasValue)
+            {
+                var sid = semesterId.Value;
+                assignmentOptions = new QueryOptions<ReviewerAssignment>
+                {
+                    Predicate = ra => reviewerIds.Contains(ra.ReviewerId) &&
+                                        ((ra.Submission != null && ra.Submission.Topic != null && ra.Submission.Topic.SemesterId == sid) ||
+                                         (ra.Submission != null && ra.Submission.TopicVersion != null && ra.Submission.TopicVersion.Topic != null && ra.Submission.TopicVersion.Topic.SemesterId == sid)),
                     IncludeProperties = new List<Expression<Func<ReviewerAssignment, object>>>
                     {
-                        ra => ra.Submission,
-                        ra => ra.Submission.TopicVersion,
-                        ra => ra.Submission.TopicVersion.Topic
-                    }
+                        ra => ra.Submission!,
+                        ra => ra.Submission!.Topic!,
+                        ra => ra.Submission!.TopicVersion!,
+                        ra => ra.Submission!.TopicVersion!.Topic!
+                    },
                 };
-                var assignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(assignmentOptions);
-
-                if (semesterId.HasValue)
+            }
+            else
+            {
+                assignmentOptions = new QueryOptions<ReviewerAssignment>
                 {
-                    // Filter by semester if provided
-                    assignments = assignments.Where(ra =>
-                        ra.Submission.TopicVersion.Topic.SemesterId == semesterId.Value);
-                }
+                    Predicate = ra => reviewerIds.Contains(ra.ReviewerId),
+                    IncludeProperties = new List<Expression<Func<ReviewerAssignment, object>>>
+                    {
+                        ra => ra.Submission!,
+                        ra => ra.Submission!.Topic!,
+                        ra => ra.Submission!.TopicVersion!,
+                        ra => ra.Submission!.TopicVersion!.Topic!
+                    },
+                    };
+            }
 
-                var activeAssignments = assignments.Count(ra =>
-                    ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress);
-                var completedAssignments = assignments.Count(ra => ra.Status == AssignmentStatus.Completed);
+            var assignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(assignmentOptions);
 
-                var performance = reviewer.ReviewerPerformances
-                    .FirstOrDefault(rp => !semesterId.HasValue || rp.SemesterId == semesterId.Value);
+            // Group assignments by reviewer to compute counts efficiently in-memory
+            var assignmentsByReviewer = assignments
+                .Where(ra => ra != null)
+                .GroupBy(ra => ra.ReviewerId)
+                .ToDictionary(g => g.Key, g => g.ToList());
+
+            // Load reviewer performances for these reviewers (filtered by semester when provided)
+            var perfOptions = new QueryOptions<ReviewerPerformance>
+            {
+                Predicate = rp => reviewerIds.Contains(rp.ReviewerId) && (!semesterId.HasValue || rp.SemesterId == semesterId.Value)
+            };
+            var performances = await _unitOfWork.GetRepo<ReviewerPerformance>().GetAllAsync(perfOptions);
+
+            // Build a lookup: if semester provided, prefer that semester's perf; otherwise pick the latest by LastUpdated or SemesterId
+            Dictionary<int, ReviewerPerformance?> performanceByReviewer;
+            if (semesterId.HasValue)
+            {
+                performanceByReviewer = performances
+                    .GroupBy(p => p.ReviewerId)
+                    .ToDictionary(g => g.Key, g => g.OrderByDescending(p => p.LastUpdated).FirstOrDefault());
+            }
+            else
+            {
+                performanceByReviewer = performances
+                    .GroupBy(p => p.ReviewerId)
+                    .ToDictionary(g => g.Key, g => g.OrderByDescending(p => p.SemesterId).FirstOrDefault());
+            }
+
+            var workloadInfo = new List<AvailableReviewerDTO>();
+            foreach (var reviewer in reviewers)
+            {
+                if (reviewer == null) continue;
+                assignmentsByReviewer.TryGetValue(reviewer.Id, out var revAssignments);
+                revAssignments ??= new List<ReviewerAssignment>();
+
+                var activeAssignments = revAssignments.Count(ra => ra.Status == AssignmentStatus.Assigned || ra.Status == AssignmentStatus.InProgress);
+                //var completedAssignments = revAssignments.Count(ra => ra.Status == AssignmentStatus.Completed);
+
+                performanceByReviewer.TryGetValue(reviewer.Id, out var perf);
+
+                // Fallback to any loaded in-memory performance if DB lookup returned nothing
+                perf ??= reviewer.ReviewerPerformances?.OrderByDescending(rp => rp.LastUpdated).FirstOrDefault();
 
                 var workload = new AvailableReviewerDTO
                 {
@@ -710,11 +825,11 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                     Email = reviewer.Email,
                     PhoneNumber = reviewer.PhoneNumber,
                     CurrentAssignments = activeAssignments,
-                    CompletedAssignments = completedAssignments,
-                    AverageScoreGiven = performance?.AverageScoreGiven,
-                    OnTimeRate = performance?.OnTimeRate,
-                    QualityRating = performance?.QualityRating,
-                    Skills = reviewer.LecturerSkills.Select(ls => ls.SkillTag).ToList(),
+                    CompletedAssignments = perf?.CompletedAssignments ?? 0,
+                    AverageScoreGiven = perf?.AverageScoreGiven,
+                    OnTimeRate = perf?.OnTimeRate,
+                    QualityRating = perf?.QualityRating,
+                    Skills = reviewer.LecturerSkills?.Select(ls => ls.SkillTag).ToList() ?? new List<string>(),
                     IsAvailable = activeAssignments < 10
                 };
 
@@ -729,9 +844,15 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 Data = workloadInfo.OrderBy(w => w.CurrentAssignments).ToList()
             };
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            _logger.LogError(ex, "Failed to get reviewers workload");
+            return new BaseResponseModel<List<AvailableReviewerDTO>>
+            {
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = $"Lỗi hệ thống: {ex.Message}"
+            };
         }
     }
     public async Task<BaseResponseModel<AutoAssignmentResult>> AutoAssignReviewersAsync(AutoAssignReviewerDTO dto,
@@ -882,8 +1003,8 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
     {
         try
         {
-            // Get topic skill tags
-            var topicSkillTags = await _skillMatchingService.ExtractTopicSkillTagsAsync(submissionId);
+            // Get topic skill tags (ensure non-null)
+            var topicSkillTags = await _skillMatchingService.ExtractTopicSkillTagsAsync(submissionId) ?? new List<string>();
 
             // Get reviewer info
             var reviewerOptions = new QueryOptions<User>
@@ -910,22 +1031,48 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
             var matchingResult = new ReviewerMatchingResult
             {
                 ReviewerId = reviewer.Id,
-                ReviewerName = reviewer.UserName,
-                ReviewerEmail = reviewer.Email
+                ReviewerName = reviewer.UserName ?? "Unknown",
+                ReviewerEmail = reviewer.Email ?? string.Empty
             };
 
             // Calculate scores
-            matchingResult.SkillMatchScore =
-                await _skillMatchingService.CalculateSkillMatchScoreAsync(reviewerId, topicSkillTags);
-            matchingResult.PerformanceScore = await _skillMatchingService.CalculatePerformanceScoreAsync(reviewerId);
-            matchingResult.WorkloadScore = await _skillMatchingService.CalculateWorkloadScoreAsync(reviewerId);
+            // Calculate scores (wrap external service calls defensively)
+            try
+            {
+                matchingResult.SkillMatchScore = await _skillMatchingService.CalculateSkillMatchScoreAsync(reviewerId, topicSkillTags);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Skill match calculation failed for reviewer {ReviewerId} submission {SubmissionId}", reviewerId, submissionId);
+                matchingResult.SkillMatchScore = 0;
+            }
 
-            // Get additional info
-            matchingResult.ReviewerSkills = reviewer.LecturerSkills.ToDictionary(
-                ls => ls.SkillTag,
-                ls => ls.ProficiencyLevel);
+            try
+            {
+                matchingResult.PerformanceScore = await _skillMatchingService.CalculatePerformanceScoreAsync(reviewerId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Performance score calculation failed for reviewer {ReviewerId}", reviewerId);
+                matchingResult.PerformanceScore = 0;
+            }
 
-            var performance = reviewer.ReviewerPerformances.FirstOrDefault();
+            try
+            {
+                matchingResult.WorkloadScore = await _skillMatchingService.CalculateWorkloadScoreAsync(reviewerId);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Workload score calculation failed for reviewer {ReviewerId}", reviewerId);
+                matchingResult.WorkloadScore = 0;
+            }
+
+            // Get additional info (guard null collections)
+            matchingResult.ReviewerSkills = reviewer.LecturerSkills?
+                .Where(ls => !string.IsNullOrEmpty(ls.SkillTag))
+                .ToDictionary(ls => ls.SkillTag!, ls => ls.ProficiencyLevel) ?? new Dictionary<string, App.Entities.Enums.ProficiencyLevels>();
+
+            var performance = reviewer.ReviewerPerformances?.FirstOrDefault();
             if (performance != null)
             {
                 matchingResult.CompletedAssignments = performance.CompletedAssignments;
@@ -952,9 +1099,15 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 Data = matchingResult
             };
         }
-        catch (Exception)
+        catch (Exception ex)
         {
-            throw;
+            _logger.LogError(ex, "AnalyzeReviewerMatchAsync failed for reviewer {ReviewerId} submission {SubmissionId}", reviewerId, submissionId);
+            return new BaseResponseModel<ReviewerMatchingResult>
+            {
+                IsSuccess = false,
+                StatusCode = StatusCodes.Status500InternalServerError,
+                Message = $"Lỗi hệ thống: {ex.Message}"
+            };
         }
     }
 
@@ -1190,6 +1343,8 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 IncludeProperties = new List<Expression<Func<ReviewerAssignment, object>>>
                 {
                     ra => ra.Submission,
+                    // ensure Topic navigation is loaded directly when available
+                    ra => ra.Submission.Topic,
                     ra => ra.Submission.TopicVersion,
                     ra => ra.Submission.TopicVersion.Topic,
                     ra => ra.Submission.SubmittedByUser,
@@ -1212,6 +1367,15 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 };
             }
 
+            // Defensive: guard against null navigation properties and provide safe defaults
+            var submission = assignment.Submission;
+            var topicVersion = submission?.TopicVersion;
+            // Prefer submission.Topic if it's loaded; otherwise fall back to TopicVersion.Topic
+            var topic = submission?.Topic ?? topicVersion?.Topic;
+            var submittedByUser = submission?.SubmittedByUser;
+            var phase = submission?.Phase;
+            var reviews = assignment.Reviews ?? new List<Review>();
+
             var details = new AssignmentDetailsDTO
             {
                 AssignmentId = assignment.Id,
@@ -1225,33 +1389,33 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
 
                 // Reviewer Info
                 ReviewerId = assignment.ReviewerId,
-                ReviewerName = assignment.Reviewer.UserName ?? "Unknown",
-                ReviewerEmail = assignment.Reviewer.Email ?? "",
+                ReviewerName = assignment.Reviewer?.UserName ?? "Unknown",
+                ReviewerEmail = assignment.Reviewer?.Email ?? string.Empty,
 
                 // Submission Info
                 SubmissionId = assignment.SubmissionId,
-                SubmissionStatus = assignment.Submission.Status,
-                SubmittedAt = assignment.Submission.SubmittedAt,
-                DocumentUrl = assignment.Submission.DocumentUrl,
-                AdditionalNotes = assignment.Submission.AdditionalNotes,
+                SubmissionStatus = submission?.Status ?? default,
+                SubmittedAt = submission?.SubmittedAt,
+                DocumentUrl = submission?.DocumentUrl,
+                AdditionalNotes = submission?.AdditionalNotes,
 
-                // Topic Info
-                TopicId = assignment.Submission.TopicVersion.TopicId,
-                TopicTitle = assignment.Submission.TopicVersion.Topic.EN_Title,
-                TopicDescription = assignment.Submission.TopicVersion.Topic.Description,
-                TopicObjectives = assignment.Submission.TopicVersion.Topic.Objectives,
+                // Topic Info (safe fallbacks)
+                TopicId = topic?.Id ?? topicVersion?.TopicId ?? 0,
+                TopicTitle = topic?.EN_Title ?? submission?.Topic?.EN_Title ?? "(Không xác định)",
+                TopicDescription = topic?.Description ?? string.Empty,
+                TopicObjectives = topic?.Objectives ?? string.Empty,
 
                 // Student Info
-                StudentId = assignment.Submission.SubmittedBy,
-                StudentName = assignment.Submission.SubmittedByUser.UserName ?? "Unknown",
-                StudentEmail = assignment.Submission.SubmittedByUser.Email ?? "",
+                StudentId = submission?.SubmittedBy ?? 0,
+                StudentName = submittedByUser?.UserName ?? "Unknown",
+                StudentEmail = submittedByUser?.Email ?? string.Empty,
 
                 // Phase Info
-                PhaseId = assignment.Submission.PhaseId,
-                PhaseName = assignment.Submission.Phase.Name,
+                PhaseId = submission?.PhaseId ?? 0,
+                PhaseName = phase?.Name ?? string.Empty,
 
-                // Review Info
-                Reviews = assignment.Reviews.Where(r => r.IsActive).Select(r => new ReviewSummaryDTO
+                // Review Info (guard nulls)
+                Reviews = reviews.Where(r => r != null && r.IsActive).Select(r => new ReviewSummaryDTO
                 {
                     ReviewId = r.Id,
                     Status = r.Status,
@@ -1261,10 +1425,10 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                     TimeSpentMinutes = r.TimeSpentMinutes
                 }).ToList(),
 
-                IsOverdue = assignment.Deadline.HasValue && assignment.Deadline < DateTime.UtcNow &&
+                IsOverdue = assignment.Deadline.HasValue && assignment.Deadline < DateTime.Now &&
                             assignment.Status != AssignmentStatus.Completed,
                 CanStartReview = assignment.Status == AssignmentStatus.Assigned,
-                HasActiveReview = assignment.Reviews.Any(r => r.IsActive && r.Status == ReviewStatus.Draft)
+                HasActiveReview = reviews.Any(r => r != null && r.IsActive && r.Status == ReviewStatus.Draft)
             };
 
             return new BaseResponseModel<AssignmentDetailsDTO>

@@ -73,7 +73,7 @@ public class DeadlineNotificationService : BackgroundService
                         ra => ra.Reviewer,
                         ra => ra.Submission,
                         ra => ra.Submission.TopicVersion,
-                        ra => ra.Submission.TopicVersion.Topic
+                        ra => ra.Submission.Topic
                     }
                 });
 
@@ -89,7 +89,7 @@ public class DeadlineNotificationService : BackgroundService
                         ra => ra.Reviewer,
                         ra => ra.Submission,
                         ra => ra.Submission.TopicVersion,
-                        ra => ra.Submission.TopicVersion.Topic
+                        ra => ra.Submission.Topic
                     }
                 });
 
