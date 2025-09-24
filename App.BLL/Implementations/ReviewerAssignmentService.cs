@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using App.BLL.Interfaces;
 using System.ComponentModel.DataAnnotations;
+using System.Text;
 using App.Commons;
 using App.Commons.Interfaces;
 using App.Entities.DTOs.Notifications;
@@ -41,6 +42,58 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
         _notificationService = notificationService;
         _emailService = emailService;
         _logger = logger;
+    }
+
+    // Helper to build email HTML and plain-text bodies for assignment notifications
+    private (string htmlBody, string plainText) BuildAssignmentEmailBodies(ReviewerAssignment createdAssignment, string topicTitle)
+    {
+        var reviewerName = createdAssignment.Reviewer?.UserName ?? "Reviewer";
+        var deadlineText = createdAssignment.Deadline.HasValue
+            ? createdAssignment.Deadline.Value.ToString("dd/MM/yyyy HH:mm")
+            : "Không có";
+
+        var plainText = $@"Xin chào {reviewerName},
+
+Bạn vừa được phân công review đề tài: {topicTitle}.
+Deadline: {deadlineText}
+
+Vui lòng đăng nhập vào hệ thống để xem chi tiết và bắt đầu review.
+
+Trân trọng,
+CapBot";
+
+        var sb = new StringBuilder();
+        sb.AppendLine("<!doctype html>");
+        sb.AppendLine("<html lang=\"vi\"> ");
+        sb.AppendLine("  <head>");
+        sb.AppendLine("    <meta charset=\"utf-8\" />");
+        sb.AppendLine("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />");
+        sb.AppendLine("    <title>Phân công review</title>");
+        sb.AppendLine("    <style>");
+        sb.AppendLine("      body { font-family: Arial, Helvetica, sans-serif; background:#f7f7f7; color:#333; }");
+        sb.AppendLine("      .container { max-width:680px; margin:18px auto; background:#fff; padding:20px; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.08) }");
+        sb.AppendLine("      h1 { font-size:18px; margin:0 0 12px 0 }");
+        sb.AppendLine("      p { line-height:1.5; margin:8px 0 }");
+        sb.AppendLine("      .meta { background:#f0f4ff; padding:10px; border-radius:4px; margin:12px 0 }");
+        sb.AppendLine("      .footer { font-size:13px; color:#666; margin-top:18px }");
+        sb.AppendLine("      a.btn { display:inline-block; background:#0b62d6; color:#fff; padding:10px 14px; border-radius:4px; text-decoration:none }");
+        sb.AppendLine("    </style>");
+        sb.AppendLine("  </head>");
+        sb.AppendLine("  <body>");
+        sb.AppendLine("    <div class=\"container\">");
+        sb.AppendLine($"      <h1>Xin chào {System.Net.WebUtility.HtmlEncode(reviewerName)},</h1>");
+        sb.AppendLine("      <p>Bạn vừa được phân công review đề tài dưới đây. Vui lòng kiểm tra assignment trong hệ thống và hoàn thành trước hạn chót.</p>");
+        sb.AppendLine("      <div class=\"meta\">");
+        sb.AppendLine($"        <strong>Đề tài:</strong> {System.Net.WebUtility.HtmlEncode(topicTitle)}<br/>");
+        sb.AppendLine($"        <strong>Deadline:</strong> {System.Net.WebUtility.HtmlEncode(deadlineText)}");
+        sb.AppendLine("      </div>");
+        sb.AppendLine("      <p><a class=\"btn\" href=\"#\" target=\"_blank\">Xem assignment</a></p>");
+        sb.AppendLine("      <p class=\"footer\">Trân trọng,<br/>CapBot</p>");
+        sb.AppendLine("    </div>");
+        sb.AppendLine("  </body>");
+        sb.AppendLine("</html>");
+
+        return (sb.ToString(), plainText);
     }
 
     public async Task<BaseResponseModel<ReviewerAssignmentResponseDTO>> AssignReviewerAsync(AssignReviewerDTO dto,
@@ -183,6 +236,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                     ra => ra.Reviewer,
                     ra => ra.AssignedByUser,
                     ra => ra.Submission,
+                    ra => ra.Submission.Topic,
                     ra => ra.Submission.TopicVersion,
                     ra => ra.Submission.TopicVersion.Topic
                 }
@@ -196,7 +250,7 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
             // Ensure a system notification row exists for the assigned reviewer. Use NotificationService first; if it fails, fall back to direct DB insert.
             try
             {
-                var topicTitle = createdAssignment.Submission?.TopicVersion?.Topic?.EN_Title ?? createdAssignment.Submission?.Topic?.EN_Title ?? "(Không xác định)";
+                var topicTitle = createdAssignment.Submission?.Topic?.EN_Title ?? "(Không xác định)";
                 var title = $"Bạn được phân công review: {topicTitle}";
                 var message = $"Bạn vừa được phân công review đề tài '{topicTitle}'. Vui lòng kiểm tra assignment và hoàn thành trước deadline.";
 
@@ -238,16 +292,14 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
                 {
                     try
                     {
-                        var emailBody = $@"Xin chào {createdAssignment.Reviewer?.UserName ?? "Reviewer"},
-\n\nBạn vừa được phân công review đề tài: {topicTitle}.
-\nDeadline: {(createdAssignment.Deadline.HasValue ? createdAssignment.Deadline.Value.ToString("dd/MM/yyyy HH:mm") : "Không có")}
-\nVui lòng đăng nhập vào hệ thống để xem chi tiết và bắt đầu review.
-\n\nTrân trọng,\nCapBot";
+                        // Build email bodies (html + plain text) via helper to keep this method readable
+                        var (htmlBody, plainText) = BuildAssignmentEmailBodies(createdAssignment, topicTitle);
 
+                        // Prefer to send the HTML body; the EmailService implementation may include a plain-text fallback.
                         var emailModel = new EmailModel(
                             new[] { reviewerEmail },
                             $"[CapBot] Phân công review: {topicTitle}",
-                            emailBody
+                            htmlBody
                         );
 
                         var emailSent = await _emailService.SendEmailAsync(emailModel);
