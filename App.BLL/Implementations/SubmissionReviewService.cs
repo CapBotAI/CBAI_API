@@ -409,14 +409,14 @@ public class SubmissionReviewService : ISubmissionReviewService
             switch (moderatorDTO.FinalRecommendation)
             {
                 case ReviewRecommendations.Approve:
-                    submission.Status = SubmissionStatus.Completed;
+                    submission.Status = SubmissionStatus.Approved;
                     break;
                 case ReviewRecommendations.MinorRevision:
                 case ReviewRecommendations.MajorRevision:
                     submission.Status = SubmissionStatus.RevisionRequired;
                     break;
                 case ReviewRecommendations.Reject:
-                    submission.Status = SubmissionStatus.Pending; // Coi như failed
+                    submission.Status = SubmissionStatus.Rejected; // Coi như failed
                     break;
             }
 
