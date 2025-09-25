@@ -10,6 +10,7 @@ using App.Entities.Entities.App;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using App.DAL.Interfaces;
+using Microsoft.Extensions.Logging;
 
 namespace App.BLL.Implementations;
 
@@ -19,13 +20,15 @@ public class LecturerSkillService : ILecturerSkillService
     private readonly IMapper _mapper;
     private readonly IIdentityRepository _identityRepository;
 
+    private readonly ILogger<LecturerSkillService> _logger;
 
-    public LecturerSkillService(IUnitOfWork unitOfWork, IMapper mapper, IIdentityRepository identityRepository)
+
+    public LecturerSkillService(IUnitOfWork unitOfWork, IMapper mapper, IIdentityRepository identityRepository, ILogger<LecturerSkillService> logger)
     {
         _unitOfWork = unitOfWork;
         _mapper = mapper;
         _identityRepository = identityRepository;
-
+        _logger = logger;
     }
 
     public async Task<BaseResponseModel<LecturerSkillResponseDTO>> CreateAsync(CreateLecturerSkillDTO dto, int userId, bool isAdmin)
@@ -45,7 +48,7 @@ public class LecturerSkillService : ILecturerSkillService
 
             // Xác định lecturerId hợp lệ
             int targetLecturerId;
-            if (!isAdmin && dto.LecturerId != null && dto.LecturerId > 0)
+            if (isAdmin && dto.LecturerId.HasValue && dto.LecturerId > 0)
             {
                 targetLecturerId = dto.LecturerId.Value;
             }
@@ -53,6 +56,10 @@ public class LecturerSkillService : ILecturerSkillService
             {
                 targetLecturerId = userId;
             }
+
+            _logger.LogInformation($"UserId: {userId}");
+
+            // Non-admin không được tạo cho người khác
             if (!isAdmin && targetLecturerId != userId)
             {
                 return new BaseResponseModel<LecturerSkillResponseDTO>
@@ -62,6 +69,8 @@ public class LecturerSkillService : ILecturerSkillService
                     Message = "Bạn không có quyền tạo kỹ năng cho giảng viên khác"
                 };
             }
+
+            _logger.LogInformation($"Target lecturerId: {targetLecturerId} - isAdmin: {isAdmin}");
 
             // Check trùng (LecturerId + SkillTag)
             var existed = await repo.GetSingleAsync(new QueryOptions<LecturerSkill>
