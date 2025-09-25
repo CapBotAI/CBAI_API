@@ -12,6 +12,7 @@ public class SemesterDetailDTO
     public string CreatedBy { get; set; } = null!;
     public DateTime UpdatedAt { get; set; }
     public string UpdatedBy { get; set; } = null!;
+    public string? Description { get; set; }
 
     public SemesterDetailDTO(App.Entities.Entities.App.Semester semester)
     {
@@ -23,5 +24,6 @@ public class SemesterDetailDTO
         CreatedBy = semester.CreatedBy ?? string.Empty;
         UpdatedAt = semester.LastModifiedAt ?? DateTime.Now;
         UpdatedBy = semester.LastModifiedBy ?? string.Empty;
+        Description = semester.Description;
     }
 }
