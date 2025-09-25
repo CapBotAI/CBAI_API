@@ -27,6 +27,9 @@ namespace App.BLL.Implementations
         // Simple in-memory cache for reviewer TF maps and norms
         private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, (Dictionary<string, decimal> Tf, decimal Norm, DateTime ExpiresAt)> _reviewerTfCache = new();
         private static readonly TimeSpan ReviewerTfCacheTtl = TimeSpan.FromMinutes(30);
+    // Cache for reviewer embeddings (semantic vectors) to avoid repeated external calls
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, (float[] Emb, DateTime ExpiresAt)> _reviewerEmbeddingCache = new();
+    private static readonly TimeSpan ReviewerEmbeddingCacheTtl = TimeSpan.FromHours(1);
 
         public ReviewerSuggestionService(GeminiAIService aiService, IUnitOfWork unitOfWork, ILogger<ReviewerSuggestionService> logger)
         {
@@ -66,8 +69,12 @@ namespace App.BLL.Implementations
                 {
                     submission.Topic.Category?.Name,
                     submission.Topic.EN_Title,
+                    submission.Topic.VN_title,
                     submission.Topic.Description,
-                    submission.Topic.Objectives
+                    submission.Topic.Objectives,
+                    submission.Topic.Problem,
+                    submission.Topic.Content,
+                    submission.Topic.Context
                 }.Where(s => !string.IsNullOrWhiteSpace(s)));
 
                 if (string.IsNullOrWhiteSpace(submissionContext))
@@ -113,11 +120,13 @@ namespace App.BLL.Implementations
                     var topicFields = new Dictionary<string, string>
                     {
                         { "Title", submission.Topic.EN_Title ?? string.Empty },
+                        { "VN_Title", submission.Topic.VN_title ?? string.Empty },
                         { "Category", submission.Topic.Category?.Name ?? string.Empty },
                         { "Description", submission.Topic.Description ?? string.Empty },
                         { "Objectives", submission.Topic.Objectives ?? string.Empty },
-                        { "Content", string.Empty },
-                        { "Context", string.Empty }
+                        { "Problem", submission.Topic.Problem ?? string.Empty },
+                        { "Content", submission.Topic.Content ?? string.Empty },
+                        { "Context", submission.Topic.Context ?? string.Empty }
                     };
 
                     int? semesterId = submission.Topic?.SemesterId;
@@ -182,7 +191,7 @@ namespace App.BLL.Implementations
             }
         }
 
-    private Task<List<ReviewerSuggestionDTO>> CalculateReviewerScores(List<User> reviewers, Dictionary<string, string> topicFields, string submissionContext, List<string> skipMessages, int? semesterId)
+    private async Task<List<ReviewerSuggestionDTO>> CalculateReviewerScores(List<User> reviewers, Dictionary<string, string> topicFields, string submissionContext, List<string> skipMessages, int? semesterId)
         {
             // Validate submission context
             if (string.IsNullOrWhiteSpace(submissionContext))
@@ -203,13 +212,25 @@ namespace App.BLL.Implementations
             var topicTf = BuildTermFrequency(topicTokens);
             var topicNorm = ComputeVectorNorm(topicTf);
 
-            // Use explicit topicFields passed from caller (Title, Category, Description, Objectives, Content, Context)
+            // Build per-field TF maps from whatever fields the caller provided (keeps extensions flexible)
             var topicFieldTfs = new Dictionary<string, Dictionary<string, decimal>>(StringComparer.OrdinalIgnoreCase);
-            foreach (var key in new[] { "Title", "Category", "Description", "Objectives", "Content", "Context" })
+            foreach (var key in topicFields.Keys)
             {
                 topicFields.TryGetValue(key, out var raw);
                 var tokens = TokenizeText(raw ?? string.Empty);
                 topicFieldTfs[key] = BuildTermFrequency(tokens);
+            }
+
+            // Try to generate a topic embedding once (best-effort). If Gemini fails, we continue with TF-only scores.
+            float[]? topicEmbedding = null;
+            try
+            {
+                var emb = await _aiService.GetEmbeddingAsync(submissionContext);
+                topicEmbedding = emb;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogDebug(ex, "Topic embedding failed - falling back to TF-only similarity");
             }
 
             foreach (var reviewer in reviewers)
@@ -271,7 +292,7 @@ namespace App.BLL.Implementations
                         _reviewerTfCache[reviewer.Id] = (reviewerTf, reviewerNorm, now.Add(ReviewerTfCacheTtl));
                     }
 
-                    // Compute cosine similarity using sparse intersection (overall)
+                    // Compute TF-based cosine similarity (sparse intersection)
                     var dot = 0.0m;
                     foreach (var kv in reviewerTf)
                     {
@@ -281,11 +302,54 @@ namespace App.BLL.Implementations
                         }
                     }
 
-                    var skillMatchScore = 0.0m;
+                    var tfSkillMatch = 0.0m;
                     if (topicNorm > 0 && reviewerNorm > 0)
                     {
-                        skillMatchScore = dot / (topicNorm * reviewerNorm);
+                        tfSkillMatch = dot / (topicNorm * reviewerNorm);
                     }
+
+                    // Try semantic embedding cosine if available
+                    double semanticScore = 0.0;
+                    try
+                    {
+                        // get or compute reviewer embedding
+                        float[]? reviewerEmb = null;
+                        var nowUtc = DateTime.UtcNow;
+                        if (_reviewerEmbeddingCache.TryGetValue(reviewer.Id, out var cacheEmb) && cacheEmb.ExpiresAt > nowUtc)
+                        {
+                            reviewerEmb = cacheEmb.Emb;
+                        }
+                        else
+                        {
+                            // build a short text from reviewer skills to embed
+                            var skillText = string.Join(" ", reviewer.LecturerSkills?.Select(s => s.SkillTag).Where(t => !string.IsNullOrWhiteSpace(t)) ?? Enumerable.Empty<string>());
+                            if (!string.IsNullOrWhiteSpace(skillText))
+                            {
+                                reviewerEmb = await _aiService.GetEmbeddingAsync(skillText);
+                                if (reviewerEmb != null && reviewerEmb.Length > 0)
+                                {
+                                    _reviewerEmbeddingCache[reviewer.Id] = (reviewerEmb, nowUtc.Add(ReviewerEmbeddingCacheTtl));
+                                }
+                            }
+                        }
+
+                        if (topicEmbedding != null && reviewerEmb != null && topicEmbedding.Length == reviewerEmb.Length)
+                        {
+                            semanticScore = _aiService.CosineSimilarity(topicEmbedding, reviewerEmb);
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogDebug(ex, "Reviewer embedding failed for {ReviewerId}", reviewer.Id);
+                        semanticScore = 0.0;
+                    }
+
+                    // Blend TF and semantic scores; prefer semantic when available but keep TF as robust signal
+                    // Both scores normalized in [0,1]; semanticScore may be negative if vectors disagree - clamp
+                    var semanticClamped = Math.Max(0.0, Math.Min(1.0, semanticScore));
+                    var tfDouble = (double)tfSkillMatch;
+                    var blended = topicEmbedding != null && semanticClamped > 0 ? (0.55 * semanticClamped + 0.45 * tfDouble) : tfDouble;
+                    var skillMatchScore = (decimal)blended;
 
                     // Per-field similarity breakdown
                     var fieldScores = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
@@ -400,7 +464,7 @@ namespace App.BLL.Implementations
                 }
             }
 
-            return Task.FromResult(reviewerScores);
+            return reviewerScores;
         }
 
         // Simple tokenizer: lowercase, remove punctuation, split on whitespace
@@ -438,100 +502,105 @@ namespace App.BLL.Implementations
         // Expanded synonyms map for acronyms, phrases and common variants (programming, frameworks, infra, data, app types)
         private static readonly Dictionary<string, string[]> _synonyms = new(StringComparer.OrdinalIgnoreCase)
         {
-            { "nlp", new[]{ "nlp", "natural language processing", "natural language", "language processing" } },
-            { "natural language processing", new[]{ "natural language processing", "nlp" } },
-            { "ai", new[]{ "ai", "artificial intelligence", "artificial", "intelligence" } },
-            { "artificial intelligence", new[]{ "artificial intelligence", "ai" } },
-            { "ml", new[]{ "ml", "machine learning", "machine", "learning" } },
-            { "machine learning", new[]{ "machine learning", "ml" } },
-            { "dl", new[]{ "dl", "deep learning", "deep", "learning" } },
-            { "deep learning", new[]{ "deep learning", "dl", "neural networks", "neural" } },
-            { "cv", new[]{ "cv", "computer vision", "image processing", "vision" } },
-            { "computer vision", new[]{ "computer vision", "cv", "image processing" } },
-            { "transformer", new[]{ "transformer", "transformers", "bert", "gpt", "llm" } },
-            { "bert", new[]{ "bert", "transformer" } },
-            { "gpt", new[]{ "gpt", "llm", "transformer" } },
-            { "llm", new[]{ "llm", "large language model", "language model" } },
-            { "rnn", new[]{ "rnn", "recurrent neural network", "recurrent" } },
-            { "lstm", new[]{ "lstm", "long short term memory", "recurrent" } },
-            { "data science", new[]{ "data science", "data", "analytics", "data mining" } },
-            { "data mining", new[]{ "data mining", "data", "mining" } },
-            { "statistics", new[]{ "statistics", "statistical", "probability" } },
-            { "software engineering", new[]{ "software engineering", "software", "engineering" } },
-            { "programming language", new[]{ "programming language", "programming", "language" } },
+            // Core AI / NLP
+            { "nlp", new[]{ "nlp", "natural language processing", "natural language", "language processing", "xử lý ngôn ngữ tự nhiên" } },
+            { "natural language processing", new[]{ "natural language processing", "nlp", "xử lý ngôn ngữ tự nhiên" } },
+            { "ai", new[]{ "ai", "artificial intelligence", "artificial", "intelligence", "trí tuệ nhân tạo" } },
+            { "artificial intelligence", new[]{ "artificial intelligence", "ai", "trí tuệ nhân tạo" } },
+            { "ml", new[]{ "ml", "machine learning", "machine", "learning", "học máy" } },
+            { "machine learning", new[]{ "machine learning", "ml", "học máy" } },
+            { "dl", new[]{ "dl", "deep learning", "deep", "learning", "học sâu" } },
+            { "deep learning", new[]{ "deep learning", "dl", "neural networks", "neural", "học sâu", "mạng nơ-ron" } },
+            { "cv", new[]{ "cv", "computer vision", "image processing", "vision", "thị giác máy tính", "xử lý ảnh" } },
+            { "computer vision", new[]{ "computer vision", "cv", "image processing", "thị giác máy tính" } },
+            { "transformer", new[]{ "transformer", "transformers", "bert", "gpt", "llm", "mô hình transformer" } },
+            { "bert", new[]{ "bert", "transformer", "mô hình bert" } },
+            { "gpt", new[]{ "gpt", "llm", "transformer", "mô hình gpt" } },
+            { "llm", new[]{ "llm", "large language model", "language model", "mô hình ngôn ngữ lớn" } },
+            { "rnn", new[]{ "rnn", "recurrent neural network", "recurrent", "mạng nơ-ron hồi tiếp" } },
+            { "lstm", new[]{ "lstm", "long short term memory", "recurrent", "lstm" } },
+
+            // Data & analytics
+            { "data science", new[]{ "data science", "data", "analytics", "data mining", "khoa học dữ liệu" } },
+            { "data mining", new[]{ "data mining", "data", "mining", "khai thác dữ liệu" } },
+            { "statistics", new[]{ "statistics", "statistical", "probability", "thống kê" } },
+
+            // Engineering / programming
+            { "software engineering", new[]{ "software engineering", "software", "engineering", "kỹ thuật phần mềm" } },
+            { "programming language", new[]{ "programming language", "programming", "language", "ngôn ngữ lập trình" } },
 
             // Programming languages
-            { "python", new[]{ "python", "py" } },
-            { "java", new[]{ "java" } },
-            { "csharp", new[]{ "csharp", "c#", "dotnet", "dot net", ".net" } },
-            { "cpp", new[]{ "cpp", "c++", "c plus plus", "cplus" } },
-            { "javascript", new[]{ "javascript", "js", "nodejs", "node" } },
-            { "typescript", new[]{ "typescript", "ts" } },
-            { "go", new[]{ "go", "golang" } },
-            { "rust", new[]{ "rust" } },
-            { "kotlin", new[]{ "kotlin" } },
-            { "swift", new[]{ "swift" } },
-            { "php", new[]{ "php" } },
-            { "ruby", new[]{ "ruby", "ruby on rails", "rails" } },
+            { "python", new[]{ "python", "py", "python" } },
+            { "java", new[]{ "java", "java" } },
+            { "csharp", new[]{ "csharp", "c#", "dotnet", "dot net", ".net", "c#" } },
+            { "cpp", new[]{ "cpp", "c++", "c plus plus", "cplus", "c++" } },
+            { "javascript", new[]{ "javascript", "js", "nodejs", "node", "javascript" } },
+            { "typescript", new[]{ "typescript", "ts", "typescript" } },
+            { "go", new[]{ "go", "golang", "go" } },
+            { "rust", new[]{ "rust", "rust" } },
+            { "kotlin", new[]{ "kotlin", "kotlin" } },
+            { "swift", new[]{ "swift", "swift" } },
+            { "php", new[]{ "php", "php" } },
+            { "ruby", new[]{ "ruby", "ruby on rails", "rails", "ruby" } },
 
             // Frameworks and libraries
-            { "aspnet", new[]{ "aspnet", "asp.net", "asp net", "asp" } },
-            { "spring", new[]{ "spring", "spring boot", "springboot", "spring-boot" } },
-            { "django", new[]{ "django" } },
-            { "flask", new[]{ "flask" } },
-            { "react", new[]{ "react", "reactjs", "react native", "reactnative" } },
-            { "angular", new[]{ "angular" } },
-            { "vue", new[]{ "vue", "vuejs" } },
-            { "svelte", new[]{ "svelte" } },
-            { "nextjs", new[]{ "nextjs", "next" } },
-            { "nuxt", new[]{ "nuxt" } },
-            { "node", new[]{ "node", "nodejs", "node js" } },
-            { "express", new[]{ "express", "expressjs" } },
-            { "laravel", new[]{ "laravel" } },
+            { "aspnet", new[]{ "aspnet", "asp.net", "asp net", "asp", "asp.net" } },
+            { "spring", new[]{ "spring", "spring boot", "springboot", "spring-boot", "spring" } },
+            { "django", new[]{ "django", "django" } },
+            { "flask", new[]{ "flask", "flask" } },
+            { "react", new[]{ "react", "reactjs", "react native", "reactnative", "react" } },
+            { "angular", new[]{ "angular", "angular" } },
+            { "vue", new[]{ "vue", "vuejs", "vue" } },
+            { "svelte", new[]{ "svelte", "svelte" } },
+            { "nextjs", new[]{ "nextjs", "next", "next.js" } },
+            { "nuxt", new[]{ "nuxt", "nuxt" } },
+            { "node", new[]{ "node", "nodejs", "node js", "node" } },
+            { "express", new[]{ "express", "expressjs", "express" } },
+            { "laravel", new[]{ "laravel", "laravel" } },
 
             // App types and architectures
-            { "web app", new[]{ "web app", "web application", "web" } },
-            { "mobile", new[]{ "mobile", "mobile app", "android", "ios" } },
-            { "desktop", new[]{ "desktop", "desktop app" } },
-            { "microservice", new[]{ "microservice", "microservices" } },
-            { "rest", new[]{ "rest", "rest api", "restful" } },
-            { "grpc", new[]{ "grpc" } },
-            { "graphql", new[]{ "graphql" } },
+            { "web app", new[]{ "web app", "web application", "web", "ứng dụng web" } },
+            { "mobile", new[]{ "mobile", "mobile app", "android", "ios", "di động", "ứng dụng di động" } },
+            { "desktop", new[]{ "desktop", "desktop app", "ứng dụng desktop" } },
+            { "microservice", new[]{ "microservice", "microservices", "dịch vụ vi mô", "microservice" } },
+            { "rest", new[]{ "rest", "rest api", "restful", "api rest" } },
+            { "grpc", new[]{ "grpc", "grpc" } },
+            { "graphql", new[]{ "graphql", "graphql" } },
 
             // Infra / DevOps
-            { "docker", new[]{ "docker", "container", "containers" } },
-            { "kubernetes", new[]{ "kubernetes", "k8s", "kube" } },
-            { "helm", new[]{ "helm" } },
-            { "ci/cd", new[]{ "ci/cd", "ci", "cd", "continuous integration", "continuous delivery" } },
+            { "docker", new[]{ "docker", "container", "containers", "docker" } },
+            { "kubernetes", new[]{ "kubernetes", "k8s", "kube", "kubernetes" } },
+            { "helm", new[]{ "helm", "helm" } },
+            { "ci/cd", new[]{ "ci/cd", "ci", "cd", "continuous integration", "continuous delivery", "tiếp tục tích hợp", "ci cd" } },
 
             // Cloud / platforms
-            { "aws", new[]{ "aws", "amazon web services" } },
-            { "azure", new[]{ "azure", "microsoft azure" } },
-            { "gcp", new[]{ "gcp", "google cloud", "google cloud platform" } },
+            { "aws", new[]{ "aws", "amazon web services", "aws" } },
+            { "azure", new[]{ "azure", "microsoft azure", "azure" } },
+            { "gcp", new[]{ "gcp", "google cloud", "google cloud platform", "gcp" } },
 
             // Data / Big Data
-            { "etl", new[]{ "etl", "extract transform load" } },
-            { "big data", new[]{ "big data", "hadoop", "spark" } },
-            { "hadoop", new[]{ "hadoop" } },
-            { "spark", new[]{ "spark" } },
+            { "etl", new[]{ "etl", "extract transform load", "etl" } },
+            { "big data", new[]{ "big data", "hadoop", "spark", "dữ liệu lớn" } },
+            { "hadoop", new[]{ "hadoop", "hadoop" } },
+            { "spark", new[]{ "spark", "spark" } },
 
             // Testing / QA
-            { "testing", new[]{ "testing", "unit test", "integration test", "tdd" } },
-            { "tdd", new[]{ "tdd", "test driven development" } },
+            { "testing", new[]{ "testing", "unit test", "integration test", "tdd", "kiểm thử" } },
+            { "tdd", new[]{ "tdd", "test driven development", "phát triển theo kiểm thử" } },
 
             // Security / blockchain / iot
-            { "security", new[]{ "security", "cybersecurity", "information security" } },
-            { "blockchain", new[]{ "blockchain", "distributed ledger", "smart contract" } },
-            { "solidity", new[]{ "solidity", "smart contract" } },
-            { "iot", new[]{ "iot", "internet of things", "embedded" } },
+            { "security", new[]{ "security", "cybersecurity", "information security", "bảo mật" } },
+            { "blockchain", new[]{ "blockchain", "distributed ledger", "smart contract", "blockchain" } },
+            { "solidity", new[]{ "solidity", "smart contract", "solidity" } },
+            { "iot", new[]{ "iot", "internet of things", "embedded", "iot", "vạn vật kết nối" } },
 
             // Misc common terms
-            { "database", new[]{ "database", "sql", "nosql", "mysql", "postgresql", "mongodb" } },
-            { "sql", new[]{ "sql", "structured query language" } },
-            { "nosql", new[]{ "nosql", "document db", "key value" } },
-            { "algorithm", new[]{ "algorithm", "algorithms" } },
-            { "optimization", new[]{ "optimization", "optimisation", "optimise" } },
-            { "evaluation", new[]{ "evaluation", "metrics", "accuracy", "f1", "precision", "recall" } }
+            { "database", new[]{ "database", "sql", "nosql", "mysql", "postgresql", "mongodb", "cơ sở dữ liệu" } },
+            { "sql", new[]{ "sql", "structured query language", "sql" } },
+            { "nosql", new[]{ "nosql", "document db", "key value", "nosql" } },
+            { "algorithm", new[]{ "algorithm", "algorithms", "thuật toán" } },
+            { "optimization", new[]{ "optimization", "optimisation", "optimise", "tối ưu hóa" } },
+            { "evaluation", new[]{ "evaluation", "metrics", "accuracy", "f1", "precision", "recall", "đánh giá" } }
         };
 
         private static IEnumerable<string> ExpandSynonyms(string token)
@@ -566,37 +635,6 @@ namespace App.BLL.Implementations
             return (decimal)Math.Sqrt((double)sumSquares);
         }
 
-        // Heuristic extractor: tries to find "FieldName: ..." patterns; returns whole text if not found
-        private static string? ExtractField(string text, string fieldName)
-        {
-            if (string.IsNullOrWhiteSpace(text)) return null;
-            try
-            {
-                var lower = text.ToLowerInvariant();
-                var marker = fieldName.ToLowerInvariant() + ":";
-                var idx = lower.IndexOf(marker, StringComparison.Ordinal);
-                if (idx >= 0)
-                {
-                    var start = idx + marker.Length;
-                    // take up to next double newline or end
-                    var rest = text.Substring(start).Trim();
-                    var sep = rest.IndexOf("\n\n");
-                    if (sep > 0) return rest.Substring(0, sep).Trim();
-                    // fallback: up to 300 chars
-                    return rest.Length > 300 ? rest.Substring(0, 300) : rest;
-                }
-            }
-            catch { }
-            // if not found, return null so caller can fall back
-            return null;
-        }
-
-        private decimal CalculateWorkloadScore(User reviewer)
-        {
-            var activeAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) ?? 0;
-            return 1 - Math.Min(1, activeAssignments / 5m);
-        }
-
         private decimal CalculatePerformanceScore(User reviewer)
         {
             var performance = reviewer.ReviewerPerformances.OrderByDescending(p => p.LastUpdated).FirstOrDefault();
@@ -607,97 +645,120 @@ namespace App.BLL.Implementations
 
         private async Task<string?> GenerateAIExplanation(string submissionContext, List<ReviewerSuggestionDTO> suggestions)
         {
+            if (suggestions == null || suggestions.Count == 0) return null;
+
             try
             {
-                // Build a structured, professional prompt including per-field match details
-                // Build a compact JSON input describing reviewers and submission context
-                var reviewersJsonItems = suggestions.Select((s, i) =>
+                // Build compact candidates block
+                var reviewersLines = suggestions.Select((s, idx) =>
                 {
-                    // Safely truncate long lists/tokens
-                    string safeTokens = string.Join(",", s.SkillMatchTopTokens.SelectMany(kv => kv.Value).Take(10));
-                    string safeMatchedSkills = string.Join(",", (s.MatchedSkills ?? new List<string>()).Take(6));
+                    var tokens = (s.SkillMatchTopTokens?.Values.SelectMany(v => v) ?? Enumerable.Empty<string>()).Take(6);
+                    var matched = (s.MatchedSkills ?? new List<string>()).Take(4);
+                    var overallPct = (double)(s.OverallScore * 100);
+                    var skillPct = (double)(s.SkillMatchScore * 100);
+                    return string.Format(System.Globalization.CultureInfo.InvariantCulture,
+                        "{0}) Id:{1} | Name:{2} | Active:{3} | Overall:{4:0.0}% | SkillMatch:{5:0.0}% | Matched:[{6}] | Tokens:[{7}]",
+                        idx + 1, s.ReviewerId, s.ReviewerName, s.CurrentActiveAssignments, overallPct, skillPct,
+                        string.Join(",", matched), string.Join(",", tokens));
+                });
 
-                    // Include performance fields explicitly
-                    var perfObj = new
-                    {
-                        averageScoreGiven = s.AverageScoreGiven ?? 0m,
-                        onTimeRate = s.OnTimeRate ?? 0m,
-                        qualityRating = s.QualityRating ?? 0m,
-                        performanceScore = s.PerformanceScore
-                    };
+                var reviewersBlock = string.Join("\n", reviewersLines);
 
-                    return new
-                    {
-                        id = s.ReviewerId,
-                        name = s.ReviewerName,
-                        overallScore = s.OverallScore,
-                        skillMatchScore = s.SkillMatchScore,
-                        fieldScores = s.SkillMatchFieldScores,
-                        topTokens = safeTokens,
-                        matchedSkills = safeMatchedSkills,
-                        workload = s.WorkloadScore,
-                        currentActiveAssignments = s.CurrentActiveAssignments,
-                        completedAssignments = s.CompletedAssignments,
-                        performance = perfObj
-                    };
-                }).ToList();
+                // Prompt instructions (concise, strict, bilingual)
+                var instruction = new StringBuilder();
+                instruction.AppendLine("You are an expert system that recommends reviewers using ONLY the CANDIDATES data and Submission context provided.");
+                instruction.AppendLine("Rules:");
+                instruction.AppendLine("- Recommend at least TWO reviewers, ordered by lowest CurrentActiveAssignments first. If tied, prefer higher Overall percentage.");
+                instruction.AppendLine("- For each recommended reviewer provide a single Recommendation line plus: Overall% and SkillMatch% (format: 0.0%), and a one-line rationale that mentions matched skills/tokens and current active assignments.");
+                instruction.AppendLine("- Provide an Alternatives section with two backup reviewers (Name, Id, Active count).");
+                instruction.AppendLine("- Output plain text only. First ENGLISH section, then VIETNAMESE translation of the same content.");
+                instruction.AppendLine("- Do NOT use JSON, markdown, or code fences. Use percentage values (0.0%) for scores. Keep each language concise (<=180 words).");
 
-                var payload = new
+                var submissionSnippet = submissionContext.Length > 1000 ? submissionContext.Substring(0, 1000) + "..." : submissionContext;
+
+                var prompt = new StringBuilder();
+                prompt.AppendLine(instruction.ToString());
+                prompt.AppendLine("Submission context:");
+                prompt.AppendLine(submissionSnippet);
+                prompt.AppendLine();
+                prompt.AppendLine("CANDIDATES:");
+                prompt.AppendLine(reviewersBlock);
+                prompt.AppendLine();
+                prompt.AppendLine("Please respond following the rules above.");
+
+                // Call AI provider
+                var aiResponse = await _aiService.GetPromptCompletionAsync(prompt.ToString());
+                if (string.IsNullOrWhiteSpace(aiResponse))
                 {
-                    instructions = "Return a JSON object with keys: reviewers (array), overall_recommendation (string). For each reviewer return id, recommendation (" +
-                                   "'strong_yes'|'yes'|'no'|'uncertain'), reasons (array of short strings), concerns (array), top_matching_tokens (array of strings). Keep answers concise.",
-                    submission = submissionContext.Length > 1000 ? submissionContext.Substring(0, 1000) + "..." : submissionContext,
-                    reviewers = reviewersJsonItems
-                };
-
-                // Build a short system prompt that forces JSON-only response
-                var jsonOnlyPrompt = "You are an assistant that must respond ONLY with JSON. Do not include any extra text. Follow the instructions exactly.";
-                var userPrompt = System.Text.Json.JsonSerializer.Serialize(payload);
-
-                var finalPrompt = jsonOnlyPrompt + "\n" + userPrompt;
-
-                // Send to AI service
-                var aiResult = await _aiService.GetPromptCompletionAsync(finalPrompt);
-
-                // Attempt to detect and trim non-JSON prefixes/suffixes from response
-                if (string.IsNullOrWhiteSpace(aiResult)) return null;
-                var firstBrace = aiResult.IndexOf('{');
-                var lastBrace = aiResult.LastIndexOf('}');
-                if (firstBrace >= 0 && lastBrace > firstBrace)
-                {
-                    var json = aiResult.Substring(firstBrace, lastBrace - firstBrace + 1);
-                    return json;
+                    // fallback deterministic answer
+                    return BuildDeterministicFallback(suggestions);
                 }
 
-                // Fallback: return raw result (already logged by caller on failure)
-                return aiResult;
+                var result = aiResponse.Trim();
+
+                // Strip code fences if present
+                if (result.StartsWith("```") && result.EndsWith("```"))
+                {
+                    var lines = result.Split('\n');
+                    var start = (lines.Length > 0 && lines[0].StartsWith("```")) ? 1 : 0;
+                    var end = (lines.Length > 1 && lines[lines.Length - 1].StartsWith("```")) ? lines.Length - 1 : lines.Length;
+                    result = string.Join('\n', lines.Skip(start).Take(Math.Max(0, end - start))).Trim();
+                }
+
+                // If model ignored rules, fallback
+                if (!result.Contains("Recommend", StringComparison.OrdinalIgnoreCase) && !result.Contains("Recommendation", StringComparison.OrdinalIgnoreCase))
+                {
+                    return BuildDeterministicFallback(suggestions);
+                }
+
+                _logger.LogDebug("AI explanation generated (preview): {Preview}", result.Length > 200 ? result.Substring(0, 200) + "..." : result);
+                return result;
             }
             catch (Exception ex)
             {
-                // Log full exception for administrators, but return a concise, non-sensitive message to the API client
-                _logger.LogWarning(ex, "Prompt completion failed for submission context");
-
-                var full = ex.ToString();
-                var summary = ex.Message ?? "Prompt generation failed";
-
-                // Remove any JSON payload from the summary to avoid leaking provider responses
-                var idx = summary.IndexOf('{');
-                if (idx > 0)
-                {
-                    summary = summary.Substring(0, idx).Trim();
-                }
-
-                // Detect common rate-limit/quota signals from provider responses
-                var isRateLimit = full.Contains("TooManyRequests") || full.Contains("RESOURCE_EXHAUSTED") || full.Contains("Quota exceeded") || full.Contains("429");
-
-                var howToFix = isRateLimit
-                    ? "How to fix: retry after a delay (respect Retry-After header), reduce request rate or batch requests, or request a quota increase in Google Cloud Console; consider caching or background queueing."
-                    : "How to fix: check provider response and logs, implement retries/backoff for transient errors, and ensure request payloads are valid.";
-
-                // Return a concise message; full provider error is kept only in logs
-                var result = $"Failed to generate AI explanation: {summary}. {howToFix} Full provider error has been logged for administrators.";
-                return result;
+                _logger.LogWarning(ex, "GenerateAIExplanation failed");
+                return BuildDeterministicFallback(suggestions, errorNote: true);
             }
+        }
+
+        private string BuildDeterministicFallback(List<ReviewerSuggestionDTO> suggestions, bool errorNote = false)
+        {
+            var ordered = suggestions.OrderBy(r => r.CurrentActiveAssignments).ThenByDescending(r => r.OverallScore).ToList();
+            var picks = ordered.Take(2).ToList();
+
+            var sb = new StringBuilder();
+            if (errorNote) sb.AppendLine("(Automatic fallback used due to AI error)");
+
+            sb.AppendLine("ENGLISH:");
+            foreach (var p in picks)
+            {
+                var overallPct = (double)(p.OverallScore * 100);
+                var skillPct = (double)(p.SkillMatchScore * 100);
+                var skills = p.MatchedSkills != null && p.MatchedSkills.Any() ? string.Join(", ", p.MatchedSkills.Take(3)) : "(no matched skills)";
+                sb.AppendLine($"Recommendation: {p.ReviewerName} (Id: {p.ReviewerId})");
+                sb.AppendLine($"Overall: {overallPct:0.0}% | SkillMatch: {skillPct:0.0}%");
+                sb.AppendLine($"Rationale: Low active assignments ({p.CurrentActiveAssignments}) and matched skills: {skills}.");
+                sb.AppendLine();
+            }
+            sb.AppendLine("Alternatives:");
+            foreach (var alt in ordered.Skip(2).Take(2)) sb.AppendLine($"- {alt.ReviewerName} (Id: {alt.ReviewerId}) - Active: {alt.CurrentActiveAssignments}");
+
+            sb.AppendLine();
+            sb.AppendLine("VIETNAMESE:");
+            foreach (var p in picks)
+            {
+                var overallPct = (double)(p.OverallScore * 100);
+                var skillPct = (double)(p.SkillMatchScore * 100);
+                var skills = p.MatchedSkills != null && p.MatchedSkills.Any() ? string.Join(", ", p.MatchedSkills.Take(3)) : "(không có kỹ năng khớp)";
+                sb.AppendLine($"Đề xuất: {p.ReviewerName} (Id: {p.ReviewerId})");
+                sb.AppendLine($"Tổng điểm: {overallPct:0.0}% | Khớp kỹ năng: {skillPct:0.0}%");
+                sb.AppendLine($"Lý do: Ít bài đang xử lý ({p.CurrentActiveAssignments}) và kỹ năng khớp: {skills}.");
+                sb.AppendLine();
+            }
+            sb.AppendLine("Phương án thay thế:");
+            foreach (var alt in ordered.Skip(2).Take(2)) sb.AppendLine($"- {alt.ReviewerName} (Id: {alt.ReviewerId}) - Số bài đang xử lý: {alt.CurrentActiveAssignments}");
+
+            return sb.ToString().Trim();
         }
 
         public async Task<BaseResponseModel<ReviewerSuggestionOutputDTO>> SuggestReviewersAsync(ReviewerSuggestionInputDTO input)
@@ -990,11 +1051,19 @@ namespace App.BLL.Implementations
                 };
             }
 
-            // Step 2: Prepare context for AI embedding
+            // Step 2: Prepare context for AI embedding - include the same rich fields used for submissions
             var topicContext = string.Join(" ", new[]
             {
                 topic.Category.Name,
-                topic.EN_Title
+                topic.EN_Title,
+                // optional Vietnamese title, problem, description, objectives, content and context when present
+                // these mirror the fields used when building submissionContext earlier in the service
+                topic.VN_title,
+                topic.Description,
+                topic.Objectives,
+                topic.Problem,
+                topic.Content,
+                topic.Context
             }.Where(s => !string.IsNullOrWhiteSpace(s)));
 
             // Step 3: Fetch eligible reviewers
@@ -1029,8 +1098,8 @@ namespace App.BLL.Implementations
                     { "Category", topic.Category?.Name ?? string.Empty },
                     { "Description", topic.Description ?? string.Empty },
                     { "Objectives", topic.Objectives ?? string.Empty },
-                    { "Content", string.Empty },
-                    { "Context", string.Empty }
+                    { "Content", topic.Content ?? string.Empty },
+                    { "Context", topic.Context ?? string.Empty }
                 };
 
                 var skipMessages = new List<string>();
