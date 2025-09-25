@@ -308,5 +308,15 @@ namespace App.BLL.Services
                 _promptSemaphore.Release();
             }
         }
+
+        /// <summary>
+        /// Helper: compute cosine similarity between two embeddings (returns double in [-1,1]).
+        /// </summary>
+        public double CosineSimilarity(float[]? a, float[]? b)
+        {
+            if (a == null || b == null) return 0.0;
+            if (a.Length != b.Length) return 0.0;
+            return (double)VectorMath.CosineSimilarity(a, b);
+        }
     }
 }
