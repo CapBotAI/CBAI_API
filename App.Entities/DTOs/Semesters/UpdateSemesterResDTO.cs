@@ -6,6 +6,7 @@ public class UpdateSemesterResDTO
 {
     public int Id { get; set; }
     public string Name { get; set; } = null!;
+    public string? Description { get; set; }
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
     public DateTime UpdatedAt { get; set; }
@@ -17,6 +18,7 @@ public class UpdateSemesterResDTO
         Name = semester.Name;
         StartDate = semester.StartDate;
         EndDate = semester.EndDate;
+        Description = semester.Description;
         UpdatedAt = semester.LastModifiedAt ?? DateTime.Now;
         UpdatedBy = semester.LastModifiedBy ?? string.Empty;
     }

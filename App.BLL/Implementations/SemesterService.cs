@@ -41,6 +41,20 @@ public class SemesterService : ISemesterService
 
             var semesterRepo = _unitOfWork.GetRepo<App.Entities.Entities.App.Semester>();
 
+            var existedName = await semesterRepo.GetSingleAsync(new QueryBuilder<Semester>()
+                .WithPredicate(x => x.Name == createSemesterDTO.Name)
+                .WithTracking(false)
+                .Build());
+            if (existedName != null)
+            {
+                return new BaseResponseModel<CreateSemesterResDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Tên học kỳ đã tồn tại"
+                };
+            }
+
             var semester = createSemesterDTO.GetEntity();
             semester.CreatedBy = user.UserName;
             semester.CreatedAt = DateTime.Now;
@@ -109,6 +123,21 @@ public class SemesterService : ISemesterService
                     IsSuccess = false,
                     StatusCode = StatusCodes.Status404NotFound,
                     Message = "Học kỳ không tồn tại"
+                };
+            }
+
+            var existedName = await semesterRepo.GetSingleAsync(new QueryBuilder<Semester>()
+            .WithPredicate(x => x.Name == updateSemesterDTO.Name && x.Id != updateSemesterDTO.Id)
+            .WithTracking(false)
+            .Build());
+
+            if (existedName != null)
+            {
+                return new BaseResponseModel<UpdateSemesterResDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Tên học kỳ đã tồn tại"
                 };
             }
 
