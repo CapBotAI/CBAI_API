@@ -143,77 +143,77 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
 
     // THÊM method này vào class EvaluationCriteriaService
 
-    public async Task<BaseResponseModel<List<EvaluationCriteriaResponseDTO>>> GetCurrentSemesterCriteriaAsync()
+public async Task<BaseResponseModel<List<EvaluationCriteriaResponseDTO>>> GetCurrentSemesterCriteriaAsync()
+{
+    try
     {
-        try
+        // 1. Lấy semester hiện tại
+        var semesterRepo = _unitOfWork.GetRepo<Semester>();
+        var currentDate = DateTime.Now;
+        
+        var currentSemester = await semesterRepo.GetSingleAsync(new QueryOptions<Semester>
         {
-            // 1. Lấy semester hiện tại
-            var semesterRepo = _unitOfWork.GetRepo<Semester>();
-            var currentDate = DateTime.Now;
+            Predicate = x => x.IsActive && 
+                           x.DeletedAt == null && 
+                           x.StartDate <= currentDate && 
+                           x.EndDate >= currentDate,
+            Tracked = false
+        });
 
-            var currentSemester = await semesterRepo.GetSingleAsync(new QueryOptions<Semester>
+        // 2. Lấy criteria theo semester hiện tại
+        var criteriaRepo = _unitOfWork.GetRepo<EvaluationCriteria>();
+        
+        IEnumerable<EvaluationCriteria> criteriaEnumerable; // ✅ Đổi thành IEnumerable
+        
+        if (currentSemester != null)
+        {
+            // Có semester hiện tại -> lấy criteria của semester này + criteria chung
+            criteriaEnumerable = await criteriaRepo.GetAllAsync(new QueryOptions<EvaluationCriteria>
             {
-                Predicate = x => x.IsActive &&
-                               x.DeletedAt == null &&
-                               x.StartDate <= currentDate &&
-                               x.EndDate >= currentDate,
-                Tracked = false
+                Predicate = x => x.IsActive && 
+                               (x.SemesterId == currentSemester.Id || x.SemesterId == null),
+                Tracked = false,
+                OrderBy = q => q.OrderBy(x => x.Name)
             });
-
-            // 2. Lấy criteria theo semester hiện tại
-            var criteriaRepo = _unitOfWork.GetRepo<EvaluationCriteria>();
-
-            IEnumerable<EvaluationCriteria> criteriaEnumerable; // ✅ Đổi thành IEnumerable
-
-            if (currentSemester != null)
-            {
-                // Có semester hiện tại -> lấy criteria của semester này + criteria chung
-                criteriaEnumerable = await criteriaRepo.GetAllAsync(new QueryOptions<EvaluationCriteria>
-                {
-                    Predicate = x => x.IsActive &&
-                                   (x.SemesterId == currentSemester.Id || x.SemesterId == null),
-                    Tracked = false,
-                    OrderBy = q => q.OrderBy(x => x.Name)
-                });
-            }
-            else
-            {
-                // Không có semester hiện tại -> chỉ lấy criteria chung
-                criteriaEnumerable = await criteriaRepo.GetAllAsync(new QueryOptions<EvaluationCriteria>
-                {
-                    Predicate = x => x.IsActive && x.SemesterId == null,
-                    Tracked = false,
-                    OrderBy = q => q.OrderBy(x => x.Name)
-                });
-            }
-
-            // ✅ Convert sang List nếu cần
-            var criteria = criteriaEnumerable.ToList();
-
-            var responseItems = _mapper.Map<List<EvaluationCriteriaResponseDTO>>(criteria);
-
-            var message = currentSemester != null
-                ? $"Lấy tiêu chí đánh giá của học kỳ '{currentSemester.Name}' thành công"
-                : "Lấy tiêu chí đánh giá chung thành công (không có học kỳ hiện tại)";
-
-            return new BaseResponseModel<List<EvaluationCriteriaResponseDTO>>
-            {
-                IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK,
-                Message = message,
-                Data = responseItems
-            };
         }
-        catch (Exception ex)
+        else
         {
-            return new BaseResponseModel<List<EvaluationCriteriaResponseDTO>>
+            // Không có semester hiện tại -> chỉ lấy criteria chung
+            criteriaEnumerable = await criteriaRepo.GetAllAsync(new QueryOptions<EvaluationCriteria>
             {
-                IsSuccess = false,
-                StatusCode = StatusCodes.Status500InternalServerError,
-                Message = $"Lỗi hệ thống: {ex.Message}"
-            };
+                Predicate = x => x.IsActive && x.SemesterId == null,
+                Tracked = false,
+                OrderBy = q => q.OrderBy(x => x.Name)
+            });
         }
+
+        // ✅ Convert sang List nếu cần
+        var criteria = criteriaEnumerable.ToList();
+
+        var responseItems = _mapper.Map<List<EvaluationCriteriaResponseDTO>>(criteria);
+
+        var message = currentSemester != null 
+            ? $"Lấy tiêu chí đánh giá của học kỳ '{currentSemester.Name}' thành công"
+            : "Lấy tiêu chí đánh giá chung thành công (không có học kỳ hiện tại)";
+
+        return new BaseResponseModel<List<EvaluationCriteriaResponseDTO>>
+        {
+            IsSuccess = true,
+            StatusCode = StatusCodes.Status200OK,
+            Message = message,
+            Data = responseItems
+        };
     }
+    catch (Exception ex)
+    {
+        return new BaseResponseModel<List<EvaluationCriteriaResponseDTO>>
+        {
+            IsSuccess = false,
+            StatusCode = StatusCodes.Status500InternalServerError,
+            Message = $"Lỗi hệ thống: {ex.Message}"
+        };
+    }
+}
     public async Task<BaseResponseModel<EvaluationCriteriaResponseDTO>> UpdateAsync(
         UpdateEvaluationCriteriaDTO updateDTO)
     {
@@ -372,7 +372,11 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
             var criteria = await repo.GetSingleAsync(new QueryOptions<EvaluationCriteria>
             {
                 Predicate = x => x.Id == id && x.IsActive,
-                Tracked = false
+                Tracked = false,
+                IncludeProperties = new List<System.Linq.Expressions.Expression<Func<EvaluationCriteria, object>>>
+                {
+                    x => x.Semester
+                }
             });
 
             if (criteria == null)
@@ -386,6 +390,7 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
             }
 
             var responseDTO = _mapper.Map<EvaluationCriteriaResponseDTO>(criteria);
+
             return new BaseResponseModel<EvaluationCriteriaResponseDTO>
             {
                 IsSuccess = true,
@@ -415,7 +420,11 @@ public class EvaluationCriteriaService : IEvaluationCriteriaService
             {
                 Predicate = x => x.IsActive,
                 Tracked = false,
-                OrderBy = q => q.OrderBy(x => x.CreatedAt)
+                OrderBy = q => q.OrderBy(x => x.CreatedAt),
+                IncludeProperties = new List<System.Linq.Expressions.Expression<Func<EvaluationCriteria, object>>>
+                {
+                    x => x.Semester
+                }
             });
 
             var totalItems = await query.CountAsync();

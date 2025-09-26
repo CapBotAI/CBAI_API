@@ -15,13 +15,36 @@ namespace App.BLL.Services
     {
         private readonly string _apiKey;
         private readonly HttpClient _httpClient;
+        private readonly string _embeddingModel;
+        private readonly string _promptModel;
+        private readonly string _region;
         // Limit concurrent prompt-generation calls to avoid bursting the provider
         private static readonly System.Threading.SemaphoreSlim _promptSemaphore = new System.Threading.SemaphoreSlim(4);
 
         public GeminiAIService(IConfiguration config)
         {
             _apiKey = config["GeminiAI:ApiKey"] ?? throw new ArgumentNullException("GeminiAI:ApiKey missing");
+            _embeddingModel = config["GeminiAI:EmbeddingModel"] ?? "gemini-embedding-001";
+            _promptModel = config["GeminiAI:PromptModel"] ?? "gemini-1.5-flash";
+            _region = config["GeminiAI:Region"] ?? "us-central1";
+
             _httpClient = new HttpClient();
+
+            // Add API key as a header as some endpoints prefer header-based keys or additional header checks.
+            // Also set a simple User-Agent to help with provider logs.
+            try
+            {
+                if (!_httpClient.DefaultRequestHeaders.Contains("x-goog-api-key"))
+                    _httpClient.DefaultRequestHeaders.Add("x-goog-api-key", _apiKey);
+                if (!_httpClient.DefaultRequestHeaders.UserAgent.TryParseAdd("CapBot/1.0"))
+                {
+                    // ignore user-agent parse failures
+                }
+            }
+            catch
+            {
+                // Don't fail construction if headers can't be set; they'll be attempted per-request.
+            }
         }
 
         public async Task<float[]> GetEmbeddingAsync(string text)
@@ -31,8 +54,8 @@ namespace App.BLL.Services
                 throw new ArgumentException("Input text cannot be null or empty.", nameof(text));
             }
 
-            // Use the correct embedding model
-            var model = "gemini-embedding-001";
+            // Use the configured embedding model (supports simple model name or a fully-qualified model path)
+            var model = _embeddingModel ?? "gemini-embedding-001";
 
             // Adjust payload structure for embedding requests
             var body = new
@@ -47,7 +70,16 @@ namespace App.BLL.Services
                 }
             };
 
-            var url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:embedContent?key={_apiKey}";
+            // Build URL: if a fully-qualified model path was supplied (contains '/'), call that directly.
+            string url;
+            if (model.Contains("/"))
+            {
+                url = $"https://{model}:embedContent?key={_apiKey}";
+            }
+            else
+            {
+                url = $"https://generativelanguage.googleapis.com/v1beta/models/{model}:embedContent?key={_apiKey}";
+            }
 
             try
             {
@@ -182,7 +214,18 @@ namespace App.BLL.Services
         public async Task<string> GetPromptCompletionAsync(string prompt)
         {
             var body = new { contents = new[] { new { parts = new[] { new { text = prompt } } } } };
-            var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={_apiKey}"; // Model
+
+            // Use configured prompt model; allow fully-qualified path or simple model name
+            var promptModel = _promptModel ?? "gemini-1.5-flash";
+            string url;
+            if (promptModel.Contains("/"))
+            {
+                url = $"https://{promptModel}:generateContent?key={_apiKey}";
+            }
+            else
+            {
+                url = $"https://generativelanguage.googleapis.com/v1beta/models/{promptModel}:generateContent?key={_apiKey}";
+            } // Model
 
             // Ensure we don't overwhelm the provider with parallel requests
             await _promptSemaphore.WaitAsync();
@@ -197,18 +240,33 @@ namespace App.BLL.Services
 
                 for (int attempt = 1; attempt <= maxAttempts; attempt++)
                 {
-                    try
-                    {
-                        resp = await _httpClient.PostAsync(url, new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json"));
-                        respContent = await resp.Content.ReadAsStringAsync();
+                        try
+                        {
+                            var request = new HttpRequestMessage(HttpMethod.Post, url)
+                            {
+                                Content = new StringContent(JsonSerializer.Serialize(body), Encoding.UTF8, "application/json")
+                            };
+
+                            // Ensure API key header exists per-request (some infra blocks query keys)
+                            if (!request.Headers.Contains("x-goog-api-key")) request.Headers.Add("x-goog-api-key", _apiKey);
+                            if (!request.Headers.UserAgent.TryParseAdd("CapBot/1.0")) { }
+
+                            resp = await _httpClient.SendAsync(request);
+                            respContent = await resp.Content.ReadAsStringAsync();
 
                         if (resp.IsSuccessStatusCode)
                             break;
 
-                        // If client error other than 429, don't retry
+                        // If client error other than 429, don't retry - treat as non-fatal and return empty so callers can fallback
                         if ((int)resp.StatusCode >= 400 && (int)resp.StatusCode < 500 && resp.StatusCode != (System.Net.HttpStatusCode)429)
                         {
-                            throw new Exception($"Gemini Prompt API error: {resp.StatusCode}");
+                            // Log details for diagnostics (do not include API keys)
+                            Console.WriteLine($"Gemini Prompt API client error (no-retry): {resp.StatusCode}. Response: {respContent}");
+                            if (resp.StatusCode == System.Net.HttpStatusCode.NotFound)
+                            {
+                                Console.WriteLine("Gemini endpoint returned 404 NotFound - check model name, API key permissions, and whether the project has access to the requested model.");
+                            }
+                            return string.Empty;
                         }
 
                         // If 429, check Retry-After header
@@ -241,12 +299,16 @@ namespace App.BLL.Services
                 }
 
                 if (resp == null)
-                    throw new Exception("No response from Gemini Prompt API.");
+                {
+                    Console.WriteLine("Gemini Prompt API: no response after retries.");
+                    return string.Empty;
+                }
 
                 if (!resp.IsSuccessStatusCode)
                 {
-                    // Provide a concise error but log full content in server logs (caller should log details)
-                    throw new Exception($"Gemini Prompt API error after retries: {resp.StatusCode}");
+                    // Log details and return empty so caller can use its fallback logic
+                    Console.WriteLine($"Gemini Prompt API error after retries: {resp.StatusCode}. Response: {respContent}");
+                    return string.Empty;
                 }
 
                 // Parse response robustly and extract the first textual candidate
@@ -300,13 +362,25 @@ namespace App.BLL.Services
                 }
                 catch (JsonException ex)
                 {
-                    throw new Exception($"Failed to parse Gemini Prompt API response: {ex.Message}. Response omitted for brevity.");
+                    // Log parse failure and return empty so callers can fallback
+                    Console.WriteLine($"Failed to parse Gemini Prompt API response: {ex.Message}. Raw response: {respContent}");
+                    return string.Empty;
                 }
             }
             finally
             {
                 _promptSemaphore.Release();
             }
+        }
+
+        /// <summary>
+        /// Helper: compute cosine similarity between two embeddings (returns double in [-1,1]).
+        /// </summary>
+        public double CosineSimilarity(float[]? a, float[]? b)
+        {
+            if (a == null || b == null) return 0.0;
+            if (a.Length != b.Length) return 0.0;
+            return (double)VectorMath.CosineSimilarity(a, b);
         }
     }
 }

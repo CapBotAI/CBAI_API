@@ -569,6 +569,12 @@ public class ReviewService : IReviewService
                 {
                     x => x.ReviewCriteriaScores
                 },
+                // Ensure nested navigation (Criteria on each ReviewCriteriaScore) is included so AutoMapper
+                // can populate Criteria in CriteriaScoreResponseDTO and controller projections won't get null refs
+                AdvancedIncludes = new List<App.DAL.Queries.Interfaces.IIncludeSpecification<Review>>
+                {
+                    new App.DAL.Queries.Implementations.ComplexIncludeSpecification<Review>("ReviewCriteriaScores.Criteria")
+                },
                 Tracked = false
             });
 
@@ -613,6 +619,10 @@ public class ReviewService : IReviewService
                 IncludeProperties = new List<System.Linq.Expressions.Expression<Func<Review, object>>>
                 {
                     x => x.ReviewCriteriaScores
+                },
+                AdvancedIncludes = new List<App.DAL.Queries.Interfaces.IIncludeSpecification<Review>>
+                {
+                    new App.DAL.Queries.Implementations.ComplexIncludeSpecification<Review>("ReviewCriteriaScores.Criteria")
                 },
                 Tracked = false,
                 OrderBy = q => q.OrderByDescending(x => x.CreatedAt)
@@ -797,6 +807,10 @@ public class ReviewService : IReviewService
                 IncludeProperties = new List<System.Linq.Expressions.Expression<Func<Review, object>>>
                 {
                     x => x.ReviewCriteriaScores
+                },
+                AdvancedIncludes = new List<App.DAL.Queries.Interfaces.IIncludeSpecification<Review>>
+                {
+                    new App.DAL.Queries.Implementations.ComplexIncludeSpecification<Review>("ReviewCriteriaScores.Criteria")
                 },
                 Tracked = false,
                 OrderBy = q => q.OrderByDescending(x => x.CreatedAt)

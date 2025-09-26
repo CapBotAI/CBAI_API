@@ -7,6 +7,7 @@ public class CreateSemesterResDTO
     public int Id { get; set; }
 
     public string Name { get; set; } = null!;
+    public string? Description { get; set; }
 
     public DateTime StartDate { get; set; }
 
@@ -20,6 +21,7 @@ public class CreateSemesterResDTO
     {
         Id = semester.Id;
         Name = semester.Name;
+        Description = semester.Description;
         StartDate = semester.StartDate;
         EndDate = semester.EndDate;
         CreatedBy = semester.CreatedBy;

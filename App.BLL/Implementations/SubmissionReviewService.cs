@@ -230,9 +230,16 @@ public class SubmissionReviewService : ISubmissionReviewService
                 Predicate = x => x.Id == submissionId,
                 IncludeProperties = new List<System.Linq.Expressions.Expression<Func<Submission, object>>>
                 {
-                    x => x.TopicVersion.Topic,
+                    // load the primary Topic navigation (use Topic.EN_Title instead of TopicVersion)
+                    x => x.Topic,
                     x => x.SubmittedByUser,
                     x => x.ReviewerAssignments
+                },
+                AdvancedIncludes = new List<App.DAL.Queries.Interfaces.IIncludeSpecification<Submission>>
+                {
+                    // ensure nested reviewer assignment reviews/reviewer are loaded
+                    new App.DAL.Queries.Implementations.ComplexIncludeSpecification<Submission>("ReviewerAssignments.Reviews"),
+                    new App.DAL.Queries.Implementations.ComplexIncludeSpecification<Submission>("ReviewerAssignments.Reviewer")
                 },
                 Tracked = false
             });
@@ -250,12 +257,13 @@ public class SubmissionReviewService : ISubmissionReviewService
             var summary = new SubmissionReviewSummaryDTO
             {
                 SubmissionId = submission.Id,
-                TopicTitle = submission.TopicVersion.Topic.EN_Title,
-                StudentName = submission.SubmittedByUser.UserName ?? "N/A",
+                // Use Submission.Topic as the canonical title source
+                TopicTitle = submission.Topic?.EN_Title ?? "N/A",
+                StudentName = submission.SubmittedByUser?.UserName ?? "N/A",
                 SubmissionStatus = submission.Status,
                 RequiredReviewerCount = 2,
                 CompletedReviewCount = submission.ReviewerAssignments
-                    .SelectMany(ra => ra.Reviews)
+                    .SelectMany(ra => ra.Reviews ?? new List<Review>())
                     .Count(r => r.Status == ReviewStatus.Submitted && r.IsActive)
             };
 
@@ -266,7 +274,11 @@ public class SubmissionReviewService : ISubmissionReviewService
                 Predicate = x => submission.ReviewerAssignments.Select(ra => ra.Id).Contains(x.AssignmentId) && x.IsActive,
                 IncludeProperties = new List<System.Linq.Expressions.Expression<Func<Review, object>>>
                 {
-                    x => x.Assignment.Reviewer
+                    x => x.Assignment
+                },
+                AdvancedIncludes = new List<App.DAL.Queries.Interfaces.IIncludeSpecification<Review>>
+                {
+                    new App.DAL.Queries.Implementations.ComplexIncludeSpecification<Review>("Assignment.Reviewer")
                 },
                 Tracked = false
             });
@@ -285,9 +297,13 @@ public class SubmissionReviewService : ISubmissionReviewService
 
             // Tính điểm trung bình
             var submittedReviews = summary.Reviews.Where(r => r.Status == ReviewStatus.Submitted).ToList();
-            if (submittedReviews.Any() && submittedReviews.All(r => r.OverallScore.HasValue))
+            if (submittedReviews.Any())
             {
-                summary.FinalScore = submittedReviews.Average(r => r.OverallScore.Value);
+                var scores = submittedReviews.Where(r => r.OverallScore.HasValue).Select(r => r.OverallScore!.Value).ToList();
+                if (scores.Any())
+                {
+                    summary.FinalScore = scores.Average();
+                }
             }
 
             // Kiểm tra xung đột

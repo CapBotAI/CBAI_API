@@ -12,4 +12,9 @@ public class EvaluationCriteriaResponseDTO
     public string? CreatedBy { get; set; }
     public string? LastModifiedBy { get; set; }
     public bool IsActive { get; set; }
+    
+    /// <summary>
+    /// Tên semester áp dụng tiêu chí này (null nếu là tiêu chí chung)
+    /// </summary>
+    public string? SemesterName { get; set; }
 }
