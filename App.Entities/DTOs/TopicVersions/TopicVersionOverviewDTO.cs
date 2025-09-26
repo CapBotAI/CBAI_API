@@ -17,7 +17,7 @@ public class TopicVersionOverviewDTO
     public string? SubmittedByUserName { get; set; }
     public DateTime CreatedAt { get; set; }
     public string? CreatedBy { get; set; }
-
+    public string? PotentialDuplicate { get; set; }
     public TopicVersionOverviewDTO(TopicVersion topicVersion)
     {
         Id = topicVersion.Id;
@@ -31,5 +31,6 @@ public class TopicVersionOverviewDTO
         SubmittedByUserName = topicVersion.SubmittedByUser?.UserName;
         CreatedAt = topicVersion.CreatedAt;
         CreatedBy = topicVersion.CreatedBy;
+        PotentialDuplicate = topicVersion.PotentialDuplicate;
     }
 }

@@ -18,6 +18,7 @@ public class CreateTopicResDTO
     public string SemesterName { get; set; } = null!;
     public int MaxStudents { get; set; }
     public bool IsApproved { get; set; }
+    public string? PotentialDuplicate { get; set; }
     public DateTime? CreatedAt { get; set; }
     public string? CreatedBy { get; set; }
     public int CurrentVersionNumber { get; set; }

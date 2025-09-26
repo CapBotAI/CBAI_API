@@ -40,6 +40,8 @@ public partial class TopicVersion : CommonDataModel
     public string? Context { get; set; }
     public string? Content { get; set; }
 
+    public string? PotentialDuplicate { get; set; }
+
     public virtual Topic Topic { get; set; } = null!;
     public virtual User? SubmittedByUser { get; set; }
     public virtual ICollection<Submission> Submissions { get; set; } = new List<Submission>();

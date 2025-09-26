@@ -227,6 +227,7 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.IsLegacy).HasDefaultValue(false);
             entity.Property(e => e.IsApproved).HasDefaultValue(true);
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
+            
 
             entity.HasOne(d => d.Supervisor)
                 .WithMany(p => p.Topics)

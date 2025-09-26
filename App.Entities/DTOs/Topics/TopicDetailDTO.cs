@@ -40,6 +40,7 @@ public class TopicDetailDTO
     public int TotalSubmissions { get; set; }
 
     public bool HasSubmitted { get; set; }
+    public string? PotentialDuplicate { get; set; }
 
     public SubmissionStatus? LatestSubmissionStatus { get; set; }
     public DateTime? LatestSubmittedAt { get; set; }
@@ -70,7 +71,7 @@ public class TopicDetailDTO
         IsApproved = topic.IsApproved;
         IsLegacy = topic.IsLegacy;
         TotalVersions = topic.TopicVersions?.Count ?? 0;
-
+        PotentialDuplicate = topic.PotentialDuplicate;
         
 
         CreatedAt = topic.CreatedAt;

@@ -31,6 +31,7 @@ public class CreateTopicVersionDTO : IEntity<TopicVersion>, IValidationPipeline
 
     public string? Context { get; set; }
     public string? Content { get; set; }
+    public string? PotentialDuplicate { get; set; }
 
     public TopicVersion GetEntity()
     {
@@ -47,7 +48,8 @@ public class CreateTopicVersionDTO : IEntity<TopicVersion>, IValidationPipeline
             VN_title = VN_title?.Trim(),
             Problem = Problem?.Trim(),
             Context = Context?.Trim(),
-            Content = Content?.Trim()
+            Content = Content?.Trim(),
+            PotentialDuplicate = PotentialDuplicate?.Trim()
         };
     }
 

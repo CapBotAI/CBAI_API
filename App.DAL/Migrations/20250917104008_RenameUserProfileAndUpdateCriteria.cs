@@ -49,5 +49,6 @@ namespace App.DAL.Migrations
                 newName: "profiles");
 
         }
+
     }
 }
