@@ -30,6 +30,7 @@ public class TopicVersionDetailDTO
 
     public string? Context { get; set; }
     public string? Content { get; set; }
+    public string? PotentialDuplicate { get; set; }
 
     public TopicVersionDetailDTO() { }
 
@@ -57,5 +58,7 @@ public class TopicVersionDetailDTO
         Problem = topicVersion.Problem;
         Context = topicVersion.Context;
         Content = topicVersion.Content;
+        PotentialDuplicate = topicVersion.PotentialDuplicate;
+       
     }
 }

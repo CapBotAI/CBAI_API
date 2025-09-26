@@ -20,6 +20,7 @@ public class TopicOverviewResDTO
     public int MaxStudents { get; set; }
     public bool IsApproved { get; set; }
     public bool IsLegacy { get; set; }
+    public string? PotentialDuplicate { get; set; }
 
     public int? CurrentVersionNumber { get; set; }
     public TopicStatus? CurrentVersionStatus { get; set; }
@@ -50,7 +51,7 @@ public class TopicOverviewResDTO
         MaxStudents = topic.MaxStudents;
         IsApproved = topic.IsApproved;
         IsLegacy = topic.IsLegacy;
-
+        PotentialDuplicate= topic.PotentialDuplicate;
 
         CreatedAt = topic.CreatedAt;
 

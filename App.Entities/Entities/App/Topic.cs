@@ -34,6 +34,8 @@ public partial class Topic : CommonDataModel
     public string? Context { get; set; }
     public string? Content { get; set; }
 
+    public string? PotentialDuplicate { get; set; }
+
     public virtual User Supervisor { get; set; } = null!;
     public virtual TopicCategory? Category { get; set; }
     public virtual Semester Semester { get; set; } = null!;

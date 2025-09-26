@@ -27,6 +27,7 @@ public class CreaterTopicVersionResDTO
 
     public string? Context { get; set; }
     public string? Content { get; set; }
+    public string? PotentialDuplicate { get; set; }
 
     public CreaterTopicVersionResDTO(TopicVersion topicVersion, EntityFile? entityFile)
     {
@@ -50,5 +51,6 @@ public class CreaterTopicVersionResDTO
         Problem = topicVersion.Problem;
         Context = topicVersion.Context;
         Content = topicVersion.Content;
+       PotentialDuplicate = topicVersion.PotentialDuplicate;
     }
 }

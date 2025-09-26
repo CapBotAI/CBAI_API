@@ -30,9 +30,9 @@ public class CreateTopicDTO : IValidationPipeline, IEntity<Topic>
     [Required(ErrorMessage = "Học kỳ không được để trống")]
     public int SemesterId { get; set; }
 
-    [Range(1, 5, ErrorMessage = "Số lượng sinh viên tối đa phải từ 1 đến 5")]
-    public int MaxStudents { get; set; } = 1;
-
+    [Range(4, 5, ErrorMessage = "Số lượng sinh viên tối đa phải từ 1 đến 5")]
+    public int MaxStudents { get; set; } = 4;
+    public string? PotentialDuplicate { get; set; } = null;
     public long? FileId { get; set; }
 
     public Topic GetEntity()
@@ -50,6 +50,7 @@ public class CreateTopicDTO : IValidationPipeline, IEntity<Topic>
             Problem = Problem?.Trim(),
             Context = Context?.Trim(),
             Content = Content?.Trim(),
+           PotentialDuplicate = PotentialDuplicate?.Trim()
         };
     }
 
