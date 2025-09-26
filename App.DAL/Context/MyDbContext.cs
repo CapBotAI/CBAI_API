@@ -424,7 +424,7 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.ToTable("review_criteria_scores");
             entity.HasKey(e => e.Id);
             entity.Property(e => e.Id).ValueGeneratedOnAdd();
-            entity.Property(e => e.Score).HasPrecision(4, 2).IsRequired();
+            entity.Property(e => e.Score).HasPrecision(6, 2).IsRequired();
             entity.Property(e => e.CreatedAt).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(d => d.Review)
