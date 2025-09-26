@@ -1,0 +1,621 @@
+2025-09-27 01:29:51.318 +07:00 [DBG] An 'IServiceProvider' was created for internal use by Entity Framework.
+2025-09-27 01:29:51.427 +07:00 [INF] User profile is available. Using 'C:\Users\ANDIM\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-09-27 01:29:51.655 +07:00 [DBG] No relationship from 'ReviewerAssignment' to 'User' has been configured by convention because there are multiple properties on one entity type - {'AssignedByUser', 'Reviewer'} that could be matched with the properties on the other entity type - {'ReviewerAssignments'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.681 +07:00 [DBG] No relationship from 'SubmissionWorkflowLog' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromStateLogs', 'ToStateLogs'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.698 +07:00 [DBG] No relationship from 'User' to 'ReviewerAssignment' has been configured by convention because there are multiple properties on one entity type - {'ReviewerAssignments'} that could be matched with the properties on the other entity type - {'AssignedByUser', 'Reviewer'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.700 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.700 +07:00 [DBG] No relationship from 'WorkflowState' to 'WorkflowTransition' has been configured by convention because there are multiple properties on one entity type - {'FromTransitions', 'ToTransitions'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.701 +07:00 [DBG] No relationship from 'WorkflowTransition' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromTransitions', 'ToTransitions'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.907 +07:00 [DBG] No relationship from 'ReviewerAssignment' to 'User' has been configured by convention because there are multiple properties on one entity type - {'AssignedByUser', 'Reviewer'} that could be matched with the properties on the other entity type - {'ReviewerAssignments'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.909 +07:00 [DBG] No relationship from 'User' to 'ReviewerAssignment' has been configured by convention because there are multiple properties on one entity type - {'ReviewerAssignments'} that could be matched with the properties on the other entity type - {'AssignedByUser', 'Reviewer'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.926 +07:00 [DBG] No relationship from 'WorkflowTransition' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromTransitions', 'ToTransitions'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.926 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.927 +07:00 [DBG] No relationship from 'WorkflowState' to 'WorkflowTransition' has been configured by convention because there are multiple properties on one entity type - {'FromTransitions', 'ToTransitions'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.928 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.933 +07:00 [DBG] No relationship from 'SubmissionWorkflowLog' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromStateLogs', 'ToStateLogs'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.933 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 01:29:51.989 +07:00 [DBG] The index {'LecturerId'} was not created on entity type 'LecturerSkill' as the properties are already covered by the index {'LecturerId', 'SkillTag'}.
+2025-09-27 01:29:51.990 +07:00 [DBG] The index {'SemesterId'} was not created on entity type 'Phase' as the properties are already covered by the index {'SemesterId', 'PhaseTypeId'}.
+2025-09-27 01:29:51.990 +07:00 [DBG] The index {'AssignmentId'} was not created on entity type 'Review' as the properties are already covered by the index {'AssignmentId', 'Status'}.
+2025-09-27 01:29:51.991 +07:00 [DBG] The index {'ReviewId'} was not created on entity type 'ReviewComment' as the properties are already covered by the index {'ReviewId', 'SectionName'}.
+2025-09-27 01:29:51.991 +07:00 [DBG] The index {'ReviewId'} was not created on entity type 'ReviewCriteriaScore' as the properties are already covered by the index {'ReviewId', 'CriteriaId'}.
+2025-09-27 01:29:51.992 +07:00 [DBG] The index {'ReviewerId'} was not created on entity type 'ReviewerAssignment' as the properties are already covered by the index {'ReviewerId', 'Status'}.
+2025-09-27 01:29:51.992 +07:00 [DBG] The index {'SubmissionId'} was not created on entity type 'ReviewerAssignment' as the properties are already covered by the index {'SubmissionId', 'ReviewerId'}.
+2025-09-27 01:29:51.992 +07:00 [DBG] The index {'ReviewerId'} was not created on entity type 'ReviewerPerformance' as the properties are already covered by the index {'ReviewerId', 'SemesterId'}.
+2025-09-27 01:29:51.992 +07:00 [DBG] The index {'PhaseId'} was not created on entity type 'Submission' as the properties are already covered by the index {'PhaseId', 'Status'}.
+2025-09-27 01:29:51.993 +07:00 [DBG] The index {'PhaseId'} was not created on entity type 'Submission' as the properties are already covered by the index {'PhaseId', 'Status', 'SubmittedAt'}.
+2025-09-27 01:29:51.993 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'Submission' as the properties are already covered by the index {'TopicId', 'PhaseId', 'SubmissionRound'}.
+2025-09-27 01:29:51.993 +07:00 [DBG] The index {'SubmissionId'} was not created on entity type 'SubmissionWorkflowLog' as the properties are already covered by the index {'SubmissionId', 'CreatedAt'}.
+2025-09-27 01:29:51.994 +07:00 [DBG] The index {'UserId'} was not created on entity type 'SystemNotification' as the properties are already covered by the index {'UserId', 'IsRead', 'CreatedAt'}.
+2025-09-27 01:29:51.994 +07:00 [DBG] The index {'SemesterId'} was not created on entity type 'Topic' as the properties are already covered by the index {'SemesterId', 'IsApproved'}.
+2025-09-27 01:29:51.994 +07:00 [DBG] The index {'SupervisorId'} was not created on entity type 'Topic' as the properties are already covered by the index {'SupervisorId', 'SemesterId'}.
+2025-09-27 01:29:51.995 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'TopicVersion' as the properties are already covered by the index {'TopicId', 'Status'}.
+2025-09-27 01:29:51.995 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'TopicVersion' as the properties are already covered by the index {'TopicId', 'VersionNumber'}.
+2025-09-27 01:29:51.995 +07:00 [DBG] The index {'UserId'} was not created on entity type 'UserRole' as the properties are already covered by the index {'UserId', 'RoleId'}.
+2025-09-27 01:29:51.995 +07:00 [DBG] The index {'UserId'} was not created on entity type 'UserToken' as the properties are already covered by the index {'UserId', 'LoginProvider', 'Name'}.
+2025-09-27 01:29:52.227 +07:00 [WRN] The 'ProficiencyLevels' property 'ProficiencyLevel' on entity type 'LecturerSkill' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ProficiencyLevels' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 01:29:52.227 +07:00 [WRN] The 'ReviewRecommendations' property 'Recommendation' on entity type 'Review' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ReviewRecommendations' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 01:29:52.228 +07:00 [WRN] The 'ReviewStatus' property 'Status' on entity type 'Review' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ReviewStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 01:29:52.229 +07:00 [WRN] The 'CommentTypes' property 'CommentType' on entity type 'ReviewComment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'CommentTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 01:29:52.230 +07:00 [WRN] The 'PriorityLevels' property 'Priority' on entity type 'ReviewComment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'PriorityLevels' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 01:29:52.230 +07:00 [WRN] The 'AssignmentTypes' property 'AssignmentType' on entity type 'ReviewerAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AssignmentTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 01:29:52.231 +07:00 [WRN] The 'AssignmentStatus' property 'Status' on entity type 'ReviewerAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AssignmentStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 01:29:52.231 +07:00 [WRN] The 'AiCheckStatus' property 'AiCheckStatus' on entity type 'Submission' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AiCheckStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 01:29:52.232 +07:00 [WRN] The 'SubmissionStatus' property 'Status' on entity type 'Submission' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'SubmissionStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 01:29:52.232 +07:00 [WRN] The 'NotificationTypes' property 'Type' on entity type 'SystemNotification' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'NotificationTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 01:29:52.233 +07:00 [WRN] The 'TopicStatus' property 'Status' on entity type 'TopicVersion' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'TopicStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 01:29:52.461 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-09-27 01:29:52.544 +07:00 [DBG] Compiling query expression: 
+'DbSet<Role>()
+    .FirstOrDefault(r => r.NormalizedName == __normalizedName_0)'
+2025-09-27 01:29:52.689 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<Role>(
+    asyncEnumerable: new SingleQueryingEnumerable<Role>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: Role.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Role.ConcurrencyStamp (string), 1], [Property: Role.IsAdmin (bool) Required, 2], [Property: Role.Name (string), 3], [Property: Role.NormalizedName (string), 4] }
+            SELECT TOP(1) r.Id, r.ConcurrencyStamp, r.IsAdmin, r.Name, r.NormalizedName
+            FROM roles AS r
+            WHERE r.NormalizedName == @__normalizedName_0), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, Role>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-09-27 01:29:52.730 +07:00 [DBG] Creating DbConnection.
+2025-09-27 01:29:52.759 +07:00 [DBG] Created DbConnection. (26ms).
+2025-09-27 01:29:52.764 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:52.968 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:52.972 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 01:29:52.978 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (4ms).
+2025-09-27 01:29:52.985 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (13ms).
+2025-09-27 01:29:52.991 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 01:29:53.066 +07:00 [INF] Executed DbCommand (74ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 01:29:53.104 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 01:29:53.125 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.129 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 58ms reading results.
+2025-09-27 01:29:53.131 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.135 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (3ms).
+2025-09-27 01:29:53.139 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.140 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.140 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 01:29:53.140 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.140 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.140 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 01:29:53.144 +07:00 [INF] Executed DbCommand (4ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 01:29:53.145 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 01:29:53.146 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.146 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 01:29:53.146 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.146 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 01:29:53.146 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.147 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.147 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 01:29:53.147 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.147 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.147 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 01:29:53.148 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 01:29:53.148 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 01:29:53.149 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.149 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 01:29:53.149 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.149 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 01:29:53.150 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.150 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.150 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 01:29:53.150 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.151 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.151 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 01:29:53.151 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 01:29:53.152 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 01:29:53.152 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.152 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 01:29:53.152 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.153 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 01:29:53.159 +07:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .SingleOrDefault(u => u.NormalizedEmail == __normalizedEmail_0)'
+2025-09-27 01:29:53.165 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<User>(
+    asyncEnumerable: new SingleQueryingEnumerable<User>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: User.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: User.AccessFailedCount (int) Required, 1], [Property: User.ConcurrencyStamp (string), 2], [Property: User.CreatedAt (DateTime) Required, 3], [Property: User.DeletedAt (DateTime?), 4], [Property: User.Email (string), 5], [Property: User.EmailConfirmed (bool) Required, 6], [Property: User.LastModifiedAt (DateTime) Required, 7], [Property: User.LastModifiedBy (string), 8], [Property: User.LockoutEnabled (bool) Required, 9], [Property: User.LockoutEnd (DateTimeOffset?), 10], [Property: User.NormalizedEmail (string), 11], [Property: User.NormalizedUserName (string), 12], [Property: User.PasswordHash (string), 13], [Property: User.PhoneNumber (string), 14], [Property: User.PhoneNumberConfirmed (bool) Required, 15], [Property: User.SecurityStamp (string), 16], [Property: User.TwoFactorEnabled (bool) Required, 17], [Property: User.UserName (string), 18] }
+            SELECT TOP(2) u.Id, u.AccessFailedCount, u.ConcurrencyStamp, u.CreatedAt, u.DeletedAt, u.Email, u.EmailConfirmed, u.LastModifiedAt, u.LastModifiedBy, u.LockoutEnabled, u.LockoutEnd, u.NormalizedEmail, u.NormalizedUserName, u.PasswordHash, u.PhoneNumber, u.PhoneNumberConfirmed, u.SecurityStamp, u.TwoFactorEnabled, u.UserName
+            FROM users AS u
+            WHERE u.NormalizedEmail == @__normalizedEmail_0), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, User>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-09-27 01:29:53.167 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.167 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.168 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 01:29:53.168 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.168 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.168 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 01:29:53.177 +07:00 [INF] Executed DbCommand (9ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 01:29:53.198 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 01:29:53.226 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.227 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 49ms reading results.
+2025-09-27 01:29:53.227 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.227 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 01:29:53.230 +07:00 [INF] Admin user 'fptslayer@gmail.com' already exists
+2025-09-27 01:29:53.233 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.233 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.233 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 01:29:53.234 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.234 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.234 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 01:29:53.235 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 01:29:53.235 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 01:29:53.235 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.235 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 01:29:53.236 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.236 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 01:29:53.236 +07:00 [INF] Sample moderator 'moderator@example.com' already exists
+2025-09-27 01:29:53.236 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.236 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.237 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 01:29:53.237 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.237 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.237 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 01:29:53.239 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 01:29:53.239 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 01:29:53.240 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.240 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 01:29:53.240 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.240 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 01:29:53.241 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.241 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.241 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 01:29:53.241 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.242 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 01:29:53.242 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 01:29:53.242 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 01:29:53.243 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 01:29:53.243 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.243 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 01:29:53.243 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.243 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 01:29:53.244 +07:00 [INF] Data seeding completed successfully
+2025-09-27 01:29:53.245 +07:00 [DBG] 'MyDbContext' disposed.
+2025-09-27 01:29:53.247 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 01:29:53.248 +07:00 [DBG] Disposed connection to database '' on server '' (1ms).
+2025-09-27 01:29:53.270 +07:00 [DBG] Registered SignalR Protocol: json, implemented by Microsoft.AspNetCore.SignalR.Protocol.JsonHubProtocol.
+2025-09-27 01:29:53.466 +07:00 [DBG] Registered model binder providers, in the following order: ["Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BinderTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ServicesModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BodyModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.HeaderModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FloatingPointTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.EnumTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.DateTimeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.SimpleTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.TryParseModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CancellationTokenModelBinderProvider"]
+2025-09-27 01:29:53.595 +07:00 [DBG] Hosting starting
+2025-09-27 01:29:53.608 +07:00 [DBG] Reading data from file 'C:\Users\ANDIM\AppData\Local\ASP.NET\DataProtection-Keys\key-0fa816d3-b3b2-4b2c-8375-c12fc2a38bc8.xml'.
+2025-09-27 01:29:53.640 +07:00 [DBG] Reading data from file 'C:\Users\ANDIM\AppData\Local\ASP.NET\DataProtection-Keys\key-87a32676-82f5-447f-9f47-810d67407518.xml'.
+2025-09-27 01:29:53.663 +07:00 [DBG] Reading data from file 'C:\Users\ANDIM\AppData\Local\ASP.NET\DataProtection-Keys\key-bb6dbb6a-ba85-42f1-afa1-f74928115ed1.xml'.
+2025-09-27 01:29:53.686 +07:00 [DBG] Reading data from file 'C:\Users\ANDIM\AppData\Local\ASP.NET\DataProtection-Keys\key-c1a09f0b-f353-4627-932d-b51fd4e45a4b.xml'.
+2025-09-27 01:29:53.709 +07:00 [DBG] Found key {0fa816d3-b3b2-4b2c-8375-c12fc2a38bc8}.
+2025-09-27 01:29:53.716 +07:00 [DBG] Found key {87a32676-82f5-447f-9f47-810d67407518}.
+2025-09-27 01:29:53.717 +07:00 [DBG] Found key {bb6dbb6a-ba85-42f1-afa1-f74928115ed1}.
+2025-09-27 01:29:53.717 +07:00 [DBG] Found key {c1a09f0b-f353-4627-932d-b51fd4e45a4b}.
+2025-09-27 01:29:53.722 +07:00 [DBG] Considering key {c1a09f0b-f353-4627-932d-b51fd4e45a4b} with expiration date 2025-10-05 17:29:26Z as default key.
+2025-09-27 01:29:53.725 +07:00 [DBG] Forwarded activator type request from Microsoft.AspNetCore.DataProtection.XmlEncryption.DpapiXmlDecryptor, Microsoft.AspNetCore.DataProtection, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.XmlEncryption.DpapiXmlDecryptor, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2025-09-27 01:29:53.726 +07:00 [DBG] Decrypting secret element using Windows DPAPI.
+2025-09-27 01:29:53.729 +07:00 [DBG] Forwarded activator type request from Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2025-09-27 01:29:53.730 +07:00 [DBG] Opening CNG algorithm 'AES' from provider 'null' with chaining mode CBC.
+2025-09-27 01:29:53.733 +07:00 [DBG] Opening CNG algorithm 'SHA256' from provider 'null' with HMAC.
+2025-09-27 01:29:53.735 +07:00 [DBG] Using key {c1a09f0b-f353-4627-932d-b51fd4e45a4b} as the default key.
+2025-09-27 01:29:53.735 +07:00 [DBG] Key ring with default key {c1a09f0b-f353-4627-932d-b51fd4e45a4b} was loaded during application startup.
+2025-09-27 01:29:53.885 +07:00 [INF] Now listening on: https://localhost:7190
+2025-09-27 01:29:53.885 +07:00 [DBG] Loaded hosting startup assembly CapBot.api
+2025-09-27 01:29:53.885 +07:00 [DBG] Loaded hosting startup assembly Microsoft.AspNetCore.Watch.BrowserRefresh
+2025-09-27 01:29:53.885 +07:00 [DBG] Loaded hosting startup assembly Microsoft.WebTools.BrowserLink.Net
+2025-09-27 01:29:53.886 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-27 01:29:53.886 +07:00 [INF] Hosting environment: Development
+2025-09-27 01:29:53.886 +07:00 [INF] Content root path: C:\Users\ANDIM\Desktop\Capstone_CapBot\CBAI_API\CapBot.api
+2025-09-27 01:29:53.888 +07:00 [DBG] Hosting started
+2025-09-27 01:29:54.018 +07:00 [DBG] Connection id "0HNFT5AO0E42C" accepted.
+2025-09-27 01:29:54.020 +07:00 [DBG] Connection id "0HNFT5AO0E42C" started.
+2025-09-27 01:29:54.026 +07:00 [DBG] Connection id "0HNFT5AO0E42D" accepted.
+2025-09-27 01:29:54.027 +07:00 [DBG] Connection id "0HNFT5AO0E42D" started.
+2025-09-27 01:29:54.134 +07:00 [DBG] Connection id "0HNFT5AO0E42C" received FIN.
+2025-09-27 01:29:54.134 +07:00 [DBG] Connection id "0HNFT5AO0E42D" received FIN.
+2025-09-27 01:29:54.143 +07:00 [DBG] Failed to authenticate HTTPS connection.
+System.IO.IOException: Received an unexpected EOF or 0 bytes from the transport stream.
+   at System.Net.Security.SslStream.ReceiveHandshakeFrameAsync[TIOAdapter](CancellationToken cancellationToken)
+   at System.Net.Security.SslStream.ForceAuthenticationAsync[TIOAdapter](Boolean receiveFirst, Byte[] reAuthenticationData, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Https.Internal.HttpsConnectionMiddleware.OnConnectionAsync(ConnectionContext context)
+2025-09-27 01:29:54.143 +07:00 [DBG] Failed to authenticate HTTPS connection.
+System.IO.IOException: Received an unexpected EOF or 0 bytes from the transport stream.
+   at System.Net.Security.SslStream.ReceiveHandshakeFrameAsync[TIOAdapter](CancellationToken cancellationToken)
+   at System.Net.Security.SslStream.ForceAuthenticationAsync[TIOAdapter](Boolean receiveFirst, Byte[] reAuthenticationData, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Https.Internal.HttpsConnectionMiddleware.OnConnectionAsync(ConnectionContext context)
+2025-09-27 01:29:54.162 +07:00 [DBG] Connection id "0HNFT5AO0E42D" stopped.
+2025-09-27 01:29:54.162 +07:00 [DBG] Connection id "0HNFT5AO0E42C" stopped.
+2025-09-27 01:29:54.164 +07:00 [DBG] Connection id "0HNFT5AO0E42D" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-09-27 01:29:54.164 +07:00 [DBG] Connection id "0HNFT5AO0E42C" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-09-27 01:29:54.762 +07:00 [DBG] Connection id "0HNFT5AO0E42E" accepted.
+2025-09-27 01:29:54.762 +07:00 [DBG] Connection id "0HNFT5AO0E42E" started.
+2025-09-27 01:29:54.831 +07:00 [DBG] Connection 0HNFT5AO0E42E established using the following protocol: "Tls13"
+2025-09-27 01:29:54.904 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/index.html - null null
+2025-09-27 01:29:54.974 +07:00 [DBG] Wildcard detected, all requests with hosts will be allowed.
+2025-09-27 01:29:55.085 +07:00 [DBG] Response markup is scheduled to include Browser Link script injection.
+2025-09-27 01:29:55.086 +07:00 [DBG] Response markup is scheduled to include browser refresh script injection.
+2025-09-27 01:29:55.103 +07:00 [DBG] Response markup was updated to include Browser Link script injection.
+2025-09-27 01:29:55.104 +07:00 [DBG] Response markup was updated to include browser refresh script injection.
+2025-09-27 01:29:55.106 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/index.html - 200 null text/html;charset=utf-8 203.8752ms
+2025-09-27 01:29:55.128 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/_framework/aspnetcore-browser-refresh.js - null null
+2025-09-27 01:29:55.136 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/_framework/aspnetcore-browser-refresh.js - 200 13756 application/javascript; charset=utf-8 7.2535ms
+2025-09-27 01:29:55.384 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/_vs/browserLink - null null
+2025-09-27 01:29:55.462 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/_vs/browserLink - 200 null text/javascript; charset=UTF-8 78.0676ms
+2025-09-27 01:29:55.519 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/swagger/v1/swagger.json - null null
+2025-09-27 01:29:55.843 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 323.589ms
+2025-09-27 01:29:59.327 +07:00 [DBG] Connection id "0HNFT5AO0E42E" received FIN.
+2025-09-27 01:29:59.331 +07:00 [DBG] The connection queue processing loop for 0HNFT5AO0E42E completed.
+2025-09-27 01:29:59.331 +07:00 [DBG] Connection id "0HNFT5AO0E42E" is closed. The last processed stream ID was 7.
+2025-09-27 01:29:59.331 +07:00 [DBG] Connection id "0HNFT5AO0E42E" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-09-27 01:29:59.345 +07:00 [DBG] Connection id "0HNFT5AO0E42E" stopped.
+2025-09-27 02:13:08.629 +07:00 [DBG] An 'IServiceProvider' was created for internal use by Entity Framework.
+2025-09-27 02:13:08.747 +07:00 [INF] User profile is available. Using 'C:\Users\ANDIM\AppData\Local\ASP.NET\DataProtection-Keys' as key repository and Windows DPAPI to encrypt keys at rest.
+2025-09-27 02:13:08.974 +07:00 [DBG] No relationship from 'ReviewerAssignment' to 'User' has been configured by convention because there are multiple properties on one entity type - {'AssignedByUser', 'Reviewer'} that could be matched with the properties on the other entity type - {'ReviewerAssignments'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:08.994 +07:00 [DBG] No relationship from 'SubmissionWorkflowLog' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromStateLogs', 'ToStateLogs'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.008 +07:00 [DBG] No relationship from 'User' to 'ReviewerAssignment' has been configured by convention because there are multiple properties on one entity type - {'ReviewerAssignments'} that could be matched with the properties on the other entity type - {'AssignedByUser', 'Reviewer'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.012 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.013 +07:00 [DBG] No relationship from 'WorkflowState' to 'WorkflowTransition' has been configured by convention because there are multiple properties on one entity type - {'FromTransitions', 'ToTransitions'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.015 +07:00 [DBG] No relationship from 'WorkflowTransition' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromTransitions', 'ToTransitions'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.275 +07:00 [DBG] No relationship from 'ReviewerAssignment' to 'User' has been configured by convention because there are multiple properties on one entity type - {'AssignedByUser', 'Reviewer'} that could be matched with the properties on the other entity type - {'ReviewerAssignments'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.276 +07:00 [DBG] No relationship from 'User' to 'ReviewerAssignment' has been configured by convention because there are multiple properties on one entity type - {'ReviewerAssignments'} that could be matched with the properties on the other entity type - {'AssignedByUser', 'Reviewer'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.298 +07:00 [DBG] No relationship from 'WorkflowTransition' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromTransitions', 'ToTransitions'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.299 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.299 +07:00 [DBG] No relationship from 'WorkflowState' to 'WorkflowTransition' has been configured by convention because there are multiple properties on one entity type - {'FromTransitions', 'ToTransitions'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.301 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.306 +07:00 [DBG] No relationship from 'SubmissionWorkflowLog' to 'WorkflowState' has been configured by convention because there are multiple properties on one entity type - {'FromState', 'ToState'} that could be matched with the properties on the other entity type - {'FromStateLogs', 'ToStateLogs'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.307 +07:00 [DBG] No relationship from 'WorkflowState' to 'SubmissionWorkflowLog' has been configured by convention because there are multiple properties on one entity type - {'FromStateLogs', 'ToStateLogs'} that could be matched with the properties on the other entity type - {'FromState', 'ToState'}. This message can be disregarded if explicit configuration has been specified in 'OnModelCreating'.
+2025-09-27 02:13:09.351 +07:00 [DBG] The index {'LecturerId'} was not created on entity type 'LecturerSkill' as the properties are already covered by the index {'LecturerId', 'SkillTag'}.
+2025-09-27 02:13:09.352 +07:00 [DBG] The index {'SemesterId'} was not created on entity type 'Phase' as the properties are already covered by the index {'SemesterId', 'PhaseTypeId'}.
+2025-09-27 02:13:09.352 +07:00 [DBG] The index {'AssignmentId'} was not created on entity type 'Review' as the properties are already covered by the index {'AssignmentId', 'Status'}.
+2025-09-27 02:13:09.352 +07:00 [DBG] The index {'ReviewId'} was not created on entity type 'ReviewComment' as the properties are already covered by the index {'ReviewId', 'SectionName'}.
+2025-09-27 02:13:09.352 +07:00 [DBG] The index {'ReviewId'} was not created on entity type 'ReviewCriteriaScore' as the properties are already covered by the index {'ReviewId', 'CriteriaId'}.
+2025-09-27 02:13:09.353 +07:00 [DBG] The index {'ReviewerId'} was not created on entity type 'ReviewerAssignment' as the properties are already covered by the index {'ReviewerId', 'Status'}.
+2025-09-27 02:13:09.353 +07:00 [DBG] The index {'SubmissionId'} was not created on entity type 'ReviewerAssignment' as the properties are already covered by the index {'SubmissionId', 'ReviewerId'}.
+2025-09-27 02:13:09.353 +07:00 [DBG] The index {'ReviewerId'} was not created on entity type 'ReviewerPerformance' as the properties are already covered by the index {'ReviewerId', 'SemesterId'}.
+2025-09-27 02:13:09.354 +07:00 [DBG] The index {'PhaseId'} was not created on entity type 'Submission' as the properties are already covered by the index {'PhaseId', 'Status'}.
+2025-09-27 02:13:09.354 +07:00 [DBG] The index {'PhaseId'} was not created on entity type 'Submission' as the properties are already covered by the index {'PhaseId', 'Status', 'SubmittedAt'}.
+2025-09-27 02:13:09.354 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'Submission' as the properties are already covered by the index {'TopicId', 'PhaseId', 'SubmissionRound'}.
+2025-09-27 02:13:09.354 +07:00 [DBG] The index {'SubmissionId'} was not created on entity type 'SubmissionWorkflowLog' as the properties are already covered by the index {'SubmissionId', 'CreatedAt'}.
+2025-09-27 02:13:09.355 +07:00 [DBG] The index {'UserId'} was not created on entity type 'SystemNotification' as the properties are already covered by the index {'UserId', 'IsRead', 'CreatedAt'}.
+2025-09-27 02:13:09.355 +07:00 [DBG] The index {'SemesterId'} was not created on entity type 'Topic' as the properties are already covered by the index {'SemesterId', 'IsApproved'}.
+2025-09-27 02:13:09.355 +07:00 [DBG] The index {'SupervisorId'} was not created on entity type 'Topic' as the properties are already covered by the index {'SupervisorId', 'SemesterId'}.
+2025-09-27 02:13:09.355 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'TopicVersion' as the properties are already covered by the index {'TopicId', 'Status'}.
+2025-09-27 02:13:09.356 +07:00 [DBG] The index {'TopicId'} was not created on entity type 'TopicVersion' as the properties are already covered by the index {'TopicId', 'VersionNumber'}.
+2025-09-27 02:13:09.356 +07:00 [DBG] The index {'UserId'} was not created on entity type 'UserRole' as the properties are already covered by the index {'UserId', 'RoleId'}.
+2025-09-27 02:13:09.356 +07:00 [DBG] The index {'UserId'} was not created on entity type 'UserToken' as the properties are already covered by the index {'UserId', 'LoginProvider', 'Name'}.
+2025-09-27 02:13:09.537 +07:00 [WRN] The 'ProficiencyLevels' property 'ProficiencyLevel' on entity type 'LecturerSkill' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ProficiencyLevels' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 02:13:09.537 +07:00 [WRN] The 'ReviewRecommendations' property 'Recommendation' on entity type 'Review' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ReviewRecommendations' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 02:13:09.538 +07:00 [WRN] The 'ReviewStatus' property 'Status' on entity type 'Review' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'ReviewStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 02:13:09.538 +07:00 [WRN] The 'CommentTypes' property 'CommentType' on entity type 'ReviewComment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'CommentTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 02:13:09.538 +07:00 [WRN] The 'PriorityLevels' property 'Priority' on entity type 'ReviewComment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'PriorityLevels' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 02:13:09.539 +07:00 [WRN] The 'AssignmentTypes' property 'AssignmentType' on entity type 'ReviewerAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AssignmentTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 02:13:09.539 +07:00 [WRN] The 'AssignmentStatus' property 'Status' on entity type 'ReviewerAssignment' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AssignmentStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 02:13:09.539 +07:00 [WRN] The 'AiCheckStatus' property 'AiCheckStatus' on entity type 'Submission' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'AiCheckStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 02:13:09.540 +07:00 [WRN] The 'SubmissionStatus' property 'Status' on entity type 'Submission' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'SubmissionStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 02:13:09.540 +07:00 [WRN] The 'NotificationTypes' property 'Type' on entity type 'SystemNotification' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'NotificationTypes' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 02:13:09.541 +07:00 [WRN] The 'TopicStatus' property 'Status' on entity type 'TopicVersion' is configured with a database-generated default, but has no configured sentinel value. The database-generated default will always be used for inserts when the property has the value '0', since this is the CLR default for the 'TopicStatus' type. Consider using a nullable type, using a nullable backing field, or setting the sentinel value for the property to ensure the database default is used when, and only when, appropriate. See https://aka.ms/efcore-docs-default-values for more information.
+2025-09-27 02:13:09.718 +07:00 [DBG] Entity Framework Core 8.0.16 initialized 'MyDbContext' using provider 'Microsoft.EntityFrameworkCore.SqlServer:8.0.13' with options: MigrationsAssembly=App.DAL 
+2025-09-27 02:13:09.794 +07:00 [DBG] Compiling query expression: 
+'DbSet<Role>()
+    .FirstOrDefault(r => r.NormalizedName == __normalizedName_0)'
+2025-09-27 02:13:09.932 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<Role>(
+    asyncEnumerable: new SingleQueryingEnumerable<Role>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: Role.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: Role.ConcurrencyStamp (string), 1], [Property: Role.IsAdmin (bool) Required, 2], [Property: Role.Name (string), 3], [Property: Role.NormalizedName (string), 4] }
+            SELECT TOP(1) r.Id, r.ConcurrencyStamp, r.IsAdmin, r.Name, r.NormalizedName
+            FROM roles AS r
+            WHERE r.NormalizedName == @__normalizedName_0), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, Role>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-09-27 02:13:09.964 +07:00 [DBG] Creating DbConnection.
+2025-09-27 02:13:09.983 +07:00 [DBG] Created DbConnection. (17ms).
+2025-09-27 02:13:09.986 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.148 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.152 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 02:13:10.156 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (3ms).
+2025-09-27 02:13:10.162 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (11ms).
+2025-09-27 02:13:10.168 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 02:13:10.239 +07:00 [INF] Executed DbCommand (70ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 02:13:10.272 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 02:13:10.289 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.295 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 52ms reading results.
+2025-09-27 02:13:10.297 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.300 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (3ms).
+2025-09-27 02:13:10.304 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.305 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.306 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 02:13:10.306 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.306 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.306 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 02:13:10.308 +07:00 [INF] Executed DbCommand (2ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 02:13:10.309 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 02:13:10.309 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.310 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 02:13:10.310 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.310 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 02:13:10.311 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.311 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.311 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 02:13:10.311 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.311 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.311 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 02:13:10.312 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 02:13:10.312 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 02:13:10.312 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.312 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 02:13:10.313 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.313 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 02:13:10.313 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.313 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.313 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 02:13:10.313 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.313 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.314 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 02:13:10.314 +07:00 [INF] Executed DbCommand (0ms) [Parameters=[@__normalizedName_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(1) [r].[Id], [r].[ConcurrencyStamp], [r].[IsAdmin], [r].[Name], [r].[NormalizedName]
+FROM [roles] AS [r]
+WHERE [r].[NormalizedName] = @__normalizedName_0
+2025-09-27 02:13:10.314 +07:00 [DBG] Context 'MyDbContext' started tracking 'Role' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 02:13:10.314 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.315 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 02:13:10.315 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.315 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 02:13:10.320 +07:00 [DBG] Compiling query expression: 
+'DbSet<User>()
+    .SingleOrDefault(u => u.NormalizedEmail == __normalizedEmail_0)'
+2025-09-27 02:13:10.325 +07:00 [DBG] Generated query execution expression: 
+'queryContext => ShapedQueryCompilingExpressionVisitor.SingleOrDefaultAsync<User>(
+    asyncEnumerable: new SingleQueryingEnumerable<User>(
+        (RelationalQueryContext)queryContext, 
+        RelationalCommandCache.QueryExpression(
+            Projection Mapping:
+                EmptyProjectionMember -> Dictionary<IProperty, int> { [Property: User.Id (int) Required PK AfterSave:Throw ValueGenerated.OnAdd, 0], [Property: User.AccessFailedCount (int) Required, 1], [Property: User.ConcurrencyStamp (string), 2], [Property: User.CreatedAt (DateTime) Required, 3], [Property: User.DeletedAt (DateTime?), 4], [Property: User.Email (string), 5], [Property: User.EmailConfirmed (bool) Required, 6], [Property: User.LastModifiedAt (DateTime) Required, 7], [Property: User.LastModifiedBy (string), 8], [Property: User.LockoutEnabled (bool) Required, 9], [Property: User.LockoutEnd (DateTimeOffset?), 10], [Property: User.NormalizedEmail (string), 11], [Property: User.NormalizedUserName (string), 12], [Property: User.PasswordHash (string), 13], [Property: User.PhoneNumber (string), 14], [Property: User.PhoneNumberConfirmed (bool) Required, 15], [Property: User.SecurityStamp (string), 16], [Property: User.TwoFactorEnabled (bool) Required, 17], [Property: User.UserName (string), 18] }
+            SELECT TOP(2) u.Id, u.AccessFailedCount, u.ConcurrencyStamp, u.CreatedAt, u.DeletedAt, u.Email, u.EmailConfirmed, u.LastModifiedAt, u.LastModifiedBy, u.LockoutEnabled, u.LockoutEnd, u.NormalizedEmail, u.NormalizedUserName, u.PasswordHash, u.PhoneNumber, u.PhoneNumberConfirmed, u.SecurityStamp, u.TwoFactorEnabled, u.UserName
+            FROM users AS u
+            WHERE u.NormalizedEmail == @__normalizedEmail_0), 
+        null, 
+        Func<QueryContext, DbDataReader, ResultContext, SingleQueryResultCoordinator, User>, 
+        App.DAL.Context.MyDbContext, 
+        False, 
+        False, 
+        True
+    ), 
+    cancellationToken: queryContext.CancellationToken)'
+2025-09-27 02:13:10.327 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.327 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.327 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 02:13:10.327 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.327 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.327 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 02:13:10.336 +07:00 [INF] Executed DbCommand (8ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 02:13:10.355 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 02:13:10.379 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.379 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 43ms reading results.
+2025-09-27 02:13:10.379 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.380 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 02:13:10.382 +07:00 [INF] Admin user 'fptslayer@gmail.com' already exists
+2025-09-27 02:13:10.384 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.385 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.385 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 02:13:10.385 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.385 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.385 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 02:13:10.386 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 02:13:10.386 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 02:13:10.386 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.387 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 02:13:10.387 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.387 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 02:13:10.387 +07:00 [INF] Sample moderator 'moderator@example.com' already exists
+2025-09-27 02:13:10.387 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.388 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.388 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 02:13:10.388 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.388 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.388 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 02:13:10.389 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 02:13:10.389 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 02:13:10.390 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.390 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 02:13:10.390 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.390 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 02:13:10.390 +07:00 [DBG] Opening connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.390 +07:00 [DBG] Opened connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.390 +07:00 [DBG] Creating DbCommand for 'ExecuteReader'.
+2025-09-27 02:13:10.391 +07:00 [DBG] Created DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.391 +07:00 [DBG] Initialized DbCommand for 'ExecuteReader' (0ms).
+2025-09-27 02:13:10.391 +07:00 [DBG] Executing DbCommand [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 02:13:10.391 +07:00 [INF] Executed DbCommand (1ms) [Parameters=[@__normalizedEmail_0='?' (Size = 4000)], CommandType='"Text"', CommandTimeout='30']
+SELECT TOP(2) [u].[Id], [u].[AccessFailedCount], [u].[ConcurrencyStamp], [u].[CreatedAt], [u].[DeletedAt], [u].[Email], [u].[EmailConfirmed], [u].[LastModifiedAt], [u].[LastModifiedBy], [u].[LockoutEnabled], [u].[LockoutEnd], [u].[NormalizedEmail], [u].[NormalizedUserName], [u].[PasswordHash], [u].[PhoneNumber], [u].[PhoneNumberConfirmed], [u].[SecurityStamp], [u].[TwoFactorEnabled], [u].[UserName]
+FROM [users] AS [u]
+WHERE [u].[NormalizedEmail] = @__normalizedEmail_0
+2025-09-27 02:13:10.392 +07:00 [DBG] Context 'MyDbContext' started tracking 'User' entity. Consider using 'DbContextOptionsBuilder.EnableSensitiveDataLogging' to see key values.
+2025-09-27 02:13:10.392 +07:00 [DBG] Closing data reader to 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.392 +07:00 [DBG] A data reader for 'capbot_db' on server 'localhost' is being disposed after spending 0ms reading results.
+2025-09-27 02:13:10.392 +07:00 [DBG] Closing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.392 +07:00 [DBG] Closed connection to database 'capbot_db' on server 'localhost' (0ms).
+2025-09-27 02:13:10.393 +07:00 [INF] Data seeding completed successfully
+2025-09-27 02:13:10.394 +07:00 [DBG] 'MyDbContext' disposed.
+2025-09-27 02:13:10.395 +07:00 [DBG] Disposing connection to database 'capbot_db' on server 'localhost'.
+2025-09-27 02:13:10.396 +07:00 [DBG] Disposed connection to database '' on server '' (0ms).
+2025-09-27 02:13:10.414 +07:00 [DBG] Registered SignalR Protocol: json, implemented by Microsoft.AspNetCore.SignalR.Protocol.JsonHubProtocol.
+2025-09-27 02:13:10.592 +07:00 [DBG] Registered model binder providers, in the following order: ["Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BinderTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.ServicesModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.BodyModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.HeaderModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.FloatingPointTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.EnumTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.DateTimeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.SimpleTypeModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.TryParseModelBinderProvider","Microsoft.AspNetCore.Mvc.ModelBinding.Binders.CancellationTokenModelBinderProvider"]
+2025-09-27 02:13:10.696 +07:00 [DBG] Hosting starting
+2025-09-27 02:13:10.706 +07:00 [DBG] Reading data from file 'C:\Users\ANDIM\AppData\Local\ASP.NET\DataProtection-Keys\key-0fa816d3-b3b2-4b2c-8375-c12fc2a38bc8.xml'.
+2025-09-27 02:13:10.708 +07:00 [DBG] Reading data from file 'C:\Users\ANDIM\AppData\Local\ASP.NET\DataProtection-Keys\key-87a32676-82f5-447f-9f47-810d67407518.xml'.
+2025-09-27 02:13:10.709 +07:00 [DBG] Reading data from file 'C:\Users\ANDIM\AppData\Local\ASP.NET\DataProtection-Keys\key-bb6dbb6a-ba85-42f1-afa1-f74928115ed1.xml'.
+2025-09-27 02:13:10.710 +07:00 [DBG] Reading data from file 'C:\Users\ANDIM\AppData\Local\ASP.NET\DataProtection-Keys\key-c1a09f0b-f353-4627-932d-b51fd4e45a4b.xml'.
+2025-09-27 02:13:10.714 +07:00 [DBG] Found key {0fa816d3-b3b2-4b2c-8375-c12fc2a38bc8}.
+2025-09-27 02:13:10.718 +07:00 [DBG] Found key {87a32676-82f5-447f-9f47-810d67407518}.
+2025-09-27 02:13:10.718 +07:00 [DBG] Found key {bb6dbb6a-ba85-42f1-afa1-f74928115ed1}.
+2025-09-27 02:13:10.718 +07:00 [DBG] Found key {c1a09f0b-f353-4627-932d-b51fd4e45a4b}.
+2025-09-27 02:13:10.723 +07:00 [DBG] Considering key {c1a09f0b-f353-4627-932d-b51fd4e45a4b} with expiration date 2025-10-05 17:29:26Z as default key.
+2025-09-27 02:13:10.726 +07:00 [DBG] Forwarded activator type request from Microsoft.AspNetCore.DataProtection.XmlEncryption.DpapiXmlDecryptor, Microsoft.AspNetCore.DataProtection, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.XmlEncryption.DpapiXmlDecryptor, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2025-09-27 02:13:10.727 +07:00 [DBG] Decrypting secret element using Windows DPAPI.
+2025-09-27 02:13:10.729 +07:00 [DBG] Forwarded activator type request from Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Version=8.0.0.0, Culture=neutral, PublicKeyToken=adb9793829ddae60 to Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption.ConfigurationModel.AuthenticatedEncryptorDescriptorDeserializer, Microsoft.AspNetCore.DataProtection, Culture=neutral, PublicKeyToken=adb9793829ddae60
+2025-09-27 02:13:10.729 +07:00 [DBG] Opening CNG algorithm 'AES' from provider 'null' with chaining mode CBC.
+2025-09-27 02:13:10.732 +07:00 [DBG] Opening CNG algorithm 'SHA256' from provider 'null' with HMAC.
+2025-09-27 02:13:10.734 +07:00 [DBG] Using key {c1a09f0b-f353-4627-932d-b51fd4e45a4b} as the default key.
+2025-09-27 02:13:10.734 +07:00 [DBG] Key ring with default key {c1a09f0b-f353-4627-932d-b51fd4e45a4b} was loaded during application startup.
+2025-09-27 02:13:10.835 +07:00 [INF] Now listening on: https://localhost:7190
+2025-09-27 02:13:10.835 +07:00 [DBG] Loaded hosting startup assembly CapBot.api
+2025-09-27 02:13:10.835 +07:00 [DBG] Loaded hosting startup assembly Microsoft.AspNetCore.Watch.BrowserRefresh
+2025-09-27 02:13:10.835 +07:00 [DBG] Loaded hosting startup assembly Microsoft.WebTools.BrowserLink.Net
+2025-09-27 02:13:10.835 +07:00 [INF] Application started. Press Ctrl+C to shut down.
+2025-09-27 02:13:10.836 +07:00 [INF] Hosting environment: Development
+2025-09-27 02:13:10.836 +07:00 [INF] Content root path: C:\Users\ANDIM\Desktop\Capstone_CapBot\CBAI_API\CapBot.api
+2025-09-27 02:13:10.837 +07:00 [DBG] Hosting started
+2025-09-27 02:13:11.069 +07:00 [DBG] Connection id "0HNFT62TVQVLR" accepted.
+2025-09-27 02:13:11.069 +07:00 [DBG] Connection id "0HNFT62TVQVLR" started.
+2025-09-27 02:13:11.078 +07:00 [DBG] Connection id "0HNFT62TVQVLS" accepted.
+2025-09-27 02:13:11.079 +07:00 [DBG] Connection id "0HNFT62TVQVLS" started.
+2025-09-27 02:13:11.095 +07:00 [DBG] Connection id "0HNFT62TVQVLR" received FIN.
+2025-09-27 02:13:11.095 +07:00 [DBG] Connection id "0HNFT62TVQVLS" received FIN.
+2025-09-27 02:13:11.102 +07:00 [DBG] Failed to authenticate HTTPS connection.
+System.IO.IOException: Received an unexpected EOF or 0 bytes from the transport stream.
+   at System.Net.Security.SslStream.ReceiveHandshakeFrameAsync[TIOAdapter](CancellationToken cancellationToken)
+   at System.Net.Security.SslStream.ForceAuthenticationAsync[TIOAdapter](Boolean receiveFirst, Byte[] reAuthenticationData, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Https.Internal.HttpsConnectionMiddleware.OnConnectionAsync(ConnectionContext context)
+2025-09-27 02:13:11.102 +07:00 [DBG] Failed to authenticate HTTPS connection.
+System.IO.IOException: Received an unexpected EOF or 0 bytes from the transport stream.
+   at System.Net.Security.SslStream.ReceiveHandshakeFrameAsync[TIOAdapter](CancellationToken cancellationToken)
+   at System.Net.Security.SslStream.ForceAuthenticationAsync[TIOAdapter](Boolean receiveFirst, Byte[] reAuthenticationData, CancellationToken cancellationToken)
+   at Microsoft.AspNetCore.Server.Kestrel.Https.Internal.HttpsConnectionMiddleware.OnConnectionAsync(ConnectionContext context)
+2025-09-27 02:13:11.118 +07:00 [DBG] Connection id "0HNFT62TVQVLS" stopped.
+2025-09-27 02:13:11.118 +07:00 [DBG] Connection id "0HNFT62TVQVLR" stopped.
+2025-09-27 02:13:11.120 +07:00 [DBG] Connection id "0HNFT62TVQVLR" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-09-27 02:13:11.120 +07:00 [DBG] Connection id "0HNFT62TVQVLS" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-09-27 02:13:11.124 +07:00 [DBG] Connection id "0HNFT62TVQVLT" accepted.
+2025-09-27 02:13:11.125 +07:00 [DBG] Connection id "0HNFT62TVQVLT" started.
+2025-09-27 02:13:11.158 +07:00 [DBG] Connection 0HNFT62TVQVLT established using the following protocol: "Tls13"
+2025-09-27 02:13:11.203 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/index.html - null null
+2025-09-27 02:13:11.228 +07:00 [DBG] Wildcard detected, all requests with hosts will be allowed.
+2025-09-27 02:13:11.309 +07:00 [DBG] Response markup is scheduled to include Browser Link script injection.
+2025-09-27 02:13:11.310 +07:00 [DBG] Response markup is scheduled to include browser refresh script injection.
+2025-09-27 02:13:11.320 +07:00 [DBG] Response markup was updated to include Browser Link script injection.
+2025-09-27 02:13:11.321 +07:00 [DBG] Response markup was updated to include browser refresh script injection.
+2025-09-27 02:13:11.322 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/index.html - 200 null text/html;charset=utf-8 121.6647ms
+2025-09-27 02:13:11.596 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/_framework/aspnetcore-browser-refresh.js - null null
+2025-09-27 02:13:11.597 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/_vs/browserLink - null null
+2025-09-27 02:13:11.600 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/_framework/aspnetcore-browser-refresh.js - 200 13756 application/javascript; charset=utf-8 4.0439ms
+2025-09-27 02:13:11.630 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/_vs/browserLink - 200 null text/javascript; charset=UTF-8 33.4079ms
+2025-09-27 02:13:11.716 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/swagger/v1/swagger.json - null null
+2025-09-27 02:13:11.755 +07:00 [INF] Request starting HTTP/2 GET https://localhost:7190/favicon-32x32.png - null null
+2025-09-27 02:13:11.762 +07:00 [INF] Sending file. Request path: '/favicon-32x32.png'. Physical path: 'N/A'
+2025-09-27 02:13:11.763 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/favicon-32x32.png - 200 628 image/png 7.7095ms
+2025-09-27 02:13:11.960 +07:00 [INF] Request finished HTTP/2 GET https://localhost:7190/swagger/v1/swagger.json - 200 null application/json;charset=utf-8 243.2013ms
+2025-09-27 02:13:12.113 +07:00 [DBG] Connection id "0HNFT62TVQVLT" received FIN.
+2025-09-27 02:13:12.114 +07:00 [DBG] Connection id "0HNFT62TVQVLT" is closed. The last processed stream ID was 9.
+2025-09-27 02:13:12.114 +07:00 [DBG] The connection queue processing loop for 0HNFT62TVQVLT completed.
+2025-09-27 02:13:12.114 +07:00 [DBG] Connection id "0HNFT62TVQVLT" sending FIN because: "The Socket transport's send loop completed gracefully."
+2025-09-27 02:13:12.125 +07:00 [DBG] Connection id "0HNFT62TVQVLT" stopped.
