@@ -24,12 +24,23 @@ namespace App.BLL.Implementations
         private readonly GeminiAIService _aiService;
         private readonly IUnitOfWork _unitOfWork;
         private readonly ILogger<ReviewerSuggestionService> _logger;
-        // Simple in-memory cache for reviewer TF maps and norms
-        private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, (Dictionary<string, decimal> Tf, decimal Norm, DateTime ExpiresAt)> _reviewerTfCache = new();
-        private static readonly TimeSpan ReviewerTfCacheTtl = TimeSpan.FromMinutes(30);
-    // Cache for reviewer embeddings (semantic vectors) to avoid repeated external calls
-    private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, (float[] Emb, DateTime ExpiresAt)> _reviewerEmbeddingCache = new();
-    private static readonly TimeSpan ReviewerEmbeddingCacheTtl = TimeSpan.FromHours(1);
+        // Cache for reviewer embeddings (semantic vectors) to avoid repeated external calls
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<int, (float[] Emb, DateTime ExpiresAt)> _reviewerEmbeddingCache = new();
+        private static readonly TimeSpan ReviewerEmbeddingCacheTtl = TimeSpan.FromHours(1);
+        // Cache for individual skill-tag embeddings (to support per-skill semantic matching)
+        private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (float[] Emb, DateTime ExpiresAt)> _skillEmbeddingCache = new();
+        private static readonly TimeSpan SkillEmbeddingCacheTtl = TimeSpan.FromDays(7);
+    // Cache for topic field embeddings (Title, Description, etc.)
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (float[] Emb, DateTime ExpiresAt)> _fieldEmbeddingCache = new();
+    private static readonly TimeSpan FieldEmbeddingCacheTtl = TimeSpan.FromDays(7);
+    // Cache for small token embeddings used to pick top tokens per field
+    private static readonly System.Collections.Concurrent.ConcurrentDictionary<string, (float[] Emb, DateTime ExpiresAt)> _tokenEmbeddingCache = new();
+    private static readonly TimeSpan TokenEmbeddingCacheTtl = TimeSpan.FromDays(30);
+    private const double TokenMatchThreshold = 0.45; // token-to-skill similarity threshold to show as top token (raised to reduce noise)
+    private const double FieldMatchThreshold = 0.30; // per-field similarity required to consider a skill as truly matched to a field
+    // Matching thresholds (tuneable)
+    private const double SkillTagMatchThreshold = 0.60; // per-skill embedding similarity required to consider a tag matched (raised for stability)
+    private const double EligibilityEmbeddingThreshold = 0.25; // overall embedding threshold to mark reviewer eligible when no literal token overlap
 
         public ReviewerSuggestionService(GeminiAIService aiService, IUnitOfWork unitOfWork, ILogger<ReviewerSuggestionService> logger)
         {
@@ -193,51 +204,45 @@ namespace App.BLL.Implementations
 
     private async Task<List<ReviewerSuggestionDTO>> CalculateReviewerScores(List<User> reviewers, Dictionary<string, string> topicFields, string submissionContext, List<string> skipMessages, int? semesterId)
         {
-            // Validate submission context
-            if (string.IsNullOrWhiteSpace(submissionContext))
-            {
-                throw new ArgumentException("Submission context cannot be null or empty.", nameof(submissionContext));
-            }
+            if (string.IsNullOrWhiteSpace(submissionContext)) throw new ArgumentException("Submission context cannot be null or empty.", nameof(submissionContext));
 
-            // DB-driven tokenization & term-frequency cosine similarity (no external embeddings)
             var reviewerScores = new List<ReviewerSuggestionDTO>();
 
-            // Tokenize and build topic TF map (overall) and per-field TF maps
-            var topicTokens = TokenizeText(submissionContext);
-            if (!topicTokens.Any())
-            {
-                throw new ArgumentException("Submission context has no tokens after tokenization.", nameof(submissionContext));
-            }
-
-            var topicTf = BuildTermFrequency(topicTokens);
-            var topicNorm = ComputeVectorNorm(topicTf);
-
-            // Build per-field TF maps from whatever fields the caller provided (keeps extensions flexible)
-            var topicFieldTfs = new Dictionary<string, Dictionary<string, decimal>>(StringComparer.OrdinalIgnoreCase);
-            foreach (var key in topicFields.Keys)
-            {
-                topicFields.TryGetValue(key, out var raw);
-                var tokens = TokenizeText(raw ?? string.Empty);
-                topicFieldTfs[key] = BuildTermFrequency(tokens);
-            }
-
-            // Try to generate a topic embedding once (best-effort). If Gemini fails, we continue with TF-only scores.
-            float[]? topicEmbedding = null;
-            try
-            {
-                var emb = await _aiService.GetEmbeddingAsync(submissionContext);
-                topicEmbedding = emb;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogDebug(ex, "Topic embedding failed - falling back to TF-only similarity");
-            }
+            // Prepare a topic embedding once (best-effort)
+                float[]? topicEmbedding = null;
+                // Topic embedding cache (keyed by full submissionContext)
+                try
+                {
+                    var topicCacheKey = "topic|" + submissionContext;
+                    if (_fieldEmbeddingCache.TryGetValue(topicCacheKey, out var te) && te.ExpiresAt > DateTime.UtcNow)
+                    {
+                        topicEmbedding = te.Emb;
+                    }
+                    else
+                    {
+                        var emb = await _aiService.GetEmbeddingAsync(submissionContext);
+                        if (emb != null && emb.Length > 0)
+                        {
+                            topicEmbedding = emb;
+                            _fieldEmbeddingCache[topicCacheKey] = (emb, DateTime.UtcNow.Add(FieldEmbeddingCacheTtl));
+                        }
+                        else
+                        {
+                            // If provider returned null (service unavailable), try to use any existing cached embedding
+                            if (te.Emb != null) topicEmbedding = te.Emb;
+                        }
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogDebug(ex, "Topic embedding failed - embeddings-only mode will mark semantic scores as 0");
+                }
 
             foreach (var reviewer in reviewers)
             {
                 try
                 {
-                    // Skip reviewers who currently have too many active assignments (Assigned/InProgress >= 5)
+                    // skip overloaded reviewers
                     var activeCount = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) ?? 0;
                     if (activeCount >= 5)
                     {
@@ -246,152 +251,314 @@ namespace App.BLL.Implementations
                         skipMessages?.Add(msg);
                         continue;
                     }
-                    // Reviewer skills -> tokens and TF
-                    var skills = reviewer.LecturerSkills ?? Enumerable.Empty<LecturerSkill>();
-                    if (!(skills?.Any() ?? false))
-                    {
-                        _logger.LogDebug("Reviewer {ReviewerId} has no LecturerSkills.", reviewer.Id);
-                        continue;
-                    }
 
-                    // Build reviewer token map (skill tag tokens, weighted by proficiency) and use cache
+                    var skills = reviewer.LecturerSkills ?? Enumerable.Empty<LecturerSkill>();
+                    if (!skills.Any()) continue;
+
                     var reviewerSkillDict = new Dictionary<string, string>(StringComparer.OrdinalIgnoreCase);
                     foreach (var s in skills)
                     {
                         if (string.IsNullOrWhiteSpace(s.SkillTag)) continue;
-                        var tag = s.SkillTag.Trim();
-                        reviewerSkillDict[tag] = s.ProficiencyLevel.ToString();
+                        reviewerSkillDict[s.SkillTag.Trim()] = s.ProficiencyLevel.ToString();
                     }
 
-                    if (!reviewerSkillDict.Any())
-                    {
-                        _logger.LogDebug("Reviewer {ReviewerId} has no tokens from skills.", reviewer.Id);
-                        continue;
-                    }
-
-                    // Try cache
-                    Dictionary<string, decimal> reviewerTf;
-                    decimal reviewerNorm;
-                    var now = DateTime.UtcNow;
-                    if (_reviewerTfCache.TryGetValue(reviewer.Id, out var cacheEntry) && cacheEntry.ExpiresAt > now)
-                    {
-                        reviewerTf = cacheEntry.Tf;
-                        reviewerNorm = cacheEntry.Norm;
-                    }
-                    else
-                    {
-                        var reviewerTokens = new List<string>();
-                        foreach (var kv in reviewerSkillDict)
-                        {
-                            var repeat = (int)Math.Max(1, (int)skills.First(s => s.SkillTag == kv.Key).ProficiencyLevel);
-                            for (int i = 0; i < repeat; i++) reviewerTokens.AddRange(TokenizeText(kv.Key));
-                        }
-
-                        reviewerTf = BuildTermFrequency(reviewerTokens);
-                        reviewerNorm = ComputeVectorNorm(reviewerTf);
-                        _reviewerTfCache[reviewer.Id] = (reviewerTf, reviewerNorm, now.Add(ReviewerTfCacheTtl));
-                    }
-
-                    // Compute TF-based cosine similarity (sparse intersection)
-                    var dot = 0.0m;
-                    foreach (var kv in reviewerTf)
-                    {
-                        if (topicTf.TryGetValue(kv.Key, out var tcount))
-                        {
-                            dot += kv.Value * tcount;
-                        }
-                    }
-
-                    var tfSkillMatch = 0.0m;
-                    if (topicNorm > 0 && reviewerNorm > 0)
-                    {
-                        tfSkillMatch = dot / (topicNorm * reviewerNorm);
-                    }
-
-                    // Try semantic embedding cosine if available
-                    double semanticScore = 0.0;
+                    // Get or compute reviewer-wide embedding
+                    float[]? reviewerEmb = null;
+                    var nowUtc = DateTime.UtcNow;
                     try
                     {
-                        // get or compute reviewer embedding
-                        float[]? reviewerEmb = null;
-                        var nowUtc = DateTime.UtcNow;
-                        if (_reviewerEmbeddingCache.TryGetValue(reviewer.Id, out var cacheEmb) && cacheEmb.ExpiresAt > nowUtc)
+                        if (_reviewerEmbeddingCache.TryGetValue(reviewer.Id, out var re) && re.ExpiresAt > nowUtc)
                         {
-                            reviewerEmb = cacheEmb.Emb;
+                            reviewerEmb = re.Emb;
                         }
                         else
                         {
-                            // build a short text from reviewer skills to embed
-                            var skillText = string.Join(" ", reviewer.LecturerSkills?.Select(s => s.SkillTag).Where(t => !string.IsNullOrWhiteSpace(t)) ?? Enumerable.Empty<string>());
+                            var skillText = string.Join(" ", reviewerSkillDict.Keys);
                             if (!string.IsNullOrWhiteSpace(skillText))
                             {
                                 reviewerEmb = await _aiService.GetEmbeddingAsync(skillText);
-                                if (reviewerEmb != null && reviewerEmb.Length > 0)
-                                {
-                                    _reviewerEmbeddingCache[reviewer.Id] = (reviewerEmb, nowUtc.Add(ReviewerEmbeddingCacheTtl));
-                                }
+                                if (reviewerEmb != null && reviewerEmb.Length > 0) _reviewerEmbeddingCache[reviewer.Id] = (reviewerEmb, nowUtc.Add(ReviewerEmbeddingCacheTtl));
                             }
-                        }
-
-                        if (topicEmbedding != null && reviewerEmb != null && topicEmbedding.Length == reviewerEmb.Length)
-                        {
-                            semanticScore = _aiService.CosineSimilarity(topicEmbedding, reviewerEmb);
                         }
                     }
                     catch (Exception ex)
                     {
-                        _logger.LogDebug(ex, "Reviewer embedding failed for {ReviewerId}", reviewer.Id);
-                        semanticScore = 0.0;
+                        _logger.LogDebug(ex, "Reviewer-wide embedding failed for {ReviewerId}", reviewer.Id);
+                        reviewerEmb = null;
                     }
 
-                    // Blend TF and semantic scores; prefer semantic when available but keep TF as robust signal
-                    // Both scores normalized in [0,1]; semanticScore may be negative if vectors disagree - clamp
-                    var semanticClamped = Math.Max(0.0, Math.Min(1.0, semanticScore));
-                    var tfDouble = (double)tfSkillMatch;
-                    var blended = topicEmbedding != null && semanticClamped > 0 ? (0.55 * semanticClamped + 0.45 * tfDouble) : tfDouble;
-                    var skillMatchScore = (decimal)blended;
+                    var matchedSkills = new List<string>();
+                    var matchedSkillSims = new List<double>();
+                    double chosenSemantic = 0.0;
 
-                    // Per-field similarity breakdown
+                    if (topicEmbedding != null)
+                    {
+                        try
+                        {
+                            double maxSim = 0.0;
+                            var now = DateTime.UtcNow;
+
+                            // Prepare per-field max similarity map (will be filled by comparing skill embeddings vs each topic field)
+                            var fieldMaxSim = topicFields.ToDictionary(k => k.Key, v => 0.0);
+
+                            foreach (var s in skills)
+                            {
+                                var tag = s.SkillTag?.Trim();
+                                if (string.IsNullOrWhiteSpace(tag)) continue;
+
+                                float[]? skillEmb = null;
+                                bool skillCached = false;
+                                if (_skillEmbeddingCache.TryGetValue(tag, out var se) && se.ExpiresAt > now)
+                                {
+                                    skillEmb = se.Emb;
+                                    skillCached = true;
+                                }
+                                else
+                                {
+                                    try
+                                    {
+                                        skillEmb = await _aiService.GetEmbeddingAsync(tag);
+                                        if (skillEmb != null && skillEmb.Length > 0) _skillEmbeddingCache[tag] = (skillEmb, now.Add(SkillEmbeddingCacheTtl));
+                                    }
+                                    catch (Exception innerEx)
+                                    {
+                                        _logger.LogDebug(innerEx, "Skill embedding failed for tag '{Tag}'", tag);
+                                        skillEmb = null;
+                                    }
+                                }
+
+                                if (skillEmb == null || topicEmbedding == null || skillEmb.Length != topicEmbedding.Length)
+                                {
+                                    _logger.LogDebug("Reviewer {ReviewerId} skill '{Tag}' skipped: skillEmb null? {IsNull} topicEmb null? {TopicNull} lengths equal? {LenEqual}", reviewer.Id, tag, skillEmb == null, topicEmbedding == null, skillEmb != null && topicEmbedding != null ? skillEmb.Length == topicEmbedding.Length : false);
+                                    continue;
+                                }
+
+                                // similarity between overall topic and skill
+                                var sim = _aiService.CosineSimilarity(topicEmbedding, skillEmb);
+                                sim = Math.Max(0.0, Math.Min(1.0, sim));
+
+                                _logger.LogDebug("Reviewer {ReviewerId} skill '{Tag}' sim={Sim:0.0000} cachedSkillEmb={Cached} skillLen={SkillLen} topicLen={TopicLen}", reviewer.Id, tag, sim, skillCached, skillEmb?.Length ?? 0, topicEmbedding?.Length ?? 0);
+
+                                // track this skill's max similarity against any single topic field
+                                double skillMaxFieldSim = 0.0;
+
+                                if (sim > maxSim) maxSim = sim;
+
+                                // update per-field similarities: compare each topic field embedding to this skill embedding
+                                foreach (var fieldKvp in topicFields)
+                                {
+                                    var fieldKey = fieldKvp.Key;
+                                    var fieldText = fieldKvp.Value;
+                                    if (string.IsNullOrWhiteSpace(fieldText)) continue;
+
+                                    // try get cached field embedding
+                                    float[]? fieldEmb = null;
+                                    if (_fieldEmbeddingCache.TryGetValue(fieldKey + "|" + fieldText, out var fe) && fe.ExpiresAt > DateTime.UtcNow)
+                                    {
+                                        fieldEmb = fe.Emb;
+                                    }
+                                    else
+                                    {
+                                        try
+                                        {
+                                            fieldEmb = await _aiService.GetEmbeddingAsync(fieldText);
+                                            if (fieldEmb != null && fieldEmb.Length > 0) _fieldEmbeddingCache[fieldKey + "|" + fieldText] = (fieldEmb, DateTime.UtcNow.Add(FieldEmbeddingCacheTtl));
+                                        }
+                                        catch (Exception innerEx)
+                                        {
+                                            _logger.LogDebug(innerEx, "Field embedding failed for field '{FieldKey}'", fieldKey);
+                                            fieldEmb = null;
+                                        }
+                                    }
+
+                                        if (fieldEmb == null || skillEmb == null || fieldEmb.Length != skillEmb.Length) continue;
+
+                                        try
+                                        {
+                                            var fSim = _aiService.CosineSimilarity(fieldEmb, skillEmb);
+                                            fSim = Math.Max(0.0, Math.Min(1.0, fSim));
+                                            if (fSim > fieldMaxSim[fieldKey]) fieldMaxSim[fieldKey] = fSim;
+                                            if (fSim > skillMaxFieldSim) skillMaxFieldSim = fSim;
+                                        }
+                                        catch { }
+                                }
+
+                                
+                                // If this skill both matches the overall topic (semantic) and has at least one
+                                // strongly related topic field, mark it as a matched skill. This prevents
+                                // unrelated reviewers (e.g. blockchain, marketing) from being considered matched
+                                // when their tag-topic sim is incidental.
+                                try
+                                {
+                                    if (sim >= SkillTagMatchThreshold && skillMaxFieldSim >= FieldMatchThreshold)
+                                    {
+                                        matchedSkills.Add(tag);
+                                        matchedSkillSims.Add(sim);
+                                    }
+                                }
+                                catch { }
+                            }
+
+                            if (reviewerEmb != null && topicEmbedding != null && reviewerEmb.Length == topicEmbedding.Length)
+                            {
+                                try
+                                {
+                                    var rSim = _aiService.CosineSimilarity(topicEmbedding, reviewerEmb);
+                                    rSim = Math.Max(0.0, Math.Min(1.0, rSim));
+                                    if (rSim > maxSim) maxSim = rSim;
+                                }
+                                catch { }
+                            }
+
+                            chosenSemantic = maxSim;
+
+                            // Debug log: per-reviewer semantic breakdown
+                            try
+                            {
+                                _logger.LogDebug("Reviewer {ReviewerId} semantic breakdown: maxSim={MaxSim:0.0000} matchedSkills=[{Matched}]",
+                                    reviewer.Id, maxSim, string.Join(',', matchedSkills));
+                            }
+                            catch { }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogDebug(ex, "Reviewer per-skill semantic match failed for {ReviewerId}", reviewer.Id);
+                            chosenSemantic = 0.0;
+                        }
+                    }
+
+                            // Determine the skill match score: prefer the strongest matched-skill similarity
+                            // when we actually have matched skills; otherwise fall back to the reviewer/topic
+                            // semantic similarity (chosenSemantic).
+                            decimal skillMatchScore = matchedSkillSims.Any()
+                                ? Decimal.Round((decimal)matchedSkillSims.Max(), 4)
+                                : Decimal.Round((decimal)Math.Max(0.0, Math.Min(1.0, chosenSemantic)), 4);
+
+                    // Field scores: use fieldMaxSim computed during per-skill loop
                     var fieldScores = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
                     var fieldTopTokens = new Dictionary<string, List<string>>(StringComparer.OrdinalIgnoreCase);
-                    foreach (var fld in topicFieldTfs)
+
+                    foreach (var key in topicFields.Keys)
                     {
-                        var fldTf = fld.Value;
-                        if (fldTf == null || fldTf.Count == 0)
-                        {
-                            fieldScores[fld.Key] = 0m;
-                            fieldTopTokens[fld.Key] = new List<string>();
-                            continue;
-                        }
-
-                        // dot product for field
-                        decimal fldDot = 0m;
-                        foreach (var kv in reviewerTf)
-                        {
-                            if (fldTf.TryGetValue(kv.Key, out var tcount)) fldDot += kv.Value * tcount;
-                        }
-
-                        var fldNorm = ComputeVectorNorm(fldTf);
-                        var fldScore = (fldNorm > 0 && reviewerNorm > 0) ? fldDot / (fldNorm * reviewerNorm) : 0m;
-                        fieldScores[fld.Key] = Decimal.Round(fldScore, 4);
-
-                        // Top matching tokens for this field
-                        var tokensIntersection = reviewerTf.Keys.Intersect(fldTf.Keys, StringComparer.OrdinalIgnoreCase)
-                            .OrderByDescending(k => reviewerTf[k] * fldTf[k])
-                            .Take(8)
-                            .ToList();
-                        fieldTopTokens[fld.Key] = tokensIntersection;
+                        // fieldMaxSim may not exist if topicEmbedding was null or skills loop skipped; default 0
+                        fieldScores[key] = 0m;
+                        fieldTopTokens[key] = new List<string>(); // will be filled later per-reviewer
                     }
 
-                    // Matched skills: find skill tags that have token overlap (using per-field TFs)
-                    var matchedSkills = new List<string>();
-                    foreach (var tag in reviewerSkillDict.Keys)
+                    // If topicEmbedding was available, and we computed per-field maxima, try to use those replacements now
+                    if (topicEmbedding != null)
                     {
-                        var tagTokens = TokenizeText(tag);
-                        if (tagTokens.Any(tok => topicTf.ContainsKey(tok))) matchedSkills.Add(tag);
+                        // Recompute per-field maxima by comparing each field embedding to the reviewer's skill embeddings (cheap because embeddings cached above)
+                        try
+                        {
+                            var now = DateTime.UtcNow;
+                            // ensure we have at least one skill embedding for this reviewer
+                            var reviewerSkillEmbeddings = new List<float[]>();
+                            foreach (var s in skills)
+                            {
+                                var tag = s.SkillTag?.Trim();
+                                if (string.IsNullOrWhiteSpace(tag)) continue;
+                                if (_skillEmbeddingCache.TryGetValue(tag, out var se) && se.ExpiresAt > now)
+                                {
+                                    if (se.Emb != null) reviewerSkillEmbeddings.Add(se.Emb);
+                                }
+                            }
+
+                            if (reviewerSkillEmbeddings.Count > 0)
+                            {
+                                foreach (var fk in topicFields.Keys.ToList())
+                                {
+                                    var fieldText = topicFields[fk];
+                                    if (string.IsNullOrWhiteSpace(fieldText)) { fieldScores[fk] = 0m; continue; }
+
+                                    float[]? fieldEmb = null;
+                                    if (_fieldEmbeddingCache.TryGetValue(fk + "|" + fieldText, out var fe) && fe.ExpiresAt > DateTime.UtcNow)
+                                    {
+                                        fieldEmb = fe.Emb;
+                                    }
+                                    else
+                                    {
+                                        try
+                                        {
+                                            fieldEmb = await _aiService.GetEmbeddingAsync(fieldText);
+                                            if (fieldEmb != null && fieldEmb.Length > 0) _fieldEmbeddingCache[fk + "|" + fieldText] = (fieldEmb, DateTime.UtcNow.Add(FieldEmbeddingCacheTtl));
+                                        }
+                                        catch { fieldEmb = null; }
+                                    }
+
+                                    if (fieldEmb == null) { fieldScores[fk] = 0m; continue; }
+
+                                    double fMax = 0.0;
+                                    foreach (var sEmb in reviewerSkillEmbeddings)
+                                    {
+                                        if (sEmb == null || sEmb.Length != fieldEmb.Length) continue;
+                                        try
+                                        {
+                                            var fSim = _aiService.CosineSimilarity(fieldEmb, sEmb);
+                                            fSim = Math.Max(0.0, Math.Min(1.0, fSim));
+                                            if (fSim > fMax) fMax = fSim;
+                                        }
+                                        catch { }
+                                    }
+
+                                    fieldScores[fk] = Decimal.Round((decimal)fMax, 4);
+
+                                    // Now compute top tokens for this field specific to this reviewer: choose tokens most similar to any reviewer skill embedding
+                                    try
+                                    {
+                                        var tokens = new List<(string token, double sim)>();
+                                        var cleaned = new string(fieldText.Where(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)).ToArray()).ToLowerInvariant();
+                                        var parts = cleaned.Split(new[] { ' ', '\t', '\n', '\r', ',', '.', ';', ':' }, StringSplitOptions.RemoveEmptyEntries)
+                                            .Where(p => p.Length > 2).Select(p => p.Trim()).Distinct().Take(12).ToList();
+
+                                        foreach (var token in parts)
+                                        {
+                                            try
+                                            {
+                                                float[]? tokenEmb = null;
+                                                var tKey = "token|" + token;
+                                                if (_tokenEmbeddingCache.TryGetValue(tKey, out var te) && te.ExpiresAt > DateTime.UtcNow)
+                                                {
+                                                    tokenEmb = te.Emb;
+                                                }
+                                                else
+                                                {
+                                                    tokenEmb = await _aiService.GetEmbeddingAsync(token);
+                                                    if (tokenEmb != null && tokenEmb.Length > 0) _tokenEmbeddingCache[tKey] = (tokenEmb, DateTime.UtcNow.Add(TokenEmbeddingCacheTtl));
+                                                }
+
+                                                if (tokenEmb == null) continue;
+                                                double tokenMaxSim = 0.0;
+                                                foreach (var sEmb in reviewerSkillEmbeddings)
+                                                {
+                                                    if (sEmb == null || sEmb.Length != tokenEmb.Length) continue;
+                                                    var tSim = _aiService.CosineSimilarity(tokenEmb, sEmb);
+                                                    tSim = Math.Max(0.0, Math.Min(1.0, tSim));
+                                                    if (tSim > tokenMaxSim) tokenMaxSim = tSim;
+                                                }
+
+                                                tokens.Add((token, tokenMaxSim));
+                                            }
+                                            catch { }
+                                        }
+
+                                        var best = tokens.OrderByDescending(t => t.sim).Where(t => t.sim >= TokenMatchThreshold).Take(3).Select(t => t.token).ToList();
+                                        fieldTopTokens[fk] = best;
+                                    }
+                                    catch (Exception ex)
+                                    {
+                                        _logger.LogDebug(ex, "Token top-token extraction failed for reviewer {ReviewerId} field {Field}", reviewer.Id, fk);
+                                    }
+                                }
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            _logger.LogDebug(ex, "Per-field similarity computation failed for reviewer {ReviewerId}", reviewer.Id);
+                        }
                     }
 
-                    // Prefer DB-stored ReviewerPerformance values for semester-scoped metrics when available
+                    // Performance metrics (same as before)
                     int currentActiveAssignments;
                     int completedAssignments;
                     decimal performanceScore;
@@ -408,11 +575,9 @@ namespace App.BLL.Implementations
 
                     if (perf != null)
                     {
-                        // Derive current active from TotalAssignments - CompletedAssignments (ensure non-negative)
                         var active = perf.TotalAssignments - perf.CompletedAssignments;
                         currentActiveAssignments = Math.Max(0, active);
                         completedAssignments = perf.CompletedAssignments;
-                        // Build a performance score using QualityRating, OnTimeRate and AverageScoreGiven (fallbacks to 0)
                         var quality = perf.QualityRating ?? 0m;
                         var onTime = perf.OnTimeRate ?? 0m;
                         var avgScore = perf.AverageScoreGiven ?? 0m;
@@ -420,15 +585,12 @@ namespace App.BLL.Implementations
                     }
                     else
                     {
-                        // Fallback: compute from in-memory reviewer record
                         currentActiveAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Assigned || a.Status == AssignmentStatus.InProgress) ?? 0;
                         completedAssignments = reviewer.ReviewerAssignments?.Count(a => a.Status == AssignmentStatus.Completed) ?? 0;
                         performanceScore = CalculatePerformanceScore(reviewer);
                     }
 
-                    // Workload score (lower is better) - invert so higher is better (0..1)
                     var workloadScore = 1 - Math.Min(1, currentActiveAssignments / 5m);
-
                     var overallScore = skillMatchScore * 0.5m + workloadScore * 0.3m + performanceScore * 0.2m;
 
                     var dto = new ReviewerSuggestionDTO
@@ -445,195 +607,31 @@ namespace App.BLL.Implementations
                         OverallScore = Decimal.Round(overallScore, 4),
                         CurrentActiveAssignments = currentActiveAssignments,
                         CompletedAssignments = completedAssignments,
-                        // Populate performance fields (prefer DB values when available)
                         AverageScoreGiven = perf?.AverageScoreGiven,
                         OnTimeRate = perf?.OnTimeRate,
                         QualityRating = perf?.QualityRating,
-                        IsEligible = matchedSkills.Any() && (reviewer.LecturerSkills?.Any() ?? false),
-                        IneligibilityReasons = matchedSkills.Any() ? new List<string>() : new List<string> { "No matching skills with topic" }
+                        IsEligible = ((matchedSkills.Any() || skillMatchScore >= (decimal)EligibilityEmbeddingThreshold) && (reviewer.LecturerSkills?.Any() ?? false)),
+                        IneligibilityReasons = (matchedSkills.Any() || skillMatchScore >= (decimal)EligibilityEmbeddingThreshold) ? new List<string>() : new List<string> { "No matching skills with topic (semantic similarity below threshold)" }
                     };
 
-                    // Add small explain string to log for audit
-                    _logger.LogDebug("Reviewer {ReviewerId}: overallSkill={OverallSkill} fieldScores={FieldScores}", reviewer.Id, dto.SkillMatchScore, string.Join(',', dto.SkillMatchFieldScores.Select(k => k.Key + ":" + k.Value)));
-
+                    _logger.LogDebug("Reviewer {ReviewerId}: skillScore={SkillScore} matched={Matched}", reviewer.Id, dto.SkillMatchScore, string.Join(',', dto.MatchedSkills));
+                        try
+                        {
+                            _logger.LogDebug("Reviewer {ReviewerId} field scores: {FieldScores}", reviewer.Id, string.Join(", ", dto.SkillMatchFieldScores.Select(kv => kv.Key + ":" + kv.Value)));
+                        }
+                        catch { }
                     reviewerScores.Add(dto);
                 }
                 catch (Exception ex)
                 {
-                    _logger.LogWarning(ex, "Failed to calculate DB-driven score for reviewer {ReviewerId}.", reviewer.Id);
+                    _logger.LogWarning(ex, "Failed to calculate embedding-driven score for reviewer {ReviewerId}.", reviewer.Id);
                 }
             }
 
             return reviewerScores;
         }
 
-        // Simple tokenizer: lowercase, remove punctuation, split on whitespace
-        private static List<string> TokenizeText(string text)
-        {
-            if (string.IsNullOrWhiteSpace(text)) return new List<string>();
-
-            // Normalize and remove diacritics
-            var normalized = text.Normalize(NormalizationForm.FormD);
-            var sb = new StringBuilder();
-            foreach (var ch in normalized)
-            {
-                var uc = CharUnicodeInfo.GetUnicodeCategory(ch);
-                if (uc != UnicodeCategory.NonSpacingMark) sb.Append(ch);
-            }
-
-            var cleaned = new string(sb.ToString().Normalize(NormalizationForm.FormC).ToLowerInvariant().Where(c => char.IsLetterOrDigit(c) || char.IsWhiteSpace(c)).ToArray());
-            var parts = cleaned.Split(new[] { ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries)
-                .Where(p => p.Length > 0).ToList();
-
-            // Basic token stemming and synonym expansion
-            var unigrams = parts.Where(p => p.Length > 1).Select(StemToken).ToList();
-
-            // include bigrams to catch phrases like "natural language"
-            var bigrams = new List<string>();
-            for (int i = 0; i + 1 < unigrams.Count; i++)
-            {
-                bigrams.Add($"{unigrams[i]} {unigrams[i + 1]}");
-            }
-
-            var tokens = unigrams.Concat(bigrams).SelectMany(ExpandSynonyms).Distinct(StringComparer.OrdinalIgnoreCase).ToList();
-            return tokens;
-        }
-
-        // Expanded synonyms map for acronyms, phrases and common variants (programming, frameworks, infra, data, app types)
-        private static readonly Dictionary<string, string[]> _synonyms = new(StringComparer.OrdinalIgnoreCase)
-        {
-            // Core AI / NLP
-            { "nlp", new[]{ "nlp", "natural language processing", "natural language", "language processing", "xử lý ngôn ngữ tự nhiên" } },
-            { "natural language processing", new[]{ "natural language processing", "nlp", "xử lý ngôn ngữ tự nhiên" } },
-            { "ai", new[]{ "ai", "artificial intelligence", "artificial", "intelligence", "trí tuệ nhân tạo" } },
-            { "artificial intelligence", new[]{ "artificial intelligence", "ai", "trí tuệ nhân tạo" } },
-            { "ml", new[]{ "ml", "machine learning", "machine", "learning", "học máy" } },
-            { "machine learning", new[]{ "machine learning", "ml", "học máy" } },
-            { "dl", new[]{ "dl", "deep learning", "deep", "learning", "học sâu" } },
-            { "deep learning", new[]{ "deep learning", "dl", "neural networks", "neural", "học sâu", "mạng nơ-ron" } },
-            { "cv", new[]{ "cv", "computer vision", "image processing", "vision", "thị giác máy tính", "xử lý ảnh" } },
-            { "computer vision", new[]{ "computer vision", "cv", "image processing", "thị giác máy tính" } },
-            { "transformer", new[]{ "transformer", "transformers", "bert", "gpt", "llm", "mô hình transformer" } },
-            { "bert", new[]{ "bert", "transformer", "mô hình bert" } },
-            { "gpt", new[]{ "gpt", "llm", "transformer", "mô hình gpt" } },
-            { "llm", new[]{ "llm", "large language model", "language model", "mô hình ngôn ngữ lớn" } },
-            { "rnn", new[]{ "rnn", "recurrent neural network", "recurrent", "mạng nơ-ron hồi tiếp" } },
-            { "lstm", new[]{ "lstm", "long short term memory", "recurrent", "lstm" } },
-
-            // Data & analytics
-            { "data science", new[]{ "data science", "data", "analytics", "data mining", "khoa học dữ liệu" } },
-            { "data mining", new[]{ "data mining", "data", "mining", "khai thác dữ liệu" } },
-            { "statistics", new[]{ "statistics", "statistical", "probability", "thống kê" } },
-
-            // Engineering / programming
-            { "software engineering", new[]{ "software engineering", "software", "engineering", "kỹ thuật phần mềm" } },
-            { "programming language", new[]{ "programming language", "programming", "language", "ngôn ngữ lập trình" } },
-
-            // Programming languages
-            { "python", new[]{ "python", "py", "python" } },
-            { "java", new[]{ "java", "java" } },
-            { "csharp", new[]{ "csharp", "c#", "dotnet", "dot net", ".net", "c#" } },
-            { "cpp", new[]{ "cpp", "c++", "c plus plus", "cplus", "c++" } },
-            { "javascript", new[]{ "javascript", "js", "nodejs", "node", "javascript" } },
-            { "typescript", new[]{ "typescript", "ts", "typescript" } },
-            { "go", new[]{ "go", "golang", "go" } },
-            { "rust", new[]{ "rust", "rust" } },
-            { "kotlin", new[]{ "kotlin", "kotlin" } },
-            { "swift", new[]{ "swift", "swift" } },
-            { "php", new[]{ "php", "php" } },
-            { "ruby", new[]{ "ruby", "ruby on rails", "rails", "ruby" } },
-
-            // Frameworks and libraries
-            { "aspnet", new[]{ "aspnet", "asp.net", "asp net", "asp", "asp.net" } },
-            { "spring", new[]{ "spring", "spring boot", "springboot", "spring-boot", "spring" } },
-            { "django", new[]{ "django", "django" } },
-            { "flask", new[]{ "flask", "flask" } },
-            { "react", new[]{ "react", "reactjs", "react native", "reactnative", "react" } },
-            { "angular", new[]{ "angular", "angular" } },
-            { "vue", new[]{ "vue", "vuejs", "vue" } },
-            { "svelte", new[]{ "svelte", "svelte" } },
-            { "nextjs", new[]{ "nextjs", "next", "next.js" } },
-            { "nuxt", new[]{ "nuxt", "nuxt" } },
-            { "node", new[]{ "node", "nodejs", "node js", "node" } },
-            { "express", new[]{ "express", "expressjs", "express" } },
-            { "laravel", new[]{ "laravel", "laravel" } },
-
-            // App types and architectures
-            { "web app", new[]{ "web app", "web application", "web", "ứng dụng web" } },
-            { "mobile", new[]{ "mobile", "mobile app", "android", "ios", "di động", "ứng dụng di động" } },
-            { "desktop", new[]{ "desktop", "desktop app", "ứng dụng desktop" } },
-            { "microservice", new[]{ "microservice", "microservices", "dịch vụ vi mô", "microservice" } },
-            { "rest", new[]{ "rest", "rest api", "restful", "api rest" } },
-            { "grpc", new[]{ "grpc", "grpc" } },
-            { "graphql", new[]{ "graphql", "graphql" } },
-
-            // Infra / DevOps
-            { "docker", new[]{ "docker", "container", "containers", "docker" } },
-            { "kubernetes", new[]{ "kubernetes", "k8s", "kube", "kubernetes" } },
-            { "helm", new[]{ "helm", "helm" } },
-            { "ci/cd", new[]{ "ci/cd", "ci", "cd", "continuous integration", "continuous delivery", "tiếp tục tích hợp", "ci cd" } },
-
-            // Cloud / platforms
-            { "aws", new[]{ "aws", "amazon web services", "aws" } },
-            { "azure", new[]{ "azure", "microsoft azure", "azure" } },
-            { "gcp", new[]{ "gcp", "google cloud", "google cloud platform", "gcp" } },
-
-            // Data / Big Data
-            { "etl", new[]{ "etl", "extract transform load", "etl" } },
-            { "big data", new[]{ "big data", "hadoop", "spark", "dữ liệu lớn" } },
-            { "hadoop", new[]{ "hadoop", "hadoop" } },
-            { "spark", new[]{ "spark", "spark" } },
-
-            // Testing / QA
-            { "testing", new[]{ "testing", "unit test", "integration test", "tdd", "kiểm thử" } },
-            { "tdd", new[]{ "tdd", "test driven development", "phát triển theo kiểm thử" } },
-
-            // Security / blockchain / iot
-            { "security", new[]{ "security", "cybersecurity", "information security", "bảo mật" } },
-            { "blockchain", new[]{ "blockchain", "distributed ledger", "smart contract", "blockchain" } },
-            { "solidity", new[]{ "solidity", "smart contract", "solidity" } },
-            { "iot", new[]{ "iot", "internet of things", "embedded", "iot", "vạn vật kết nối" } },
-
-            // Misc common terms
-            { "database", new[]{ "database", "sql", "nosql", "mysql", "postgresql", "mongodb", "cơ sở dữ liệu" } },
-            { "sql", new[]{ "sql", "structured query language", "sql" } },
-            { "nosql", new[]{ "nosql", "document db", "key value", "nosql" } },
-            { "algorithm", new[]{ "algorithm", "algorithms", "thuật toán" } },
-            { "optimization", new[]{ "optimization", "optimisation", "optimise", "tối ưu hóa" } },
-            { "evaluation", new[]{ "evaluation", "metrics", "accuracy", "f1", "precision", "recall", "đánh giá" } }
-        };
-
-        private static IEnumerable<string> ExpandSynonyms(string token)
-        {
-            if (_synonyms.TryGetValue(token, out var list)) return list;
-            return new[] { token };
-        }
-
-        // Very small stemmer: drop common suffixes -ing, -ed, -s
-        private static string StemToken(string token)
-        {
-            if (token.EndsWith("ing") && token.Length > 5) return token.Substring(0, token.Length - 3);
-            if (token.EndsWith("ed") && token.Length > 4) return token.Substring(0, token.Length - 2);
-            if (token.EndsWith("s") && token.Length > 3) return token.Substring(0, token.Length - 1);
-            return token;
-        }
-
-        private static Dictionary<string, decimal> BuildTermFrequency(List<string> tokens)
-        {
-            var dict = new Dictionary<string, decimal>(StringComparer.OrdinalIgnoreCase);
-            foreach (var t in tokens)
-            {
-                if (dict.ContainsKey(t)) dict[t] += 1; else dict[t] = 1;
-            }
-            return dict;
-        }
-
-        private static decimal ComputeVectorNorm(Dictionary<string, decimal> tf)
-        {
-            decimal sumSquares = 0;
-            foreach (var v in tf.Values) sumSquares += v * v;
-            return (decimal)Math.Sqrt((double)sumSquares);
-        }
+        // NOTE: Tokenization, TF and synonym helpers removed - this service now uses embeddings-only matching.
 
         private decimal CalculatePerformanceScore(User reviewer)
         {
