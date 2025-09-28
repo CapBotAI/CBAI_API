@@ -17,7 +17,6 @@ namespace App.BLL.Services
         private readonly HttpClient _httpClient;
         private readonly string _embeddingModel;
         private readonly string _promptModel;
-        private readonly string _region;
         // Limit concurrent prompt-generation calls to avoid bursting the provider
         private static readonly System.Threading.SemaphoreSlim _promptSemaphore = new System.Threading.SemaphoreSlim(4);
 
@@ -26,7 +25,7 @@ namespace App.BLL.Services
             _apiKey = config["GeminiAI:ApiKey"] ?? throw new ArgumentNullException("GeminiAI:ApiKey missing");
             _embeddingModel = config["GeminiAI:EmbeddingModel"] ?? "gemini-embedding-001";
             _promptModel = config["GeminiAI:PromptModel"] ?? "gemini-1.5-flash";
-            _region = config["GeminiAI:Region"] ?? "us-central1";
+            // Region configuration removed: we construct provider URLs using model names or fully-qualified model paths.
 
             _httpClient = new HttpClient();
 
