@@ -17,7 +17,6 @@ namespace App.BLL.Services
         private readonly HttpClient _httpClient;
         private readonly string _embeddingModel;
         private readonly string _promptModel;
-        private readonly string _region;
         // Limit concurrent prompt-generation calls to avoid bursting the provider
         private static readonly System.Threading.SemaphoreSlim _promptSemaphore = new System.Threading.SemaphoreSlim(4);
 
@@ -26,7 +25,7 @@ namespace App.BLL.Services
             _apiKey = config["GeminiAI:ApiKey"] ?? throw new ArgumentNullException("GeminiAI:ApiKey missing");
             _embeddingModel = config["GeminiAI:EmbeddingModel"] ?? "gemini-embedding-001";
             _promptModel = config["GeminiAI:PromptModel"] ?? "gemini-1.5-flash";
-            _region = config["GeminiAI:Region"] ?? "us-central1";
+            // Region configuration removed: we construct provider URLs using model names or fully-qualified model paths.
 
             _httpClient = new HttpClient();
 
@@ -47,7 +46,7 @@ namespace App.BLL.Services
             }
         }
 
-        public async Task<float[]> GetEmbeddingAsync(string text)
+    public async Task<float[]?> GetEmbeddingAsync(string text)
         {
             if (string.IsNullOrWhiteSpace(text))
             {
@@ -86,10 +85,12 @@ namespace App.BLL.Services
                 // Log the payload being sent
                 Console.WriteLine($"Sending payload to Gemini API: {JsonSerializer.Serialize(body)}");
 
-                // Send the request with simple retry/backoff for transient failures (429/5xx/network)
-                HttpResponseMessage response = null!;
+                // Send the request with exponential retry/backoff and jitter for transient failures (429/5xx/network)
+                HttpResponseMessage? response = null;
                 string responseContent = string.Empty;
-                var maxAttempts = 3;
+                var maxAttempts = 5;
+                var rand = new Random();
+
                 for (int attempt = 1; attempt <= maxAttempts; attempt++)
                 {
                     try
@@ -101,25 +102,53 @@ namespace App.BLL.Services
                         if (response.IsSuccessStatusCode)
                             break;
 
-                        // If it's a client error other than 429, bail out immediately
+                        // If it's a client error other than 429, treat as non-retryable and return null
                         if ((int)response.StatusCode >= 400 && (int)response.StatusCode < 500 && response.StatusCode != (System.Net.HttpStatusCode)429)
                         {
-                            throw new Exception($"Gemini Embedding API error: {response.StatusCode} {responseContent}");
+                            Console.WriteLine($"Gemini Embedding API client error (no-retry): {response.StatusCode}. Response: {responseContent}");
+                            return null;
                         }
+
+                        // If 429, respect Retry-After header when present
+                        if (response.StatusCode == (System.Net.HttpStatusCode)429)
+                        {
+                            if (response.Headers.TryGetValues("Retry-After", out var values))
+                            {
+                                var ra = values.FirstOrDefault();
+                                if (int.TryParse(ra, out var seconds))
+                                {
+                                    await Task.Delay(TimeSpan.FromSeconds(seconds));
+                                    continue;
+                                }
+                            }
+                        }
+
+                        // For 5xx (including 503) we will retry up to maxAttempts
                     }
                     catch (HttpRequestException) when (attempt < maxAttempts)
                     {
                         // transient network error -> retry
                     }
+                    catch (Exception ex) when (attempt < maxAttempts)
+                    {
+                        // log and retry for unexpected transient errors
+                        Console.WriteLine($"Transient error calling Gemini API (attempt {attempt}): {ex.Message}");
+                    }
 
-                    // exponential backoff before next attempt
                     if (attempt < maxAttempts)
-                        await Task.Delay(500 * attempt);
+                    {
+                        // exponential backoff with jitter
+                        var backoffMs = Math.Min(10000, (int)(Math.Pow(2, attempt) * 200));
+                        var jitter = rand.Next(100, 600);
+                        await Task.Delay(backoffMs + jitter);
+                    }
                 }
 
                 if (response == null || !response.IsSuccessStatusCode)
                 {
-                    throw new Exception($"Gemini Embedding API error after retries: {(response == null ? "no response" : response.StatusCode.ToString())} {responseContent}");
+                    // Service unavailable or repeated failures - degrade gracefully and return null so callers can continue
+                    Console.WriteLine($"Gemini Embedding API error after retries: {(response == null ? "no response" : response.StatusCode.ToString())}. Response: {responseContent}");
+                    return null;
                 }
 
                 // Parse the response and try to locate a numeric vector in various possible shapes
@@ -130,7 +159,8 @@ namespace App.BLL.Services
                 }
                 catch (JsonException jsonEx)
                 {
-                    throw new Exception($"Failed to parse Gemini API response: {jsonEx.Message}. Response: {responseContent}");
+                    Console.WriteLine($"Failed to parse Gemini API response: {jsonEx.Message}. Response: {responseContent}");
+                    return null;
                 }
 
                 // Helper: recursively search JsonElement for the first numeric array (vector)
@@ -201,7 +231,33 @@ namespace App.BLL.Services
                     throw new Exception($"Could not find numeric embedding vector in Gemini API response. Full response: {responseContent}");
                 }
 
-                return vector;
+                // Normalize embedding to unit length (L2) to make cosine similarity stable across calls
+                try
+                {
+                    double sumSq = 0.0;
+                    for (int i = 0; i < vector.Length; i++) sumSq += (double)vector[i] * (double)vector[i];
+                    var norm = Math.Sqrt(sumSq);
+                    if (norm > 1e-12)
+                    {
+                        var normalized = new float[vector.Length];
+                        for (int i = 0; i < vector.Length; i++) normalized[i] = (float)(vector[i] / norm);
+
+                        // Log a short preview for debugging (first 6 dims)
+                        var previewCount = Math.Min(6, normalized.Length);
+                        var sb = new System.Text.StringBuilder();
+                        for (int i = 0; i < previewCount; i++) { if (i > 0) sb.Append(','); sb.Append(normalized[i].ToString(System.Globalization.CultureInfo.InvariantCulture)); }
+                        Console.WriteLine($"Gemini embedding normalized (len={normalized.Length}, norm={norm:F6}) preview=[{sb}]");
+                        return normalized;
+                    }
+
+                    // if zero-norm, return raw vector
+                    return vector;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"Failed to normalize embedding: {ex.Message}");
+                    return vector;
+                }
             }
             catch (Exception ex)
             {
