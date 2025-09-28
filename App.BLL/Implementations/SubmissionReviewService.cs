@@ -198,11 +198,11 @@ public class SubmissionReviewService : ISubmissionReviewService
                 {
                     submission.Status = SubmissionStatus.RevisionRequired;
                 }
-                else if (approveCount >= 2 && approveCount == submittedReviews.Count)
+                else if (approveCount >= 2)
                 {
                     submission.Status = SubmissionStatus.Approved;
                 }
-                else if (rejectCount >= 2 && rejectCount == submittedReviews.Count)
+                else if (rejectCount >= 2)
                 {
                     submission.Status = SubmissionStatus.Rejected;
                 }

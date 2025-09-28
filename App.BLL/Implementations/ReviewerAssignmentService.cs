@@ -192,6 +192,49 @@ CapBot";
                 };
             }
 
+            // Enforce maximum of 2 reviewers per submission
+            var assignmentsForSubmissionOptions = new QueryOptions<ReviewerAssignment>
+            {
+                Predicate = ra => ra.SubmissionId == dto.SubmissionId
+            };
+            var existingAssignmentsForSubmission = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(assignmentsForSubmissionOptions);
+            var currentAssignedCount = existingAssignmentsForSubmission?.Count() ?? 0;
+            // Allow moderators to add a single extra reviewer if submission is escalated to moderator
+            var allowExtraForModerator = false;
+            if (submission != null && submission.Status == SubmissionStatus.EscalatedToModerator)
+            {
+                // check if assignedById has moderator role
+                var assignerRoles = await _unitOfWork.GetRepo<UserRole>().GetAllAsync(new QueryOptions<UserRole>
+                {
+                    Predicate = ur => ur.UserId == assignedById,
+                    IncludeProperties = new List<System.Linq.Expressions.Expression<Func<UserRole, object>>>
+                    {
+                        ur => ur.Role
+                    }
+                });
+                allowExtraForModerator = assignerRoles.Any(r => r.Role != null && r.Role.Name == SystemRoleConstants.Moderator);
+            }
+
+            if (!allowExtraForModerator && currentAssignedCount >= 2)
+            {
+                return new BaseResponseModel<ReviewerAssignmentResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Submission đã có đủ 2 reviewer được phân công. Không thể phân thêm reviewer."
+                };
+            }
+
+            if (allowExtraForModerator && currentAssignedCount >= 3)
+            {
+                return new BaseResponseModel<ReviewerAssignmentResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Submission đã có đủ reviewer (đã đạt giới hạn thêm cho moderator)."
+                };
+            }
+
             // Check workload limits (optional business rule - max 10 active assignments per reviewer)
             var activeAssignmentOptions = new QueryOptions<ReviewerAssignment>
             {
@@ -392,8 +435,21 @@ CapBot";
             var results = new List<ReviewerAssignmentResponseDTO>();
             var errors = new List<string>();
 
+            // Enforce overall cap of 2 reviewers per submission across the bulk operation.
             foreach (var assignmentDto in dto.Assignments)
             {
+                // Check current assigned count for this submission
+                var existingAssignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(new QueryOptions<ReviewerAssignment>
+                {
+                    Predicate = ra => ra.SubmissionId == assignmentDto.SubmissionId
+                });
+                var currentAssignedCount = existingAssignments?.Count() ?? 0;
+                if (currentAssignedCount >= 2)
+                {
+                    errors.Add($"Submission {assignmentDto.SubmissionId}: already has 2 reviewers assigned; skipping reviewer {assignmentDto.ReviewerId}.");
+                    continue;
+                }
+
                 var result = await AssignReviewerAsync(assignmentDto, assignedById);
                 if (result.IsSuccess)
                 {
@@ -401,8 +457,7 @@ CapBot";
                 }
                 else
                 {
-                    errors.Add(
-                        $"Submission {assignmentDto.SubmissionId} - Reviewer {assignmentDto.ReviewerId}: {result.Message}");
+                    errors.Add($"Submission {assignmentDto.SubmissionId} - Reviewer {assignmentDto.ReviewerId}: {result.Message}");
                 }
             }
 
@@ -910,9 +965,30 @@ CapBot";
                 };
             }
 
-            // Select top performers to assign
+            // Determine remaining slots (max 2 reviewers per submission)
+            var existingAssignments = await _unitOfWork.GetRepo<ReviewerAssignment>().GetAllAsync(new QueryOptions<ReviewerAssignment>
+            {
+                Predicate = ra => ra.SubmissionId == dto.SubmissionId
+            });
+            var existingCount = existingAssignments?.Count() ?? 0;
+            var remainingSlots = Math.Max(0, 2 - existingCount);
+            var requestCount = Math.Min(dto.NumberOfReviewers, remainingSlots);
+
+            if (requestCount <= 0)
+            {
+                result.Warnings.Add("Submission already has 2 reviewers assigned; auto-assign skipped.");
+                return new BaseResponseModel<AutoAssignmentResult>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Không thể auto-assign vì submission đã có đủ reviewer",
+                    Data = result
+                };
+            }
+
+            // Select top performers to assign (cap to remaining slots)
             var reviewersToAssign = eligibleReviewers
-                .Take(dto.NumberOfReviewers)
+                .Take(requestCount)
                 .ToList();
 
             // Assign selected reviewers
