@@ -1,5 +1,6 @@
 using System;
 using App.Entities.Entities.App;
+using App.Entities.Enums;
 
 namespace App.Entities.DTOs.Submissions;
 
@@ -18,6 +19,8 @@ public class SubmissionOverviewResDTO
 
     public DateTime? SubmittedAt { get; set; }
 
+    public SubmissionStatus Status { get; set; }
+
     public SubmissionOverviewResDTO(Submission submission)
     {
         Id = submission.Id;
@@ -27,5 +30,6 @@ public class SubmissionOverviewResDTO
         SubmittedByName = submission.SubmittedByUser.UserName;
         SubmissionRound = submission.SubmissionRound;
         SubmittedAt = submission.SubmittedAt;
+        Status = submission.Status;
     }
 }

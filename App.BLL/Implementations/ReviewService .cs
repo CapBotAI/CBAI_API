@@ -25,7 +25,122 @@ public class ReviewService : IReviewService
         _semesterService = semesterService;
     }
 
-    public async Task<BaseResponseModel<ReviewResponseDTO>> CreateAsync(CreateReviewDTO createDTO , int currentUserId)
+    // Ensure submission status is updated after a review is submitted
+    private async Task UpdateSubmissionStatusAfterSubmit(int assignmentId)
+    {
+        try
+        {
+            var assignmentRepo = _unitOfWork.GetRepo<ReviewerAssignment>();
+            var submissionRepo = _unitOfWork.GetRepo<Submission>();
+
+            var assignment = await assignmentRepo.GetSingleAsync(new QueryOptions<ReviewerAssignment>
+            {
+                Predicate = a => a.Id == assignmentId,
+                IncludeProperties = new List<System.Linq.Expressions.Expression<Func<ReviewerAssignment, object>>>
+                {
+                    a => a.Submission,
+                    a => a.Submission.ReviewerAssignments,
+                    a => a.Submission.ReviewerAssignments.Select(ra => ra.Reviews)
+                },
+                Tracked = false
+            });
+
+            if (assignment?.Submission == null) return;
+
+            var submission = assignment.Submission;
+
+            // Collect submitted reviews across all assignments for this submission
+            var submittedReviews = submission.ReviewerAssignments
+                .SelectMany(ra => ra.Reviews ?? new List<Review>())
+                .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted)
+                .ToList();
+
+            if (submittedReviews.Count < 2) return; // wait for at least two submitted reviews
+
+            var approveCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.Approve);
+            var rejectCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.Reject);
+            var revisionCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.MinorRevision || r.Recommendation == ReviewRecommendations.MajorRevision);
+
+            if (revisionCount > 0)
+            {
+                submission.Status = SubmissionStatus.RevisionRequired;
+            }
+            else if (approveCount >= 2 && approveCount == submittedReviews.Count)
+            {
+                submission.Status = SubmissionStatus.Approved;
+            }
+            else if (rejectCount >= 2 && rejectCount == submittedReviews.Count)
+            {
+                submission.Status = SubmissionStatus.Rejected;
+            }
+            else if (approveCount > 0 && rejectCount > 0)
+            {
+                submission.Status = SubmissionStatus.EscalatedToModerator;
+            }
+
+            // Persist submission status change
+            await submissionRepo.UpdateAsync(submission);
+
+            // Also update related assignments: mark assignments that have a submitted review as Completed or Overdue
+            // Use the latest submitted review for each assignment to determine completed time
+            var assignmentIdsWithSubmitted = submittedReviews.Select(r => r.AssignmentId).Distinct().ToList();
+            var assignmentsToUpdate = submission.ReviewerAssignments
+                .Where(ra => assignmentIdsWithSubmitted.Contains(ra.Id))
+                .ToList();
+
+            var updatedAssignmentIds = new List<int>();
+            foreach (var ra in assignmentsToUpdate)
+            {
+                try
+                {
+                    // find latest submitted review for this assignment
+                    var latestSubmitted = (ra.Reviews ?? new List<Review>())
+                        .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted)
+                        .OrderByDescending(r => r.SubmittedAt)
+                        .FirstOrDefault();
+
+                    if (latestSubmitted == null) continue;
+
+                    // Determine on-time vs overdue using UTC comparisons; if no deadline, treat as on-time
+                    var completedAt = latestSubmitted.SubmittedAt ?? DateTime.UtcNow;
+                    var isOnTime = true;
+                    if (ra.Deadline.HasValue)
+                    {
+                        isOnTime = completedAt.ToUniversalTime() <= ra.Deadline.Value.ToUniversalTime();
+                    }
+
+                    ra.CompletedAt = completedAt;
+                    ra.Status = isOnTime ? AssignmentStatus.Completed : AssignmentStatus.Overdue;
+
+                    // Update the assignment row (tracked=false so UpdateAsync will attach)
+                    await assignmentRepo.UpdateAsync(ra);
+                    updatedAssignmentIds.Add(ra.Id);
+                }
+                catch { /* best-effort, do not block */ }
+            }
+
+            // Persist all assignment changes first so performance recalculation reads persisted state
+            var saveResult = await _unitOfWork.SaveAsync();
+            if (saveResult.IsSuccess)
+            {
+                // Now recalculate reviewer performance for updated assignments (best-effort)
+                foreach (var aid in updatedAssignmentIds.Distinct())
+                {
+                    try
+                    {
+                        await UpdateReviewerPerformanceForAssignmentAsync(aid);
+                    }
+                    catch { }
+                }
+            }
+        }
+        catch
+        {
+            // Best-effort: do not throw
+        }
+    }
+
+    public async Task<BaseResponseModel<ReviewResponseDTO>> CreateAsync(CreateReviewDTO createDTO, int currentUserId)
     {
         try
         {
@@ -91,12 +206,12 @@ public class ReviewService : IReviewService
 
             var criteria = await criteriaRepo.GetAllAsync(new QueryOptions<EvaluationCriteria>
             {
-                Predicate = x => criteriaIds.Contains(x.Id) && 
+                Predicate = x => criteriaIds.Contains(x.Id) &&
                                  x.IsActive &&
                                  (x.SemesterId == currentSemesterId || x.SemesterId == null), // Filter theo semester
                 Tracked = false
             });
-            
+
 
             if (criteria.Count() != criteriaIds.Count)
             {
@@ -164,7 +279,7 @@ public class ReviewService : IReviewService
 
             await reviewRepo.CreateAsync(review);
             var saveResult = await _unitOfWork.SaveAsync();
-            
+
             if (!saveResult.IsSuccess)
             {
                 await _unitOfWork.RollBackAsync();
@@ -345,7 +460,7 @@ public class ReviewService : IReviewService
             foreach (var scoreDTO in updateDTO.CriteriaScores)
             {
                 var existingScore = existingScores.FirstOrDefault(x => x.CriteriaId == scoreDTO.CriteriaId);
-                
+
                 if (existingScore != null)
                 {
                     // Cập nhật bản ghi hiện có
@@ -426,7 +541,7 @@ public class ReviewService : IReviewService
         try
         {
             var reviewRepo = _unitOfWork.GetRepo<Review>();
-            
+
             var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
             {
                 Predicate = x => x.Id == id && x.IsActive
@@ -487,81 +602,81 @@ public class ReviewService : IReviewService
         }
     }
     public async Task<BaseResponseModel<ReviewResponseDTO>> WithdrawReviewAsync(int reviewId)
-{
-    try
     {
-        var reviewRepo = _unitOfWork.GetRepo<Review>();
-        
-        var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
+        try
         {
-            Predicate = x => x.Id == reviewId && x.IsActive
-        });
+            var reviewRepo = _unitOfWork.GetRepo<Review>();
 
-        if (review == null)
-        {
+            var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
+            {
+                Predicate = x => x.Id == reviewId && x.IsActive
+            });
+
+            if (review == null)
+            {
+                return new BaseResponseModel<ReviewResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status404NotFound,
+                    Message = "Không tìm thấy đánh giá"
+                };
+            }
+
+            if (review.Status != ReviewStatus.Submitted)
+            {
+                return new BaseResponseModel<ReviewResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status400BadRequest,
+                    Message = "Chỉ có thể rút lại đánh giá đã submit"
+                };
+            }
+
+            // Chuyển về trạng thái Draft
+            review.Status = ReviewStatus.Draft;
+            review.SubmittedAt = null;
+            review.LastModifiedAt = DateTime.UtcNow;
+
+            await reviewRepo.UpdateAsync(review);
+            var result = await _unitOfWork.SaveAsync();
+
+            if (!result.IsSuccess)
+            {
+                return new BaseResponseModel<ReviewResponseDTO>
+                {
+                    IsSuccess = false,
+                    StatusCode = StatusCodes.Status500InternalServerError,
+                    Message = result.Message
+                };
+            }
+
+            // Get updated review
+            var updatedReview = await GetByIdAsync(review.Id);
             return new BaseResponseModel<ReviewResponseDTO>
             {
-                IsSuccess = false,
-                StatusCode = StatusCodes.Status404NotFound,
-                Message = "Không tìm thấy đánh giá"
+                IsSuccess = true,
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Rút lại đánh giá thành công",
+                Data = updatedReview.Data
             };
         }
-
-        if (review.Status != ReviewStatus.Submitted)
-        {
-            return new BaseResponseModel<ReviewResponseDTO>
-            {
-                IsSuccess = false,
-                StatusCode = StatusCodes.Status400BadRequest,
-                Message = "Chỉ có thể rút lại đánh giá đã submit"
-            };
-        }
-
-        // Chuyển về trạng thái Draft
-        review.Status = ReviewStatus.Draft;
-        review.SubmittedAt = null;
-        review.LastModifiedAt = DateTime.UtcNow;
-
-        await reviewRepo.UpdateAsync(review);
-        var result = await _unitOfWork.SaveAsync();
-
-        if (!result.IsSuccess)
+        catch (Exception ex)
         {
             return new BaseResponseModel<ReviewResponseDTO>
             {
                 IsSuccess = false,
                 StatusCode = StatusCodes.Status500InternalServerError,
-                Message = result.Message
+                Message = $"Lỗi hệ thống: {ex.Message}"
             };
         }
-
-        // Get updated review
-        var updatedReview = await GetByIdAsync(review.Id);
-        return new BaseResponseModel<ReviewResponseDTO>
-        {
-            IsSuccess = true,
-            StatusCode = StatusCodes.Status200OK,
-            Message = "Rút lại đánh giá thành công",
-            Data = updatedReview.Data
-        };
     }
-    catch (Exception ex)
-    {
-        return new BaseResponseModel<ReviewResponseDTO>
-        {
-            IsSuccess = false,
-            StatusCode = StatusCodes.Status500InternalServerError,
-            Message = $"Lỗi hệ thống: {ex.Message}"
-        };
-    }
-}
 
     public async Task<BaseResponseModel<ReviewResponseDTO>> GetByIdAsync(int id)
     {
         try
         {
             var reviewRepo = _unitOfWork.GetRepo<Review>();
-            
+
             var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
             {
                 Predicate = x => x.Id == id && x.IsActive,
@@ -612,7 +727,7 @@ public class ReviewService : IReviewService
         try
         {
             var reviewRepo = _unitOfWork.GetRepo<Review>();
-            
+
             var query = reviewRepo.Get(new QueryOptions<Review>
             {
                 Predicate = x => x.IsActive,
@@ -635,7 +750,7 @@ public class ReviewService : IReviewService
                 .ToListAsync();
 
             var responseItems = _mapper.Map<List<ReviewResponseDTO>>(items);
-            
+
             pagingModel.TotalRecord = totalItems;
             var pagingData = new PagingDataModel<ReviewResponseDTO>(responseItems, pagingModel);
 
@@ -662,7 +777,7 @@ public class ReviewService : IReviewService
         try
         {
             var reviewRepo = _unitOfWork.GetRepo<Review>();
-            
+
             var review = await reviewRepo.GetSingleAsync(new QueryOptions<Review>
             {
                 Predicate = x => x.Id == reviewId && x.IsActive
@@ -768,7 +883,14 @@ public class ReviewService : IReviewService
                 };
             }
 
-            // After successful submit, update reviewer performance metrics (best-effort)
+            // Ensure submission status is updated according to review recommendations (two reviewers logic)
+            try
+            {
+                await UpdateSubmissionStatusAfterSubmit(review.AssignmentId);
+            }
+            catch { /* do not block submit if status update fails */ }
+
+            // After assignment status changes are persisted, update reviewer performance metrics (best-effort)
             try
             {
                 await UpdateReviewerPerformanceForAssignmentAsync(review.AssignmentId);
@@ -800,7 +922,7 @@ public class ReviewService : IReviewService
         try
         {
             var reviewRepo = _unitOfWork.GetRepo<Review>();
-            
+
             var reviews = await reviewRepo.GetAllAsync(new QueryOptions<Review>
             {
                 Predicate = x => x.AssignmentId == assignmentId && x.IsActive,
@@ -947,7 +1069,9 @@ public class ReviewService : IReviewService
                     AverageTimeMinutes = avgTime,
                     AverageScoreGiven = avgScore,
                     OnTimeRate = onTimeRate,
-                    LastUpdated = DateTime.UtcNow
+                    LastUpdated = DateTime.UtcNow,
+                    // Initialize QualityRating as proportionally from on-time performance (scale 0..100)
+                    QualityRating = onTimeRate.HasValue ? (onTimeRate.Value * 100m) : 0m
                 };
                 await perfRepo.CreateAsync(perf);
             }
@@ -959,6 +1083,11 @@ public class ReviewService : IReviewService
                 perf.AverageScoreGiven = avgScore;
                 perf.OnTimeRate = onTimeRate;
                 perf.LastUpdated = DateTime.UtcNow;
+                // Update QualityRating: base it on on-time rate (0..100 scale). If there's an existing QualityRating,
+                // blend it conservatively by averaging with current onTimeRate*100 to avoid sudden jumps.
+                var currentQuality = perf.QualityRating ?? 0m;
+                var latestQuality = onTimeRate.HasValue ? (onTimeRate.Value * 100m) : 0m;
+                perf.QualityRating = Math.Round((currentQuality + latestQuality) / 2m, 2);
                 await perfRepo.UpdateAsync(perf);
             }
 

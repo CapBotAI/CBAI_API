@@ -7,9 +7,11 @@ using App.DAL.UnitOfWork;
 using App.Entities.DTOs.Auth;
 using App.Entities.Entities.Core;
 using Microsoft.AspNetCore.Http;
-using App.Commons.Interfaces; 
+using App.Commons.Interfaces;
 using System.Collections.Generic;
-using App.Commons; 
+using App.Commons;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Logging;
 
 namespace App.BLL.Implementations;
 
@@ -18,15 +20,19 @@ public class AuthService : IAuthService
     private readonly IUnitOfWork _unitOfWork;
     private readonly IJwtService _jwtService;
     private readonly IIdentityRepository _identityRepository;
-    private readonly IEmailService _emailService; 
+    private readonly IEmailService _emailService;
+    private readonly IConfiguration _configuration;
+    private readonly ILogger<AuthService> _logger;
 
 
-    public AuthService(IUnitOfWork unitOfWork, IJwtService jwtService, IIdentityRepository identityRepository, IEmailService emailService)
+    public AuthService(IUnitOfWork unitOfWork, IJwtService jwtService, IIdentityRepository identityRepository, IEmailService emailService, IConfiguration configuration, ILogger<AuthService> logger)
     {
         _unitOfWork = unitOfWork;
         _jwtService = jwtService;
         _identityRepository = identityRepository;
-        _emailService = emailService; 
+        _emailService = emailService;
+        _configuration = configuration;
+        _logger = logger;
     }
 
     public async Task<BaseResponseModel<LoginResponseDTO>> SignInAsync(LoginDTO loginDTO)
@@ -293,37 +299,67 @@ public class AuthService : IAuthService
             // Generate password reset token
             var token = await _identityRepository.GeneratePasswordResetTokenAsync(user);
 
-                // build reset link pointing to the API GET handler so clicking from Swagger/browser reaches the form
-                var encodedToken = System.Net.WebUtility.UrlEncode(token);
-                var resetLink = $"/api/auth/reset-password?userId={user.Id}&token={encodedToken}";
+            // build reset link pointing to the API GET handler so clicking from Swagger/browser reaches the form
+            var encodedToken = System.Net.WebUtility.UrlEncode(token);
+            var resetLink = $"/api/auth/reset-password?userId={user.Id}&token={encodedToken}";
 
-                // send email with clear HTML + plain-text content showing userId and token
-                var emailBody = $@"<html>
-    <body style='font-family: Arial, sans-serif; color:#222'>
-      <h2>Yêu cầu đặt lại mật khẩu</h2>
-      <p>Xin chào <strong>{System.Net.WebUtility.HtmlEncode(user.UserName ?? "")}</strong>,</p>
-      <p>Bạn vừa yêu cầu đặt lại mật khẩu cho tài khoản của mình. Bạn có thể sử dụng đường dẫn bên dưới để đặt lại mật khẩu (mở trong trình duyệt hoặc trong Swagger):</p>
-      <p><a href='{resetLink}'>{resetLink}</a></p>
-      <p>Hoặc sao chép thông tin sau nếu cần thực hiện thủ công:</p>
-      <pre style='background:#f6f6f6;padding:10px;border-radius:4px'>UserId: {user.Id}
-    Token: {token}</pre>
-      <p>Lưu ý: token có hiệu lực trong thời gian ngắn. Nếu bạn không yêu cầu, hãy bỏ qua email này.</p>
-      <p>Trân trọng,<br/>CAPBOT Team</p>
-    </body>
-    </html>";
+            // send email with clear HTML + plain-text content showing userId and token
+            var emailBody = $@"<html>
+        <body style='font-family: Arial, sans-serif; color:#222'>
+            <h2>Yêu cầu đặt lại mật khẩu</h2>
+            <p>Xin chào <strong>{System.Net.WebUtility.HtmlEncode(user.UserName ?? "")}</strong>,</p>
+            <p>Bạn vừa yêu cầu đặt lại mật khẩu cho tài khoản của mình. Bạn có thể sử dụng đường dẫn bên dưới để đặt lại mật khẩu (mở trong trình duyệt hoặc trong Swagger):</p>
+            <p><a href='{resetLink}'>{resetLink}</a></p>
+            <p>Hoặc sao chép thông tin sau nếu cần thực hiện thủ công:</p>
+            <pre style='background:#f6f6f6;padding:10px;border-radius:4px'>UserId: {user.Id}
+        Token: {token}</pre>
+            <p>Lưu ý: token có hiệu lực trong thời gian ngắn. Nếu bạn không yêu cầu, hãy bỏ qua email này.</p>
+            <p>Trân trọng,<br/>CAPBOT Team</p>
+        </body>
+        </html>";
 
-                        // Plain-text fallback (some mail clients may strip HTML)
-                        var textBody = $"Xin chào {user.UserName},\n\n" +
-                                                     "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Dùng đường dẫn sau để đặt lại mật khẩu:\n\n" +
-                                                     resetLink + "\n\n" +
-                                                     $"UserId: {user.Id}\nToken: {token}\n\n" +
-                                                     "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n\nTrân trọng,\nCAPBOT";
+            // Plain-text fallback (some mail clients may strip HTML)
+            var textBody = $"Xin chào {user.UserName},\n\n" +
+                                                                     "Chúng tôi nhận được yêu cầu đặt lại mật khẩu cho tài khoản của bạn. Dùng đường dẫn sau để đặt lại mật khẩu:\n\n" +
+                                                                     resetLink + "\n\n" +
+                                                                     $"UserId: {user.Id}\nToken: {token}\n\n" +
+                                                                     "Nếu bạn không yêu cầu đặt lại mật khẩu, vui lòng bỏ qua email này.\n\nTrân trọng,\nCAPBOT";
 
-                        var recipients = new List<string>();
-                        if (!string.IsNullOrWhiteSpace(user.Email)) recipients.Add(user.Email);
-                        // EmailModel will set both BodyPlainText and BodyHtml to the provided body; pass HTML which is preferred
-                        var emailModel = new EmailModel(recipients, "Yêu cầu đặt lại mật khẩu", emailBody);
-                        await _emailService.SendEmailAsync(emailModel);
+            var recipients = new List<string>();
+            if (!string.IsNullOrWhiteSpace(user.Email)) recipients.Add(user.Email);
+            // EmailModel will set both BodyPlainText and BodyHtml to the provided body; pass HTML which is preferred
+            var emailModel = new EmailModel(recipients, "Yêu cầu đặt lại mật khẩu", emailBody);
+            await _emailService.SendEmailAsync(emailModel);
+
+            // Log the token so developers can copy it from logs for testing (do NOT enable in production)
+            try
+            {
+                var exposeFlag = _configuration["Auth:ExposeResetTokenInResponse"] ?? string.Empty;
+                var env = Environment.GetEnvironmentVariable("ASPNETCORE_ENVIRONMENT") ?? string.Empty;
+                var shouldExpose = string.Equals(exposeFlag, "true", StringComparison.OrdinalIgnoreCase) || string.Equals(env, "Development", StringComparison.OrdinalIgnoreCase);
+                // Include token in logs when explicitly allowed (Development or config flag). This helps terminal testing when email is not available.
+                if (shouldExpose)
+                {
+                    _logger.LogInformation("Password reset token generated for user {UserId}. ExposeToken={Expose} Token={Token} ResetLink={ResetLink}", user.Id, shouldExpose, token, resetLink);
+
+                    // Return the token in the API response for testing convenience (only when explicitly enabled)
+                    return new BaseResponseModel<object>
+                    {
+                        IsSuccess = true,
+                        StatusCode = StatusCodes.Status200OK,
+                        Message = "Yêu cầu đặt lại mật khẩu đã được gửi đến email nếu email tồn tại",
+                        Data = new { UserId = user.Id, Token = token, ResetLink = resetLink }
+                    };
+                }
+                else
+                {
+                    _logger.LogInformation("Password reset token generated for user {UserId}. ExposeToken={Expose}", user.Id, shouldExpose);
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to evaluate expose-reset-token flag");
+            }
 
             return new BaseResponseModel<object>
             {
