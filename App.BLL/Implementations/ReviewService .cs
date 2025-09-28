@@ -55,27 +55,56 @@ public class ReviewService : IReviewService
                 .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted)
                 .ToList();
 
-            if (submittedReviews.Count < 2) return; // wait for at least two submitted reviews
+            // If submission is escalated to moderator, a single submitted review (the moderator's extra reviewer)
+            // should decide the final status. Otherwise the standard two-reviewer rules apply.
+            if (submission.Status == SubmissionStatus.EscalatedToModerator && submittedReviews.Count >= 1)
+            {
+                // Use the latest submitted review from the assignment that triggered this call (assignment variable)
+                var latestForThisAssignment = (assignment.Reviews ?? new List<Review>())
+                    .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted)
+                    .OrderByDescending(r => r.SubmittedAt)
+                    .FirstOrDefault();
 
-            var approveCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.Approve);
-            var rejectCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.Reject);
-            var revisionCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.MinorRevision || r.Recommendation == ReviewRecommendations.MajorRevision);
+                if (latestForThisAssignment != null)
+                {
+                    if (latestForThisAssignment.Recommendation == ReviewRecommendations.MinorRevision || latestForThisAssignment.Recommendation == ReviewRecommendations.MajorRevision)
+                    {
+                        submission.Status = SubmissionStatus.RevisionRequired;
+                    }
+                    else if (latestForThisAssignment.Recommendation == ReviewRecommendations.Approve)
+                    {
+                        submission.Status = SubmissionStatus.Approved;
+                    }
+                    else if (latestForThisAssignment.Recommendation == ReviewRecommendations.Reject)
+                    {
+                        submission.Status = SubmissionStatus.Rejected;
+                    }
+                }
+            }
+            else
+            {
+                if (submittedReviews.Count < 2) return; // wait for at least two submitted reviews
 
-            if (revisionCount > 0)
-            {
-                submission.Status = SubmissionStatus.RevisionRequired;
-            }
-            else if (approveCount >= 2 && approveCount == submittedReviews.Count)
-            {
-                submission.Status = SubmissionStatus.Approved;
-            }
-            else if (rejectCount >= 2 && rejectCount == submittedReviews.Count)
-            {
-                submission.Status = SubmissionStatus.Rejected;
-            }
-            else if (approveCount > 0 && rejectCount > 0)
-            {
-                submission.Status = SubmissionStatus.EscalatedToModerator;
+                var approveCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.Approve);
+                var rejectCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.Reject);
+                var revisionCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.MinorRevision || r.Recommendation == ReviewRecommendations.MajorRevision);
+
+                if (revisionCount > 0)
+                {
+                    submission.Status = SubmissionStatus.RevisionRequired;
+                }
+                else if (approveCount >= 2)
+                {
+                    submission.Status = SubmissionStatus.Approved;
+                }
+                else if (rejectCount >= 2)
+                {
+                    submission.Status = SubmissionStatus.Rejected;
+                }
+                else if (approveCount > 0 && rejectCount > 0)
+                {
+                    submission.Status = SubmissionStatus.EscalatedToModerator;
+                }
             }
 
             // Persist submission status change
