@@ -514,8 +514,8 @@ namespace App.DAL.Migrations
                         .HasColumnType("int");
 
                     b.Property<decimal>("Score")
-                        .HasPrecision(4, 2)
-                        .HasColumnType("decimal(4,2)");
+                        .HasPrecision(6, 2)
+                        .HasColumnType("decimal(6,2)");
 
                     b.HasKey("Id");
 
@@ -940,6 +940,9 @@ namespace App.DAL.Migrations
                     b.Property<string>("Objectives")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PotentialDuplicate")
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("Problem")
                         .HasColumnType("nvarchar(max)");
 
@@ -1059,6 +1062,9 @@ namespace App.DAL.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Objectives")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PotentialDuplicate")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Problem")

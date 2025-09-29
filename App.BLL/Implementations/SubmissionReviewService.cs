@@ -81,7 +81,7 @@ public class SubmissionReviewService : ISubmissionReviewService
                 foreach (var scoreDTO in createDTO.CriteriaScores)
                 {
                     var criteriaItem = criteria.FirstOrDefault(x => x.Id == scoreDTO.CriteriaId);
-                    if (criteriaItem != null)
+                    if (criteriaItem != null && criteriaItem.MaxScore > 0)
                     {
                         var normalizedScore = (scoreDTO.Score / criteriaItem.MaxScore) * 10;
                         totalWeightedScore += normalizedScore * criteriaItem.Weight;
@@ -168,11 +168,11 @@ public class SubmissionReviewService : ISubmissionReviewService
 
         var assignmentList = assignments.ToList();
         var submittedReviews = assignmentList
-            .SelectMany(a => a.Reviews)
+            .SelectMany(a => a.Reviews ?? new List<Review>())
             .Where(r => r.Status == ReviewStatus.Submitted && r.IsActive)
             .ToList();
 
-        // Kiểm tra nếu đủ 2 review
+        // Kiểm tra nếu có ít nhất 2 review đã nộp
         if (submittedReviews.Count >= 2)
         {
             var submission = await submissionRepo.GetSingleAsync(new QueryOptions<Submission>
@@ -188,29 +188,27 @@ public class SubmissionReviewService : ISubmissionReviewService
                     r.Recommendation == ReviewRecommendations.MinorRevision ||
                     r.Recommendation == ReviewRecommendations.MajorRevision);
 
-                if (rejectCount == 2)
+                // Priority rules:
+                // - Any revision recommendation -> RevisionRequired
+                // - All submitted reviews are Approve (and at least 2) -> Approved
+                // - All submitted reviews are Reject (and at least 2) -> Rejected
+                // - Mixed Approve + Reject -> EscalatedToModerator (conflict)
+
+                if (revisionCount > 0)
                 {
-                    // Cả 2 reject → Pending (có thể coi là failed, điểm = 0)
-                    submission.Status = SubmissionStatus.Pending; // Hoặc có thể để Completed với điểm 0
-                    // Lưu ý: có thể cần thêm field để đánh dấu là "failed"
+                    submission.Status = SubmissionStatus.RevisionRequired;
                 }
-                else if (approveCount == 2 || (approveCount > 0 && revisionCount > 0))
+                else if (approveCount >= 2)
                 {
-                    // Logic cũ: Approved hoặc RequiresRevision
-                    if (revisionCount > 0)
-                    {
-                        submission.Status = SubmissionStatus.RevisionRequired;
-                    }
-                    else
-                    {
-                        submission.Status = SubmissionStatus.Completed; // Approved
-                    }
+                    submission.Status = SubmissionStatus.Approved;
                 }
-                else if ((approveCount > 0 && rejectCount > 0) ||
-                        (rejectCount > 0 && revisionCount > 0))
+                else if (rejectCount >= 2)
                 {
-                    // Xung đột → cần moderator
-                    submission.Status = SubmissionStatus.UnderReview; // Đánh dấu cần moderator
+                    submission.Status = SubmissionStatus.Rejected;
+                }
+                else if (approveCount > 0 && rejectCount > 0)
+                {
+                    submission.Status = SubmissionStatus.EscalatedToModerator;
                 }
 
                 await submissionRepo.UpdateAsync(submission);
@@ -348,7 +346,8 @@ public class SubmissionReviewService : ISubmissionReviewService
 
             var submissions = await submissionRepo.GetAllAsync(new QueryOptions<Submission>
             {
-                Predicate = x => x.Status == SubmissionStatus.UnderReview, // Status cho conflict
+                // We consider submissions escalated to moderator (EscalatedToModerator) as conflicted
+                Predicate = x => x.Status == SubmissionStatus.EscalatedToModerator,
                 Tracked = false
             });
 
@@ -357,7 +356,8 @@ public class SubmissionReviewService : ISubmissionReviewService
             foreach (var submission in submissions)
             {
                 var summary = await GetSubmissionReviewSummaryAsync(submission.Id);
-                if (summary.IsSuccess && summary.Data?.IsConflicted == true)
+                // Consider any submission with status EscalatedToModerator as conflicted
+                if (summary.IsSuccess && summary.Data != null)
                 {
                     summaries.Add(summary.Data);
                 }
@@ -526,21 +526,46 @@ public class SubmissionReviewService : ISubmissionReviewService
             var assignmentRepo = _unitOfWork.GetRepo<ReviewerAssignment>();
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
 
-            var overdueAssignments = await assignmentRepo.GetAllAsync(new QueryOptions<ReviewerAssignment>
+            // Step 1: load assignments that have a deadline (avoid including "now" in EF predicate)
+            var assignmentsWithDeadline = await assignmentRepo.GetAllAsync(new QueryOptions<ReviewerAssignment>
             {
-                Predicate = x => x.Deadline.HasValue &&
-                               x.Deadline < DateTime.UtcNow &&
-                               x.Submission.Status == SubmissionStatus.RevisionRequired,
+                Predicate = x => x.Deadline.HasValue,
                 IncludeProperties = new List<System.Linq.Expressions.Expression<Func<ReviewerAssignment, object>>>
                 {
                     x => x.Submission
-                }
+                },
+                Tracked = false // load as no-tracking and then use UpdateAsync on submissions to persist changes
             });
 
+            var now = DateTime.UtcNow;
+
+            // Step 2: filter in-memory for overdue assignments where the submission currently requires revision
+            var overdueAssignments = assignmentsWithDeadline
+                .Where(a => a.Deadline.HasValue && a.Deadline.Value < now && a.Submission != null && a.Submission.Status == SubmissionStatus.RevisionRequired)
+                .ToList();
+
+            if (!overdueAssignments.Any())
+            {
+                return new BaseResponseModel
+                {
+                    IsSuccess = true,
+                    StatusCode = StatusCodes.Status200OK,
+                    Message = "Không có submission quá hạn để xử lý"
+                };
+            }
+
+            // Deduplicate submissions so we only update each one once
+            var updatedSubmissionIds = new HashSet<int>();
             foreach (var assignment in overdueAssignments)
             {
-                assignment.Submission.Status = SubmissionStatus.Pending; // Quá hạn = failed
-                await submissionRepo.UpdateAsync(assignment.Submission);
+                var submission = assignment.Submission;
+                if (submission == null) continue;
+
+                if (updatedSubmissionIds.Contains(submission.Id)) continue;
+
+                submission.Status = SubmissionStatus.Pending; // mark overdue revisions as pending
+                await submissionRepo.UpdateAsync(submission);
+                updatedSubmissionIds.Add(submission.Id);
             }
 
             var result = await _unitOfWork.SaveAsync();
@@ -550,7 +575,7 @@ public class SubmissionReviewService : ISubmissionReviewService
                 IsSuccess = result.IsSuccess,
                 StatusCode = result.IsSuccess ? StatusCodes.Status200OK : StatusCodes.Status500InternalServerError,
                 Message = result.IsSuccess ?
-                    $"Xử lý {overdueAssignments.Count()} submission quá hạn" :
+                    $"Xử lý {updatedSubmissionIds.Count} submission quá hạn" :
                     result.Message
             };
         }

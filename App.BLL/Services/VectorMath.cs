@@ -7,23 +7,23 @@ namespace App.BLL.Services
     /// </summary>
     public static class VectorMath
     {
-        public static decimal CosineSimilarity(float[] a, float[] b)
+        public static double CosineSimilarity(float[] a, float[] b)
         {
-            decimal dot = 0, magA = 0, magB = 0;
+            if (a == null || b == null) return 0.0;
+            if (a.Length != b.Length) return 0.0;
+
+            double dot = 0.0, magA = 0.0, magB = 0.0;
             for (int i = 0; i < a.Length; i++)
             {
-                dot += (decimal)a[i] * (decimal)b[i];
-                magA += (decimal)a[i] * (decimal)a[i];
-                magB += (decimal)b[i] * (decimal)b[i];
+                var va = (double)a[i];
+                var vb = (double)b[i];
+                dot += va * vb;
+                magA += va * va;
+                magB += vb * vb;
             }
 
-            if (magA == 0 || magB == 0)
-            {
-                // Return 0 similarity if either vector has zero magnitude
-                return 0;
-            }
-
-            return dot / (decimal)(Math.Sqrt((double)magA) * Math.Sqrt((double)magB));
+            if (magA <= 0.0 || magB <= 0.0) return 0.0;
+            return dot / (Math.Sqrt(magA) * Math.Sqrt(magB));
         }
     }
 }
