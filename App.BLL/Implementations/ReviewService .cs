@@ -63,7 +63,7 @@ public class ReviewService : IReviewService
                 .SelectMany(ra => ra.Reviews ?? new List<Review>() )
                 .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted )
                 .ToList();
-
+            
             // If submission is escalated to moderator, a single submitted review (the moderator's extra reviewer)
             // should decide the final status. Otherwise the standard two-reviewer rules apply.
             if (submission.Status == SubmissionStatus.EscalatedToModerator && submittedReviews.Count > 2)
@@ -121,22 +121,66 @@ public class ReviewService : IReviewService
 
             // Also update related assignments: mark assignments that have a submitted review as Completed or Overdue
             // Use the latest submitted review for each assignment to determine completed time
+
+            // Test ***********************
+
+            //var assignmentIdsWithSubmitted = submittedReviews.Select(r => r.AssignmentId).Distinct().ToList();
+            //var assignmentsToUpdate = submission.ReviewerAssignments
+            //    .Where(ra => assignmentIdsWithSubmitted.Contains(ra.Id))
+            //    .ToList();
+
+            //var updatedAssignmentIds = new List<int>();
+            //foreach (var ra in assignmentsToUpdate)
+            //{
+            //    try
+            //    {
+            //        // find latest submitted review for this assignment
+            //        var latestSubmitted = (ra.Reviews ?? new List<Review>())
+            //            .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted)
+            //            .OrderByDescending(r => r.SubmittedAt)
+            //            .FirstOrDefault();
+
+            //        if (latestSubmitted == null) continue;
+
+            //        // Determine on-time vs overdue using UTC comparisons; if no deadline, treat as on-time
+            //        var completedAt = latestSubmitted.SubmittedAt ?? DateTime.UtcNow;
+            //        var isOnTime = true;
+            //        if (ra.Deadline.HasValue)
+            //        {
+            //            isOnTime = completedAt.ToUniversalTime() <= ra.Deadline.Value.ToUniversalTime();
+            //        }
+
+            //        ra.CompletedAt = completedAt;
+            //        ra.Status = isOnTime ? AssignmentStatus.Completed : AssignmentStatus.Overdue;
+
+            //        // Update the assignment row (tracked=false so UpdateAsync will attach)
+            //        await assignmentRepo.UpdateAsync(ra);
+            //        updatedAssignmentIds.Add(ra.Id);
+            //    }
+            //    catch { /* best-effort, do not block */ }
+            //}
+
+            // *****************************End Test
+
             var assignmentIdsWithSubmitted = submittedReviews.Select(r => r.AssignmentId).Distinct().ToList();
             var assignmentsToUpdate = submission.ReviewerAssignments
                 .Where(ra => assignmentIdsWithSubmitted.Contains(ra.Id))
                 .ToList();
 
+            var assignmentsUpdate = assignmentReviewer.Where(a => a.SubmissionId == assignment.SubmissionId).ToList();
+
+
             var updatedAssignmentIds = new List<int>();
-            foreach (var ra in assignmentsToUpdate)
+            foreach (var ra in assignmentsUpdate)
             {
                 try
                 {
                     // find latest submitted review for this assignment
-                    var latestSubmitted = (ra.Reviews ?? new List<Review>())
+                    var latestSubmitted = ra.Reviews
                         .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted)
                         .OrderByDescending(r => r.SubmittedAt)
                         .FirstOrDefault();
-
+                   
                     if (latestSubmitted == null) continue;
 
                     // Determine on-time vs overdue using UTC comparisons; if no deadline, treat as on-time
@@ -156,7 +200,6 @@ public class ReviewService : IReviewService
                 }
                 catch { /* best-effort, do not block */ }
             }
-
             // Persist all assignment changes first so performance recalculation reads persisted state
             var saveResult = await _unitOfWork.SaveAsync();
             if (saveResult.IsSuccess)
@@ -1261,7 +1304,7 @@ public class ReviewService : IReviewService
                 perf.CompletedAssignments = completedAssignments;
                 perf.AverageTimeMinutes = avgTime;
                 perf.AverageScoreGiven = avgScore;
-                perf.OnTimeRate = onTimeRate * 100;
+                perf.OnTimeRate = onTimeRate;
                 perf.LastUpdated = DateTime.UtcNow;
                 // Update QualityRating: base it on on-time rate (0..100 scale). If there's an existing QualityRating,
                 // blend it conservatively by averaging with current onTimeRate*100 to avoid sudden jumps.
