@@ -212,7 +212,7 @@ CapBot";
                         ur => ur.Role
                     }
                 });
-                allowExtraForModerator = assignerRoles.Any(r => r.Role != null && r.Role.Name == SystemRoleConstants.Moderator);
+                allowExtraForModerator = assignerRoles.Any(r => r.Role != null && r.Role.Name == SystemRoleConstants.Moderator || r.Role.Name == SystemRoleConstants.Administrator) ;
             }
 
             if (!allowExtraForModerator && currentAssignedCount >= 2)

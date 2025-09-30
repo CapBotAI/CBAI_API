@@ -84,19 +84,41 @@ namespace App.DAL.Implementations
 			return query;
 		}
 
-		public Task UpdateAsync(T entity)
-		{
+		//public Task UpdateAsync(T entity)
+		//{
 
-			if (_context.Entry<T>(entity).State == EntityState.Detached)
-			{
-				_dbSet.Attach(entity);
-			}
-			_dbSet.Update(entity);
+		//	if (_context.Entry<T>(entity).State == EntityState.Detached)
+		//	{
+		//		_dbSet.Attach(entity);
+		//	}
+		//	_dbSet.Update(entity);
 
-			return Task.CompletedTask;
-		}
+		//	return Task.CompletedTask;
+		//}
+        public Task UpdateAsync(T entity)
+        {
+            var entry = _context.Entry(entity);
+            if (entry.State == EntityState.Detached)
+            {
+                var key = _context.Model.FindEntityType(typeof(T)).FindPrimaryKey()
+                    .Properties.Select(p => p.PropertyInfo.GetValue(entity)).ToArray();
+                var trackedEntity = _dbSet.Find(key);
+                if (trackedEntity != null)
+                {
+                    _context.Entry(trackedEntity).CurrentValues.SetValues(entity);
+                    return Task.CompletedTask;
+                }
+                _dbSet.Attach(entity);
+                _dbSet.Update(entity);
+            }
+            else
+            {
+                _dbSet.Update(entity);
+            }
+            return Task.CompletedTask;
+        }
 
-		public async Task<IEnumerable<T>> GetAllAsync(QueryOptions<T> options)
+        public async Task<IEnumerable<T>> GetAllAsync(QueryOptions<T> options)
 		{
 			return await Get(options).ToListAsync();
 		}

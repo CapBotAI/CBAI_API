@@ -9,6 +9,7 @@ using App.Entities.Entities.App;
 using App.Entities.Enums;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace App.BLL.Implementations;
 
@@ -33,31 +34,39 @@ public class ReviewService : IReviewService
             var assignmentRepo = _unitOfWork.GetRepo<ReviewerAssignment>();
             var submissionRepo = _unitOfWork.GetRepo<Submission>();
 
-            var assignment = await assignmentRepo.GetSingleAsync(new QueryOptions<ReviewerAssignment>
-            {
-                Predicate = a => a.Id == assignmentId,
-                IncludeProperties = new List<System.Linq.Expressions.Expression<Func<ReviewerAssignment, object>>>
+            //var assignment = await assignmentRepo.GetSingleAsync(new QueryOptions<ReviewerAssignment>
+            //{
+            //    Predicate = a => a.Id == assignmentId,
+            //    IncludeProperties = new List<Expression<Func<ReviewerAssignment, object>>>
+            //    {
+            //        a => a.Submission,
+            //        a => a.Reviews
+            //    },
+            //    Tracked = false
+            //});
+            var assignmentReviewer = await assignmentRepo.GetAllAsync(new QueryOptions<ReviewerAssignment>
+            {              
+                IncludeProperties = new List<Expression<Func<ReviewerAssignment, object>>>
                 {
                     a => a.Submission,
-                    a => a.Submission.ReviewerAssignments,
-                    a => a.Submission.ReviewerAssignments.Select(ra => ra.Reviews)
+                    a => a.Reviews
                 },
                 Tracked = false
             });
-
-            if (assignment?.Submission == null) return;
-
+            var assignment = assignmentReviewer.FirstOrDefault(a => a.Id == assignmentId) ;
+           
+            if (assignment.Submission == null) return; // should not happen
             var submission = assignment.Submission;
 
             // Collect submitted reviews across all assignments for this submission
-            var submittedReviews = submission.ReviewerAssignments
-                .SelectMany(ra => ra.Reviews ?? new List<Review>())
-                .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted)
+            var submittedReviews = assignmentReviewer.Where(a => a.SubmissionId == assignment.SubmissionId)
+                .SelectMany(ra => ra.Reviews ?? new List<Review>() )
+                .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted )
                 .ToList();
 
             // If submission is escalated to moderator, a single submitted review (the moderator's extra reviewer)
             // should decide the final status. Otherwise the standard two-reviewer rules apply.
-            if (submission.Status == SubmissionStatus.EscalatedToModerator && submittedReviews.Count >= 1)
+            if (submission.Status == SubmissionStatus.EscalatedToModerator && submittedReviews.Count > 2)
             {
                 // Use the latest submitted review from the assignment that triggered this call (assignment variable)
                 var latestForThisAssignment = (assignment.Reviews ?? new List<Review>())
@@ -168,6 +177,148 @@ public class ReviewService : IReviewService
             // Best-effort: do not throw
         }
     }
+    //private async Task UpdateSubmissionStatusAfterSubmit(int assignmentId)
+    //{
+    //    try
+    //    {
+    //        var assignmentRepo = _unitOfWork.GetRepo<ReviewerAssignment>();
+    //        var submissionRepo = _unitOfWork.GetRepo<Submission>();
+
+    //        var assignment = await assignmentRepo.GetSingleAsync(new QueryOptions<ReviewerAssignment>
+    //        {
+    //            Predicate = a => a.Id == assignmentId,
+    //            IncludeProperties = new List<System.Linq.Expressions.Expression<Func<ReviewerAssignment, object>>>
+    //            {
+    //                a => a.Submission,
+    //                a => a.Submission.ReviewerAssignments,
+    //                a => a.Submission.ReviewerAssignments.Select(ra => ra.Reviews)
+
+    //            },
+    //            Tracked = false
+    //        });
+
+
+    //        var submission = assignment.Submission;
+
+    //        // Collect submitted reviews across all assignments for this submission
+    //        var submittedReviews = submission.ReviewerAssignments
+    //            .SelectMany(ra => ra.Reviews ?? new List<Review>())
+    //            .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted)
+    //            .ToList();
+
+    //        // If submission is escalated to moderator, a single submitted review (the moderator's extra reviewer)
+    //        // should decide the final status. Otherwise the standard two-reviewer rules apply.
+    //        if (submission.Status == SubmissionStatus.EscalatedToModerator && submittedReviews.Count >= 1)
+    //        {
+    //            // Use the latest submitted review from the assignment that triggered this call (assignment variable)
+    //            var latestForThisAssignment = (assignment.Reviews ?? new List<Review>())
+    //                .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted)
+    //                .OrderByDescending(r => r.SubmittedAt)
+    //                .FirstOrDefault();
+
+    //            if (latestForThisAssignment != null)
+    //            {
+    //                if (latestForThisAssignment.Recommendation == ReviewRecommendations.MinorRevision || latestForThisAssignment.Recommendation == ReviewRecommendations.MajorRevision)
+    //                {
+    //                    submission.Status = SubmissionStatus.RevisionRequired;
+    //                }
+    //                else if (latestForThisAssignment.Recommendation == ReviewRecommendations.Approve)
+    //                {
+    //                    submission.Status = SubmissionStatus.Approved;
+    //                }
+    //                else if (latestForThisAssignment.Recommendation == ReviewRecommendations.Reject)
+    //                {
+    //                    submission.Status = SubmissionStatus.Rejected;
+    //                }
+    //            }
+    //        }
+    //        else
+    //        {
+    //            if (submittedReviews.Count < 2) return; // wait for at least two submitted reviews
+
+    //            var approveCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.Approve);
+    //            var rejectCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.Reject);
+    //            var revisionCount = submittedReviews.Count(r => r.Recommendation == ReviewRecommendations.MinorRevision || r.Recommendation == ReviewRecommendations.MajorRevision);
+
+    //            if (revisionCount > 0)
+    //            {
+    //                submission.Status = SubmissionStatus.RevisionRequired;
+    //            }
+    //            else if (approveCount >= 2)
+    //            {
+    //                submission.Status = SubmissionStatus.Approved;
+    //            }
+    //            else if (rejectCount >= 2)
+    //            {
+    //                submission.Status = SubmissionStatus.Rejected;
+    //            }
+    //            else if (approveCount > 0 && rejectCount > 0)
+    //            {
+    //                submission.Status = SubmissionStatus.EscalatedToModerator;
+    //            }
+    //        }
+
+    //        // Persist submission status change
+    //        await submissionRepo.UpdateAsync(submission);
+
+    //        // Also update related assignments: mark assignments that have a submitted review as Completed or Overdue
+    //        // Use the latest submitted review for each assignment to determine completed time
+    //        var assignmentIdsWithSubmitted = submittedReviews.Select(r => r.AssignmentId).Distinct().ToList();
+    //        var assignmentsToUpdate = submission.ReviewerAssignments
+    //            .Where(ra => assignmentIdsWithSubmitted.Contains(ra.Id))
+    //            .ToList();
+
+    //        var updatedAssignmentIds = new List<int>();
+    //        foreach (var ra in assignmentsToUpdate)
+    //        {
+    //            try
+    //            {
+    //                // find latest submitted review for this assignment
+    //                var latestSubmitted = (ra.Reviews ?? new List<Review>())
+    //                    .Where(r => r.IsActive && r.Status == ReviewStatus.Submitted)
+    //                    .OrderByDescending(r => r.SubmittedAt)
+    //                    .FirstOrDefault();
+
+    //                if (latestSubmitted == null) continue;
+
+    //                // Determine on-time vs overdue using UTC comparisons; if no deadline, treat as on-time
+    //                var completedAt = latestSubmitted.SubmittedAt ?? DateTime.UtcNow;
+    //                var isOnTime = true;
+    //                if (ra.Deadline.HasValue)
+    //                {
+    //                    isOnTime = completedAt.ToUniversalTime() <= ra.Deadline.Value.ToUniversalTime();
+    //                }
+
+    //                ra.CompletedAt = completedAt;
+    //                ra.Status = isOnTime ? AssignmentStatus.Completed : AssignmentStatus.Overdue;
+
+    //                // Update the assignment row (tracked=false so UpdateAsync will attach)
+    //                await assignmentRepo.UpdateAsync(ra);
+    //                updatedAssignmentIds.Add(ra.Id);
+    //            }
+    //            catch { /* best-effort, do not block */ }
+    //        }
+
+    //        // Persist all assignment changes first so performance recalculation reads persisted state
+    //        var saveResult = await _unitOfWork.SaveAsync();
+    //        if (saveResult.IsSuccess)
+    //        {
+    //            // Now recalculate reviewer performance for updated assignments (best-effort)
+    //            foreach (var aid in updatedAssignmentIds.Distinct())
+    //            {
+    //                try
+    //                {
+    //                    await UpdateReviewerPerformanceForAssignmentAsync(aid);
+    //                }
+    //                catch { }
+    //            }
+    //        }
+    //    }
+    //    catch
+    //    {
+    //        // Best-effort: do not throw
+    //    }
+    //}
 
     public async Task<BaseResponseModel<ReviewResponseDTO>> CreateAsync(CreateReviewDTO createDTO, int currentUserId)
     {
