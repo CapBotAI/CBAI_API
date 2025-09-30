@@ -1229,7 +1229,7 @@ public class ReviewService : IReviewService
                 }
             }
 
-            var onTimeRate = submittedReviews.Any() ? (decimal?)((decimal)onTimeCount / submittedReviews.Count) : null;
+            var onTimeRate = submittedReviews.Any() ? (decimal?) ((decimal)onTimeCount / submittedReviews.Count) : null;
 
             // Update or create ReviewerPerformance
             var perfRepo = _unitOfWork.GetRepo<ReviewerPerformance>();
@@ -1248,7 +1248,7 @@ public class ReviewService : IReviewService
                     CompletedAssignments = completedAssignments,
                     AverageTimeMinutes = avgTime,
                     AverageScoreGiven = avgScore,
-                    OnTimeRate = onTimeRate,
+                    OnTimeRate = onTimeRate * 100m,
                     LastUpdated = DateTime.UtcNow,
                     // Initialize QualityRating as proportionally from on-time performance (scale 0..100)
                     QualityRating = onTimeRate.HasValue ? (onTimeRate.Value * 100m) : 0m
@@ -1261,7 +1261,7 @@ public class ReviewService : IReviewService
                 perf.CompletedAssignments = completedAssignments;
                 perf.AverageTimeMinutes = avgTime;
                 perf.AverageScoreGiven = avgScore;
-                perf.OnTimeRate = onTimeRate;
+                perf.OnTimeRate = onTimeRate * 100;
                 perf.LastUpdated = DateTime.UtcNow;
                 // Update QualityRating: base it on on-time rate (0..100 scale). If there's an existing QualityRating,
                 // blend it conservatively by averaging with current onTimeRate*100 to avoid sudden jumps.
