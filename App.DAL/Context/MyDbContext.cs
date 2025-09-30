@@ -547,9 +547,9 @@ public partial class MyDbContext : IdentityDbContext<User, Role, int, UserClaim,
             entity.Property(e => e.TotalAssignments).HasDefaultValue(0);
             entity.Property(e => e.CompletedAssignments).HasDefaultValue(0);
             entity.Property(e => e.AverageTimeMinutes).HasDefaultValue(0);
-            entity.Property(e => e.AverageScoreGiven).HasPrecision(4, 2);
-            entity.Property(e => e.OnTimeRate).HasPrecision(3, 2);
-            entity.Property(e => e.QualityRating).HasPrecision(3, 2);
+            entity.Property(e => e.AverageScoreGiven).HasPrecision(6, 2);
+            entity.Property(e => e.OnTimeRate).HasPrecision(6, 2);
+            entity.Property(e => e.QualityRating).HasPrecision(6, 2);
             entity.Property(e => e.LastUpdated).HasDefaultValueSql("CURRENT_TIMESTAMP");
 
             entity.HasOne(d => d.Reviewer)
