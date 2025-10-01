@@ -3,6 +3,8 @@ using App.Entities.DTOs.EvaluationCriteria;
 using App.Entities.DTOs.Review;
 using App.Entities.DTOs.ReviewComment;
 using App.Entities.DTOs.ReviewerAssignment;
+using App.Entities.DTOs.Topics;
+using App.Entities.DTOs.TopicVersions;
 using App.Entities.Entities.App;
 using App.Entities.Entities.Core;
 using AutoMapper;
@@ -14,26 +16,64 @@ public class MapperProfile : Profile
     public MapperProfile()
     {
 
+        //CreateMap<ReviewerAssignment, ReviewerAssignmentResponseDTO>()
+        //    .ForMember(dest => dest.Reviewer, opt => opt.MapFrom(src => src.Reviewer))
+        //    .ForMember(dest => dest.AssignedByUser, opt => opt.MapFrom(src => src.AssignedByUser))
+        //    // Make mapping null-safe: some navigation properties may be missing in certain DB states
+        //    .ForMember(dest => dest.SubmissionTitle, opt => opt.MapFrom(src =>
+        //        src.Submission != null
+        //            ? (src.Submission.TopicVersion != null
+        //                ? (src.Submission.TopicVersion.Topic != null
+        //                    ? src.Submission.TopicVersion.Topic.EN_Title
+        //                    : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+        //                : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+        //            : null))
+        //    .ForMember(dest => dest.TopicTitle, opt => opt.MapFrom(src =>
+        //        src.Submission != null
+        //            ? (src.Submission.TopicVersion != null
+        //                ? (src.Submission.TopicVersion.Topic != null
+        //                    ? src.Submission.TopicVersion.Topic.EN_Title
+        //                    : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+        //                : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+        //            : null));
         CreateMap<ReviewerAssignment, ReviewerAssignmentResponseDTO>()
-            .ForMember(dest => dest.Reviewer, opt => opt.MapFrom(src => src.Reviewer))
-            .ForMember(dest => dest.AssignedByUser, opt => opt.MapFrom(src => src.AssignedByUser))
-            // Make mapping null-safe: some navigation properties may be missing in certain DB states
-            .ForMember(dest => dest.SubmissionTitle, opt => opt.MapFrom(src =>
-                src.Submission != null
-                    ? (src.Submission.TopicVersion != null
-                        ? (src.Submission.TopicVersion.Topic != null
-                            ? src.Submission.TopicVersion.Topic.EN_Title
-                            : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
-                        : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
-                    : null))
-            .ForMember(dest => dest.TopicTitle, opt => opt.MapFrom(src =>
-                src.Submission != null
-                    ? (src.Submission.TopicVersion != null
-                        ? (src.Submission.TopicVersion.Topic != null
-                            ? src.Submission.TopicVersion.Topic.EN_Title
-                            : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
-                        : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
-                    : null));
+    .ForMember(dest => dest.Reviewer, opt => opt.MapFrom(src => src.Reviewer))
+    .ForMember(dest => dest.AssignedByUser, opt => opt.MapFrom(src => src.AssignedByUser))
+    // Make mapping null-safe: some navigation properties may be missing in certain DB states
+    .ForMember(dest => dest.SubmissionTitle, opt => opt.MapFrom(src =>
+        src.Submission != null
+            ? (src.Submission.TopicVersion != null
+                ? (src.Submission.TopicVersion.Topic != null
+                    ? src.Submission.TopicVersion.Topic.EN_Title
+                    : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+                : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+            : null))
+    .ForMember(dest => dest.TopicTitle, opt => opt.MapFrom(src =>
+        src.Submission != null
+            ? (src.Submission.TopicVersion != null
+                ? (src.Submission.TopicVersion.Topic != null
+                    ? src.Submission.TopicVersion.Topic.EN_Title
+                    : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+                : src.Submission.Topic != null ? src.Submission.Topic.EN_Title : null)
+            : null))
+    .ForMember(dest => dest.TopicId, opt => opt.MapFrom(src =>
+        src.Submission != null
+            ? (src.Submission.TopicVersion != null
+                ? (src.Submission.TopicVersion.Topic != null
+                    ? src.Submission.TopicVersion.Topic.Id
+                    : src.Submission.Topic != null ? src.Submission.Topic.Id : (int?)null)
+                : src.Submission.Topic != null ? src.Submission.Topic.Id : (int?)null)
+            : (int?)null))
+    .ForMember(dest => dest.Topic, opt => opt.MapFrom(src =>
+    src.Submission != null
+        ? (src.Submission.TopicVersion != null
+            ? src.Submission.TopicVersion.Topic
+            : src.Submission.Topic)
+        : null))
+    .ForMember(dest => dest.TopicVersion, opt => opt.MapFrom(src =>
+    src.Submission != null
+        ? src.Submission.TopicVersion
+        : null));
 
         CreateMap<User, AvailableReviewerDTO>()
             .ForMember(dest => dest.Skills, opt => opt.MapFrom(src =>
@@ -78,5 +118,9 @@ public class MapperProfile : Profile
                 var roles = src.UserRoles?.Select(ur => ur.Role).Where(r => r != null).Select(r => r!).ToList() ?? new List<Role>();
                 return new UserOverviewDTO(src, roles);
             });
+        CreateMap<Topic, TopicDetailDTO>();
+        CreateMap<TopicVersion, TopicVersionDetailDTO>();
+        
+
     }
 }

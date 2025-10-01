@@ -1211,11 +1211,38 @@ public class SubmissionService : ISubmissionService
     private async Task<(Stream? stream, string? fileName)> GetPrimaryDocxStreamAsync(long submissionId)
     {
         var entityFileRepo = _unitOfWork.GetRepo<EntityFile>();
-        var link = await entityFileRepo.GetSingleAsync(new QueryBuilder<EntityFile>()
-            .WithPredicate(x => x.EntityId == submissionId && x.EntityType == EntityType.Submission && x.IsPrimary)
+
+        var submissionRepo = _unitOfWork.GetRepo<Submission>();
+        var submission =    submissionRepo.GetSingleAsync(new QueryBuilder<Submission>()
+                .WithPredicate(x => x.Id == submissionId && x.IsActive)
+                .WithTracking(false)
+                .Build());
+
+        var topicIdInSubmission = submission.Result.TopicId;
+        var topicVersionIdSubmission = submission.Result.TopicVersionId;
+        var link = null as EntityFile;
+        if (topicVersionIdSubmission != null)
+        {
+            link = await entityFileRepo.GetSingleAsync(new QueryBuilder<EntityFile>()
+            .WithPredicate(x => x.EntityId == topicVersionIdSubmission && x.EntityType == EntityType.TopicVersion && x.IsPrimary)
             .WithInclude(x => x.File!)
             .WithTracking(false)
             .Build());
+
+        } else if (topicIdInSubmission != null)
+        {
+             link = await entityFileRepo.GetSingleAsync(new QueryBuilder<EntityFile>()
+            .WithPredicate(x => x.EntityId == topicIdInSubmission && x.EntityType == EntityType.Topic && x.IsPrimary)
+            .WithInclude(x => x.File!)
+            .WithTracking(false)
+            .Build());
+        }
+
+        //var link = await entityFileRepo.GetSingleAsync(new QueryBuilder<EntityFile>()
+        //    .WithPredicate(x => x.EntityId == submissionId && x.EntityType == EntityType.Submission && x.IsPrimary)
+        //    .WithInclude(x => x.File!)
+        //    .WithTracking(false)
+        //    .Build());
 
         if (link?.File == null) return (null, null);
 

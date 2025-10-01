@@ -36,21 +36,21 @@ public class UpdateSemesterDTO : IValidationPipeline
             return validationResult;
         }
 
-        if (StartDate < DateTime.Now)
-        {
-            validationResult.Message = "Ngày bắt đầu phải lớn hơn ngày hiện tại";
-            validationResult.IsSuccess = false;
-            validationResult.StatusCode = StatusCodes.Status422UnprocessableEntity;
-            return validationResult;
-        }
+        //if (StartDate < DateTime.Now)
+        //{
+        //    validationResult.Message = "Ngày bắt đầu phải lớn hơn ngày hiện tại";
+        //    validationResult.IsSuccess = false;
+        //    validationResult.StatusCode = StatusCodes.Status422UnprocessableEntity;
+        //    return validationResult;
+        //}
 
-        if (EndDate < DateTime.Now)
-        {
-            validationResult.Message = "Ngày kết thúc phải lớn hơn ngày hiện tại";
-            validationResult.IsSuccess = false;
-            validationResult.StatusCode = StatusCodes.Status422UnprocessableEntity;
-            return validationResult;
-        }
+        //if (EndDate < DateTime.Now)
+        //{
+        //    validationResult.Message = "Ngày kết thúc phải lớn hơn ngày hiện tại";
+        //    validationResult.IsSuccess = false;
+        //    validationResult.StatusCode = StatusCodes.Status422UnprocessableEntity;
+        //    return validationResult;
+        //}
 
         validationResult.IsSuccess = true;
         return validationResult;

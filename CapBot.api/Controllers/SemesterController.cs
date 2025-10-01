@@ -44,7 +44,7 @@ namespace CapBot.api.Controllers
         ///     }
         ///
         /// </remarks>
-        [Authorize(Roles = SystemRoleConstants.Administrator)]
+        [Authorize(Roles = $"{SystemRoleConstants.Administrator},{SystemRoleConstants.Moderator}")]
         [HttpPost("create")]
         [SwaggerOperation(
             Summary = "Tạo học kỳ mới",
@@ -145,7 +145,7 @@ namespace CapBot.api.Controllers
         ///     }
         ///
         /// </remarks>
-        [Authorize(Roles = SystemRoleConstants.Administrator)]
+        [Authorize(Roles = $"{SystemRoleConstants.Administrator},{SystemRoleConstants.Moderator}")]
         [HttpPut("update")]
         [SwaggerOperation(
             Summary = "Cập nhật học kỳ",
@@ -196,7 +196,7 @@ namespace CapBot.api.Controllers
         ///     GET /api/semester/detail/1
         ///
         /// </remarks>
-        [Authorize(Roles = SystemRoleConstants.Administrator)]
+        [Authorize]
         [HttpGet("detail/{semesterId}")]
         [SwaggerOperation(
             Summary = "Lấy chi tiết học kỳ",
@@ -238,7 +238,7 @@ namespace CapBot.api.Controllers
         ///     POST /api/semester/delete/1
         ///
         /// </remarks>
-        [Authorize(Roles = SystemRoleConstants.Administrator)]
+        [Authorize(Roles = $"{SystemRoleConstants.Administrator},{SystemRoleConstants.Moderator}")]
         [HttpDelete("delete/{semesterId}")]
         [SwaggerOperation(
             Summary = "Xóa học kỳ",

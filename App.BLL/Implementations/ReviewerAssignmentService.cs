@@ -618,7 +618,7 @@ CapBot";
                     ra => ra.AssignedByUser,
                     ra => ra.Submission,
                     ra => ra.Submission.TopicVersion,
-                    ra => ra.Submission.TopicVersion.Topic
+                    ra => ra.Submission.Topic
                 },
                 OrderBy = query => query.OrderByDescending(ra => ra.AssignedAt)
             };
