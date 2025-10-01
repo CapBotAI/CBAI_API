@@ -10,7 +10,9 @@ namespace App.Entities.DTOs.Semester;
 public class CreateSemesterDTO : IEntity<App.Entities.Entities.App.Semester>, IValidationPipeline
 {
     [Required(ErrorMessage = "Tên học kỳ là bắt buộc")]
-    public string Name { get; set; } = null!;
+    [RegularExpression(@"^(Fall|Spring|Summer)\d{4}$",
+        ErrorMessage = "Name must be 'Fall', 'Spring', or 'Summer' followed by 4 digits.")]
+    public string Name { get; set; } 
 
     [Required(ErrorMessage = "Ngày bắt đầu là bắt buộc")]
     [DataType(DataType.Date)]
@@ -45,21 +47,21 @@ public class CreateSemesterDTO : IEntity<App.Entities.Entities.App.Semester>, IV
             return validationResult;
         }
 
-        if (StartDate < DateTime.Now)
-        {
-            validationResult.Message = "Ngày bắt đầu phải lớn hơn ngày hiện tại";
-            validationResult.IsSuccess = false;
-            validationResult.StatusCode = StatusCodes.Status422UnprocessableEntity;
-            return validationResult;
-        }
+        //if (StartDate < DateTime.Now)
+        //{
+        //    validationResult.Message = "Ngày bắt đầu phải lớn hơn ngày hiện tại";
+        //    validationResult.IsSuccess = false;
+        //    validationResult.StatusCode = StatusCodes.Status422UnprocessableEntity;
+        //    return validationResult;
+        //}
 
-        if (EndDate < DateTime.Now)
-        {
-            validationResult.Message = "Ngày kết thúc phải lớn hơn ngày hiện tại";
-            validationResult.IsSuccess = false;
-            validationResult.StatusCode = StatusCodes.Status422UnprocessableEntity;
-            return validationResult;
-        }
+        //if (EndDate < DateTime.Now)
+        //{
+        //    validationResult.Message = "Ngày kết thúc phải lớn hơn ngày hiện tại";
+        //    validationResult.IsSuccess = false;
+        //    validationResult.StatusCode = StatusCodes.Status422UnprocessableEntity;
+        //    return validationResult;
+        //}
 
         validationResult.IsSuccess = true;
         return validationResult;
