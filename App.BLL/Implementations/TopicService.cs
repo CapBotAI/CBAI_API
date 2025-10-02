@@ -19,6 +19,11 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
+using System.Collections.Generic;
+using System.Threading.Tasks;
+using System.Linq;
+using App.DAL.Queries;
+using App.Entities.Entities.Core;
 
 namespace App.BLL.Implementations;
 
@@ -284,13 +289,14 @@ public class TopicService : ITopicService
         try
         {
             var topicRepo = _unitOfWork.GetRepo<Topic>();
+
+            // ← Sử dụng phương thức include phức tạp hơn để load nested relationships
             var topic = await topicRepo.GetSingleAsync(new QueryBuilder<Topic>()
                 .WithPredicate(x => x.Id == topicId && x.IsActive && x.DeletedAt == null)
                 .WithInclude(x => x.Supervisor)
                 .WithInclude(x => x.Category)
                 .WithInclude(x => x.Semester)
                 .WithInclude(x => x.TopicVersions)
-                .WithInclude(x => x.Submissions)
                 .WithTracking(false)
                 .Build());
 
@@ -304,6 +310,74 @@ public class TopicService : ITopicService
                 };
             }
 
+            // ← Load submissions với reviews riêng để có nested includes
+            var submissionRepo = _unitOfWork.GetRepo<Submission>();
+            var submissions = await submissionRepo.GetAllAsync(new QueryOptions<Submission>
+            {
+                Predicate = s => s.TopicId == topicId && s.IsActive && s.DeletedAt == null,
+                IncludeProperties = new List<System.Linq.Expressions.Expression<Func<Submission, object>>>
+                {
+                    s => s.Phase,
+                    s => s.SubmittedByUser,
+                    s => s.ReviewerAssignments
+                },
+                Tracked = false
+            });
+
+            // ← Load reviews cho mỗi assignment
+            if (submissions.Any())
+            {
+                var assignmentIds = submissions
+                    .SelectMany(s => s.ReviewerAssignments)
+                    .Select(ra => ra.Id)
+                    .ToList();
+                    
+                if (assignmentIds.Any())
+                {
+                    var reviewRepo = _unitOfWork.GetRepo<Review>();
+                    var reviews = await reviewRepo.GetAllAsync(new QueryOptions<Review>
+                    {
+                        Predicate = r => assignmentIds.Contains(r.AssignmentId) && r.IsActive,
+                        Tracked = false
+                    });
+
+                    // Map reviews vào assignments
+                    foreach (var submission in submissions)
+                    {
+                        foreach (var assignment in submission.ReviewerAssignments)
+                        {
+                            assignment.Reviews = reviews.Where(r => r.AssignmentId == assignment.Id).ToList();
+                        }
+                    }
+                    
+                    // ← Load reviewer info
+                    var reviewerRepo = _unitOfWork.GetRepo<User>();
+                    var reviewerIds = submissions
+                        .SelectMany(s => s.ReviewerAssignments)
+                        .Select(ra => ra.ReviewerId)
+                        .Distinct()
+                        .ToList();
+                        
+                    var reviewers = await reviewerRepo.GetAllAsync(new QueryOptions<User>
+                    {
+                        Predicate = u => reviewerIds.Contains(u.Id),
+                        Tracked = false
+                    });
+
+                    // Map reviewers vào assignments
+                    foreach (var submission in submissions)
+                    {
+                        foreach (var assignment in submission.ReviewerAssignments)
+                        {
+                            assignment.Reviewer = reviewers.FirstOrDefault(r => r.Id == assignment.ReviewerId)!;
+                        }
+                    }
+                }
+            }
+
+            // Gán submissions đã load vào topic
+            topic.Submissions = submissions.ToList();
+
             var entityFileRepo = _unitOfWork.GetRepo<EntityFile>();
             var entityFile = await entityFileRepo.GetSingleAsync(new QueryBuilder<EntityFile>()
                 .WithPredicate(x => x.EntityId == topicId && x.EntityType == EntityType.Topic && x.IsPrimary)
@@ -315,7 +389,8 @@ public class TopicService : ITopicService
             {
                 Data = new TopicDetailDTO(topic, entityFile),
                 IsSuccess = true,
-                StatusCode = StatusCodes.Status200OK
+                StatusCode = StatusCodes.Status200OK,
+                Message = "Lấy thông tin chi tiết topic thành công"
             };
         }
         catch (System.Exception)
