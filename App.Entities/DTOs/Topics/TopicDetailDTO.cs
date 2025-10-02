@@ -110,7 +110,9 @@ public class SubmissionInTopicDetailDTO
     public int TopicId { get; set; }
     public int? TopicVersionId { get; set; }
     public int PhaseId { get; set; }
+    public string? PhaseName { get; set; }
     public int SubmittedBy { get; set; }
+    public string? SubmittedByUserName { get; set; }
     public int SubmissionRound { get; set; } = 1;
     public string? DocumentUrl { get; set; }
     public string? AdditionalNotes { get; set; }
@@ -120,6 +122,11 @@ public class SubmissionInTopicDetailDTO
     public SubmissionStatus Status { get; set; }
     public DateTime? SubmittedAt { get; set; }
 
+    public List<ReviewInfoDTO> Reviews { get; set; } = new List<ReviewInfoDTO>();
+    public int TotalReviews { get; set; }
+    public int CompletedReviews { get; set; }
+    public decimal? AverageScore { get; set; }
+
     public SubmissionInTopicDetailDTO() { }
 
     public SubmissionInTopicDetailDTO(Submission submission)
@@ -128,7 +135,9 @@ public class SubmissionInTopicDetailDTO
         TopicId = submission.TopicId;
         TopicVersionId = submission.TopicVersionId;
         PhaseId = submission.PhaseId;
+        PhaseName = submission.Phase?.Name;
         SubmittedBy = submission.SubmittedBy;
+        SubmittedByUserName = submission.SubmittedByUser?.UserName;
         SubmissionRound = submission.SubmissionRound;
         DocumentUrl = submission.DocumentUrl;
         AdditionalNotes = submission.AdditionalNotes;
@@ -137,5 +146,51 @@ public class SubmissionInTopicDetailDTO
         AiCheckDetails = submission.AiCheckDetails;
         Status = submission.Status;
         SubmittedAt = submission.SubmittedAt;
+
+        if (submission.ReviewerAssignments != null)
+        {
+            Reviews = submission.ReviewerAssignments
+                .Where(ra => ra.Reviews != null && ra.Reviews.Any())
+                .SelectMany(ra => ra.Reviews.Where(r => r.IsActive).Select(r => new ReviewInfoDTO
+                {
+                    ReviewId = r.Id,
+                    ReviewerId = ra.ReviewerId,
+                    ReviewerName = ra.Reviewer?.UserName ?? "Unknown",
+                    AssignmentType = ra.AssignmentType,
+                    OverallScore = r.OverallScore,
+                    OverallComment = r.OverallComment,
+                    Recommendation = r.Recommendation,
+                    Status = r.Status,
+                    TimeSpentMinutes = r.TimeSpentMinutes,
+                    SubmittedAt = r.SubmittedAt,
+                    CreatedAt = r.CreatedAt
+                }))
+                .OrderByDescending(r => r.SubmittedAt ?? r.CreatedAt)
+                .ToList();
+
+            TotalReviews = Reviews.Count;
+            CompletedReviews = Reviews.Count(r => r.Status == ReviewStatus.Submitted);
+
+            var submittedReviews = Reviews.Where(r => r.OverallScore.HasValue).ToList();
+            if (submittedReviews.Any())
+            {
+                AverageScore = submittedReviews.Average(r => r.OverallScore!.Value);
+            }
+        }
     }
+}
+
+public class ReviewInfoDTO
+{
+    public int ReviewId { get; set; }
+    public int ReviewerId { get; set; }
+    public string ReviewerName { get; set; } = null!;
+    public AssignmentTypes AssignmentType { get; set; }
+    public decimal? OverallScore { get; set; }
+    public string? OverallComment { get; set; }
+    public ReviewRecommendations Recommendation { get; set; }
+    public ReviewStatus Status { get; set; }
+    public int? TimeSpentMinutes { get; set; }
+    public DateTime? SubmittedAt { get; set; }
+    public DateTime CreatedAt { get; set; }
 }

@@ -121,6 +121,11 @@ namespace App.BLL.Services
                                     continue;
                                 }
                             }
+                            // If we've reached the max attempts with repeated 429, throw quota exception for callers to handle.
+                            if (attempt == maxAttempts)
+                            {
+                                throw new App.BLL.Services.AIQuotaExceededException("Gemini embedding API rate limit exceeded (429) after retries.");
+                            }
                         }
 
                         // For 5xx (including 503) we will retry up to maxAttempts
@@ -337,6 +342,11 @@ namespace App.BLL.Services
                                     await Task.Delay(TimeSpan.FromSeconds(seconds));
                                     continue;
                                 }
+                            }
+                            // If this is the last attempt and we still get 429, throw quota exception so callers can stop further API usage.
+                            if (attempt == maxAttempts)
+                            {
+                                throw new App.BLL.Services.AIQuotaExceededException("Gemini prompt API rate limit exceeded (429) after retries.");
                             }
                         }
                     }

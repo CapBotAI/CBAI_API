@@ -85,7 +85,8 @@ public class MapperProfile : Profile
         // EvaluationCriteria mappings
         CreateMap<CreateEvaluationCriteriaDTO, EvaluationCriteria>();
         CreateMap<UpdateEvaluationCriteriaDTO, EvaluationCriteria>();
-        CreateMap<EvaluationCriteria, EvaluationCriteriaResponseDTO>();
+        CreateMap<EvaluationCriteria, EvaluationCriteriaResponseDTO>()
+            .ForMember(dest => dest.SemesterName, opt => opt.MapFrom(src => src.Semester != null ? src.Semester.Name : null));
 
         // Review mappings
         CreateMap<CreateReviewDTO, Review>()
