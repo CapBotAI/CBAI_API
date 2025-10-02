@@ -47,6 +47,9 @@ public class Program
             options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
             options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.Never;
             options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            // Use custom decimal converters to ensure 4 decimal places (e.g., 0.0000)
+            options.JsonSerializerOptions.Converters.Add(new App.Commons.JsonConverters.Decimal4JsonConverter());
+            options.JsonSerializerOptions.Converters.Add(new App.Commons.JsonConverters.NullableDecimal4JsonConverter());
         }).AddOData(options =>
         {
             options.Select().Filter().OrderBy().Expand().SetMaxTop(null).Count();
