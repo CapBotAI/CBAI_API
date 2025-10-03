@@ -540,15 +540,28 @@ CapBot";
                     Email = reviewer.Email,
                     PhoneNumber = reviewer.PhoneNumber,
                     CurrentAssignments = activeCount,
-                    CompletedAssignments = performance?.CompletedAssignments ?? 0,
-                    AverageScoreGiven = performance?.AverageScoreGiven,
-                    OnTimeRate = performance?.OnTimeRate,
-                    QualityRating = performance?.QualityRating,
                     Skills = reviewer.LecturerSkills.Select(ls => ls.SkillTag).ToList(),
                     IsAvailable = !isAlreadyAssigned && activeCount < 10,
                     UnavailableReason = isAlreadyAssigned ? "Đã được phân công" :
                         activeCount >= 10 ? "Quá tải assignment" : null
                 };
+
+                if (performance != null)
+                {
+                    availableReviewer.Performance = new App.Entities.DTOs.ReviewerAssignment.ReviewerPerformanceDTO
+                    {
+                        Id = performance.Id,
+                        ReviewerId = performance.ReviewerId,
+                        SemesterId = performance.SemesterId,
+                        TotalAssignments = performance.TotalAssignments,
+                        CompletedAssignments = performance.CompletedAssignments,
+                        AverageTimeMinutes = performance.AverageTimeMinutes,
+                        AverageScoreGiven = performance.AverageScoreGiven,
+                        OnTimeRate = performance.OnTimeRate,
+                        QualityRating = performance.QualityRating,
+                        LastUpdated = performance.LastUpdated
+                    };
+                }
 
                 availableReviewers.Add(availableReviewer);
             }
@@ -745,6 +758,36 @@ CapBot";
             }
 
             await _unitOfWork.GetRepo<ReviewerAssignment>().DeleteAsync(assignment);
+
+            // Best-effort: decrement ReviewerPerformance.TotalAssignments for the reviewer and semester
+            try
+            {
+                var semesterIdNullable = assignment.Submission?.TopicVersion?.Topic?.SemesterId
+                                         ?? assignment.Submission?.Topic?.SemesterId;
+
+                if (semesterIdNullable.HasValue)
+                {
+                    var semesterId = semesterIdNullable.Value;
+                    var perfRepo = _unitOfWork.GetRepo<ReviewerPerformance>();
+                    var perfOptions = new QueryOptions<ReviewerPerformance>
+                    {
+                        Predicate = rp => rp.ReviewerId == assignment.ReviewerId && rp.SemesterId == semesterId
+                    };
+
+                    var perf = await perfRepo.GetSingleAsync(perfOptions);
+                    if (perf != null)
+                    {
+                        perf.TotalAssignments = Math.Max(0, perf.TotalAssignments - 1);
+                        perf.LastUpdated = DateTime.UtcNow;
+                        await perfRepo.UpdateAsync(perf);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to decrement ReviewerPerformance after deleting assignment {AssignmentId} for reviewer {ReviewerId}", assignment.Id, assignment.ReviewerId);
+            }
+
             await _unitOfWork.SaveChangesAsync();
 
             return new BaseResponseModel
@@ -879,14 +922,36 @@ CapBot";
                     UserName = reviewer.UserName,
                     Email = reviewer.Email,
                     PhoneNumber = reviewer.PhoneNumber,
+                    // Default to active assignment count; we may overwrite this with performance-based computation below
                     CurrentAssignments = activeAssignments,
-                    CompletedAssignments = perf?.CompletedAssignments ?? 0,
-                    AverageScoreGiven = perf?.AverageScoreGiven,
-                    OnTimeRate = perf?.OnTimeRate,
-                    QualityRating = perf?.QualityRating,
                     Skills = reviewer.LecturerSkills?.Select(ls => ls.SkillTag).ToList() ?? new List<string>(),
                     IsAvailable = activeAssignments < 10
                 };
+
+                // Map the selected ReviewerPerformance into the DTO (safe projection)
+                if (perf != null)
+                {
+                    workload.Performance = new App.Entities.DTOs.ReviewerAssignment.ReviewerPerformanceDTO
+                    {
+                        Id = perf.Id,
+                        ReviewerId = perf.ReviewerId,
+                        SemesterId = perf.SemesterId,
+                        TotalAssignments = perf.TotalAssignments,
+                        CompletedAssignments = perf.CompletedAssignments,
+                        AverageTimeMinutes = perf.AverageTimeMinutes,
+                        AverageScoreGiven = perf.AverageScoreGiven,
+                        OnTimeRate = perf.OnTimeRate,
+                        QualityRating = perf.QualityRating,
+                        LastUpdated = perf.LastUpdated
+                    };
+                }
+
+                // If there's a performance snapshot, prefer showing the computed current assignments
+                // defined as total - completed so clients see the authoritative workload.
+                if (workload.Performance != null)
+                {
+                    workload.CurrentAssignments = workload.Performance.TotalAssignments - workload.Performance.CompletedAssignments;
+                }
 
                 workloadInfo.Add(workload);
             }
@@ -896,7 +961,10 @@ CapBot";
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
                 Message = "Lấy thông tin workload thành công",
-                Data = workloadInfo.OrderBy(w => w.CurrentAssignments).ToList()
+                Data = workloadInfo
+                    .OrderByDescending(w => w.CurrentAssignments)
+                    .ThenByDescending(w => w.IsAvailable)
+                    .ToList()
             };
         }
         catch (Exception ex)
