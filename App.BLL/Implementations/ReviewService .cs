@@ -119,6 +119,49 @@ public class ReviewService : IReviewService
             // Persist submission status change
             await submissionRepo.UpdateAsync(submission);
 
+            // ---- New: also update TopicVersion.Status using the same rules
+            try
+            {
+                var topicVersionRepo = _unitOfWork.GetRepo<TopicVersion>();
+                // if submission has a linked TopicVersion, try to update its status
+                if (submission.TopicVersionId.HasValue)
+                {
+                    var tv = await topicVersionRepo.GetSingleAsync(new QueryOptions<TopicVersion>
+                    {
+                        Predicate = t => t.Id == submission.TopicVersionId.Value,
+                        Tracked = false
+                    });
+
+                    if (tv != null)
+                    {
+                        // Map Submission decision -> TopicVersion.Status where appropriate
+                        // Note: TopicVersion enum uses Draft/SubmissionPending/Submitted/... older approve/reject are obsolete.
+                        // We'll set Submitted when a final decision is reached and leave finer-grained flags to Topic/Submission logs.
+                        // For parity with submission outcomes, set Submitted when Approved/Rejected/RevisionRequired/EscalatedToModerator
+                        var shouldMarkSubmitted = false;
+                        if (submission.Status == SubmissionStatus.Approved ||
+                            submission.Status == SubmissionStatus.Rejected ||
+                            submission.Status == SubmissionStatus.RevisionRequired ||
+                            submission.Status == SubmissionStatus.EscalatedToModerator)
+                        {
+                            shouldMarkSubmitted = true;
+                        }
+
+                        if (shouldMarkSubmitted)
+                        {
+                            // mark TopicVersion as Submitted to indicate review process finished for this version
+                            tv.Status = TopicStatus.Submitted;
+                            // persist change
+                            await topicVersionRepo.UpdateAsync(tv);
+                        }
+                    }
+                }
+            }
+            catch
+            {
+                // best-effort: do not block submission decision persisting
+            }
+
             // Also update related assignments: mark assignments that have a submitted review as Completed or Overdue
             // Use the latest submitted review for each assignment to determine completed time
 

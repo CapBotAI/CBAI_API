@@ -79,7 +79,6 @@ public class MapperProfile : Profile
             .ForMember(dest => dest.Skills, opt => opt.MapFrom(src =>
                 src.LecturerSkills.Select(ls => ls.SkillTag).ToList()))
             .ForMember(dest => dest.CurrentAssignments, opt => opt.Ignore())
-            .ForMember(dest => dest.CompletedAssignments, opt => opt.Ignore())
             .ForMember(dest => dest.IsAvailable, opt => opt.Ignore());
 
         // EvaluationCriteria mappings

@@ -44,58 +44,6 @@ public class ReviewerAssignmentService : IReviewerAssignmentService
         _logger = logger;
     }
 
-    // Helper to build email HTML and plain-text bodies for assignment notifications
-    private (string htmlBody, string plainText) BuildAssignmentEmailBodies(ReviewerAssignment createdAssignment, string topicTitle)
-    {
-        var reviewerName = createdAssignment.Reviewer?.UserName ?? "Reviewer";
-        var deadlineText = createdAssignment.Deadline.HasValue
-            ? createdAssignment.Deadline.Value.ToString("dd/MM/yyyy HH:mm")
-            : "Không có";
-
-        var plainText = $@"Xin chào {reviewerName},
-
-Bạn vừa được phân công review đề tài: {topicTitle}.
-Deadline: {deadlineText}
-
-Vui lòng đăng nhập vào hệ thống để xem chi tiết và bắt đầu review.
-
-Trân trọng,
-CapBot";
-
-        var sb = new StringBuilder();
-        sb.AppendLine("<!doctype html>");
-        sb.AppendLine("<html lang=\"vi\"> ");
-        sb.AppendLine("  <head>");
-        sb.AppendLine("    <meta charset=\"utf-8\" />");
-        sb.AppendLine("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />");
-        sb.AppendLine("    <title>Phân công review</title>");
-        sb.AppendLine("    <style>");
-        sb.AppendLine("      body { font-family: Arial, Helvetica, sans-serif; background:#f7f7f7; color:#333; }");
-        sb.AppendLine("      .container { max-width:680px; margin:18px auto; background:#fff; padding:20px; border-radius:6px; box-shadow:0 1px 3px rgba(0,0,0,0.08) }");
-        sb.AppendLine("      h1 { font-size:18px; margin:0 0 12px 0 }");
-        sb.AppendLine("      p { line-height:1.5; margin:8px 0 }");
-        sb.AppendLine("      .meta { background:#f0f4ff; padding:10px; border-radius:4px; margin:12px 0 }");
-        sb.AppendLine("      .footer { font-size:13px; color:#666; margin-top:18px }");
-        sb.AppendLine("      a.btn { display:inline-block; background:#0b62d6; color:#fff; padding:10px 14px; border-radius:4px; text-decoration:none }");
-        sb.AppendLine("    </style>");
-        sb.AppendLine("  </head>");
-        sb.AppendLine("  <body>");
-        sb.AppendLine("    <div class=\"container\">");
-        sb.AppendLine($"      <h1>Xin chào {System.Net.WebUtility.HtmlEncode(reviewerName)},</h1>");
-        sb.AppendLine("      <p>Bạn vừa được phân công review đề tài dưới đây. Vui lòng kiểm tra assignment trong hệ thống và hoàn thành trước hạn chót.</p>");
-        sb.AppendLine("      <div class=\"meta\">");
-        sb.AppendLine($"        <strong>Đề tài:</strong> {System.Net.WebUtility.HtmlEncode(topicTitle)}<br/>");
-        sb.AppendLine($"        <strong>Deadline:</strong> {System.Net.WebUtility.HtmlEncode(deadlineText)}");
-        sb.AppendLine("      </div>");
-        sb.AppendLine("      <p><a class=\"btn\" href=\"#\" target=\"_blank\">Xem assignment</a></p>");
-        sb.AppendLine("      <p class=\"footer\">Trân trọng,<br/>CapBot</p>");
-        sb.AppendLine("    </div>");
-        sb.AppendLine("  </body>");
-        sb.AppendLine("</html>");
-
-        return (sb.ToString(), plainText);
-    }
-
     public async Task<BaseResponseModel<ReviewerAssignmentResponseDTO>> AssignReviewerAsync(AssignReviewerDTO dto,
         int assignedById)
     {
@@ -290,21 +238,27 @@ CapBot";
             var response = _mapper.Map<ReviewerAssignmentResponseDTO>(createdAssignment);
             string extraNotes = string.Empty;
 
-            // Ensure a system notification row exists for the assigned reviewer. Use NotificationService first; if it fails, fall back to direct DB insert.
+            // Ensure a system notification row exists for the assigned reviewer and send a styled email.
             try
             {
-                var topicTitle = createdAssignment.Submission?.Topic?.EN_Title ?? "(Không xác định)";
-                var title = $"Bạn được phân công review: {topicTitle}";
-                var message = $"Bạn vừa được phân công review đề tài '{topicTitle}'. Vui lòng kiểm tra assignment và hoàn thành trước deadline.";
+                var topicTitle = createdAssignment?.Submission?.TopicVersion?.Topic?.EN_Title ??
+                                 createdAssignment?.Submission?.Topic?.EN_Title ?? "Không xác định";
 
-                var notifDto = new App.Entities.DTOs.Notifications.CreateNotificationDTO
+                var notificationTitle = "Bạn được phân công review mới";
+                var notificationMessage = $"Bạn đã được phân công review submission cho đề tài '{topicTitle}'";
+                if (dto.Deadline.HasValue)
                 {
-                    UserId = createdAssignment.ReviewerId,
-                    Title = title,
-                    Message = message,
-                    Type = App.Entities.Enums.NotificationTypes.Info,
+                    notificationMessage += $". Deadline: {dto.Deadline.Value:dd/MM/yyyy HH:mm}";
+                }
+
+                var notifDto = new CreateNotificationDTO
+                {
+                    UserId = dto.ReviewerId,
+                    Title = notificationTitle,
+                    Message = notificationMessage,
+                    Type = NotificationTypes.Info,
                     RelatedEntityType = "ReviewerAssignment",
-                    RelatedEntityId = createdAssignment.Id
+                    RelatedEntityId = createdAssignment?.Id ?? assignment.Id
                 };
 
                 var notifResult = await _notificationService.CreateAsync(notifDto);
@@ -312,56 +266,92 @@ CapBot";
                 // If notification service failed (or returned null), create the notification directly to ensure DB persistence
                 if (notifResult == null || !notifResult.IsSuccess)
                 {
-                    var repo = _unitOfWork.GetRepo<SystemNotification>();
-                    var fallback = new SystemNotification
-                    {
-                        UserId = notifDto.UserId,
-                        Title = notifDto.Title,
-                        Message = notifDto.Message,
-                        Type = notifDto.Type,
-                        RelatedEntityType = notifDto.RelatedEntityType,
-                        RelatedEntityId = notifDto.RelatedEntityId,
-                        IsRead = false,
-                        CreatedAt = DateTime.Now
-                    };
-
-                    await repo.CreateAsync(fallback);
-                    await _unitOfWork.SaveChangesAsync();
-                }
-
-                // Attempt to send email if reviewer has email. If send fails or throws, append a message but don't throw.
-                var reviewerEmail = createdAssignment.Reviewer?.Email;
-                if (!string.IsNullOrWhiteSpace(reviewerEmail))
-                {
                     try
                     {
-                        // Build email bodies (html + plain text) via helper to keep this method readable
-                        var (htmlBody, plainText) = BuildAssignmentEmailBodies(createdAssignment, topicTitle);
+                        var repo = _unitOfWork.GetRepo<SystemNotification>();
+                        var fallback = new SystemNotification
+                        {
+                            UserId = notifDto.UserId,
+                            Title = notifDto.Title,
+                            Message = notifDto.Message,
+                            Type = notifDto.Type,
+                            RelatedEntityType = notifDto.RelatedEntityType,
+                            RelatedEntityId = notifDto.RelatedEntityId,
+                            IsRead = false,
+                            CreatedAt = DateTime.Now
+                        };
 
-                        // Prefer to send the HTML body; the EmailService implementation may include a plain-text fallback.
-                        var emailModel = new EmailModel(
-                            new[] { reviewerEmail },
-                            $"[CapBot] Phân công review: {topicTitle}",
-                            htmlBody
-                        );
+                        await repo.CreateAsync(fallback);
+                        await _unitOfWork.SaveChangesAsync();
+                    }
+                    catch (Exception ex)
+                    {
+                        _logger.LogError(ex, "Fallback notification insert failed for reviewer {ReviewerId} assignment {AssignmentId}", dto.ReviewerId, notifDto.RelatedEntityId);
+                    }
+                }
 
+                // Send a styled HTML email to the reviewer (best-effort)
+                try
+                {
+                    var reviewerEmail = reviewer?.Email;
+                    if (!string.IsNullOrWhiteSpace(reviewerEmail))
+                    {
+                        var emailSubject = "[CapBot] Bạn được phân công review mới";
+
+                        var deadlineHtml = dto.Deadline.HasValue
+                            ? $"<p style=\"margin: 5px 0;\"><strong>Deadline:</strong> {dto.Deadline.Value:dd/MM/yyyy HH:mm}</p>"
+                            : string.Empty;
+
+                        var emailBody = $@"<!DOCTYPE html>
+<html>
+<head>
+    <meta charset=""utf-8"">
+    <title>Thông báo phân công review</title>
+</head>
+<body style=""font-family: Arial, sans-serif; line-height: 1.6; color: #333;"">
+    <div style=""max-width: 600px; margin: 0 auto; padding: 20px;"">
+        <h2 style=""color: #2c3e50; border-bottom: 2px solid #3498db; padding-bottom: 10px;"">            Thông báo phân công review        </h2>
+        
+        <p>Xin chào <strong>{System.Net.WebUtility.HtmlEncode(reviewer?.UserName ?? "Reviewer")}</strong>,</p>
+        
+        <p>Bạn đã được phân công review submission cho đề tài:</p>
+        
+        <div style=""background-color: #f8f9fa; padding: 15px; border-left: 4px solid #3498db; margin: 20px 0;"">
+            <p style=""margin: 5px 0;""><strong>Đề tài:</strong> {System.Net.WebUtility.HtmlEncode(topicTitle)}</p>
+            <p style=""margin: 5px 0;""><strong>Submission ID:</strong> #{dto.SubmissionId}</p>
+            <p style=""margin: 5px 0;""><strong>Loại assignment:</strong> {dto.AssignmentType}</p>
+            {deadlineHtml}
+        </div>
+        
+        <p>Vui lòng đăng nhập vào hệ thống để xem chi tiết và bắt đầu quá trình review.</p>
+        
+        <p style=""margin-top: 30px;"">Trân trọng,<br>            <strong>CapBot System</strong>
+        </p>
+        
+        <hr style=""border: none; border-top: 1px solid #ddd; margin: 30px 0;"">
+        <p style=""font-size: 12px; color: #7f8c8d;"">Email này được gửi tự động từ hệ thống CapBot. Vui lòng không trả lời email này.</p>
+    </div>
+</body>
+</html>";
+
+                        var emailModel = new EmailModel(new[] { reviewerEmail }, emailSubject, emailBody);
                         var emailSent = await _emailService.SendEmailAsync(emailModel);
                         if (!emailSent)
                         {
-                            // append info to response message so client can see email wasn't sent
                             extraNotes += " Notification created but email not sent (EmailService returned false).";
                         }
                     }
-                    catch (Exception)
-                    {
-                        // Email failure should not break assignment; inform caller via message
-                        extraNotes += " Notification created but email send threw an exception.";
-                    }
+                }
+                catch (Exception ex)
+                {
+                    extraNotes += " Notification created but email send threw an exception.";
+                    _logger.LogError(ex, "Failed to send assignment email to reviewer {ReviewerId} for assignment {AssignmentId}", dto.ReviewerId, createdAssignment?.Id ?? assignment.Id);
                 }
             }
-            catch
+            catch (Exception ex)
             {
-                // Fail silently for notification/email but do not block the main assignment success
+                // Log but don't fail the core assignment operation
+                _logger.LogError(ex, "Failed to create notification or send email for reviewer assignment (reviewerId={ReviewerId}, submissionId={SubmissionId})", dto.ReviewerId, dto.SubmissionId);
             }
 
             // Update ReviewerPerformance.TotalAssignments for the reviewer and semester (best-effort)
@@ -540,15 +530,28 @@ CapBot";
                     Email = reviewer.Email,
                     PhoneNumber = reviewer.PhoneNumber,
                     CurrentAssignments = activeCount,
-                    CompletedAssignments = performance?.CompletedAssignments ?? 0,
-                    AverageScoreGiven = performance?.AverageScoreGiven,
-                    OnTimeRate = performance?.OnTimeRate,
-                    QualityRating = performance?.QualityRating,
                     Skills = reviewer.LecturerSkills.Select(ls => ls.SkillTag).ToList(),
                     IsAvailable = !isAlreadyAssigned && activeCount < 10,
                     UnavailableReason = isAlreadyAssigned ? "Đã được phân công" :
                         activeCount >= 10 ? "Quá tải assignment" : null
                 };
+
+                if (performance != null)
+                {
+                    availableReviewer.Performance = new App.Entities.DTOs.ReviewerAssignment.ReviewerPerformanceDTO
+                    {
+                        Id = performance.Id,
+                        ReviewerId = performance.ReviewerId,
+                        SemesterId = performance.SemesterId,
+                        TotalAssignments = performance.TotalAssignments,
+                        CompletedAssignments = performance.CompletedAssignments,
+                        AverageTimeMinutes = performance.AverageTimeMinutes,
+                        AverageScoreGiven = performance.AverageScoreGiven,
+                        OnTimeRate = performance.OnTimeRate,
+                        QualityRating = performance.QualityRating,
+                        LastUpdated = performance.LastUpdated
+                    };
+                }
 
                 availableReviewers.Add(availableReviewer);
             }
@@ -745,6 +748,36 @@ CapBot";
             }
 
             await _unitOfWork.GetRepo<ReviewerAssignment>().DeleteAsync(assignment);
+
+            // Best-effort: decrement ReviewerPerformance.TotalAssignments for the reviewer and semester
+            try
+            {
+                var semesterIdNullable = assignment.Submission?.TopicVersion?.Topic?.SemesterId
+                                         ?? assignment.Submission?.Topic?.SemesterId;
+
+                if (semesterIdNullable.HasValue)
+                {
+                    var semesterId = semesterIdNullable.Value;
+                    var perfRepo = _unitOfWork.GetRepo<ReviewerPerformance>();
+                    var perfOptions = new QueryOptions<ReviewerPerformance>
+                    {
+                        Predicate = rp => rp.ReviewerId == assignment.ReviewerId && rp.SemesterId == semesterId
+                    };
+
+                    var perf = await perfRepo.GetSingleAsync(perfOptions);
+                    if (perf != null)
+                    {
+                        perf.TotalAssignments = Math.Max(0, perf.TotalAssignments - 1);
+                        perf.LastUpdated = DateTime.UtcNow;
+                        await perfRepo.UpdateAsync(perf);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "Failed to decrement ReviewerPerformance after deleting assignment {AssignmentId} for reviewer {ReviewerId}", assignment.Id, assignment.ReviewerId);
+            }
+
             await _unitOfWork.SaveChangesAsync();
 
             return new BaseResponseModel
@@ -879,14 +912,36 @@ CapBot";
                     UserName = reviewer.UserName,
                     Email = reviewer.Email,
                     PhoneNumber = reviewer.PhoneNumber,
+                    // Default to active assignment count; we may overwrite this with performance-based computation below
                     CurrentAssignments = activeAssignments,
-                    CompletedAssignments = perf?.CompletedAssignments ?? 0,
-                    AverageScoreGiven = perf?.AverageScoreGiven,
-                    OnTimeRate = perf?.OnTimeRate,
-                    QualityRating = perf?.QualityRating,
                     Skills = reviewer.LecturerSkills?.Select(ls => ls.SkillTag).ToList() ?? new List<string>(),
                     IsAvailable = activeAssignments < 10
                 };
+
+                // Map the selected ReviewerPerformance into the DTO (safe projection)
+                if (perf != null)
+                {
+                    workload.Performance = new App.Entities.DTOs.ReviewerAssignment.ReviewerPerformanceDTO
+                    {
+                        Id = perf.Id,
+                        ReviewerId = perf.ReviewerId,
+                        SemesterId = perf.SemesterId,
+                        TotalAssignments = perf.TotalAssignments,
+                        CompletedAssignments = perf.CompletedAssignments,
+                        AverageTimeMinutes = perf.AverageTimeMinutes,
+                        AverageScoreGiven = perf.AverageScoreGiven,
+                        OnTimeRate = perf.OnTimeRate,
+                        QualityRating = perf.QualityRating,
+                        LastUpdated = perf.LastUpdated
+                    };
+                }
+
+                // If there's a performance snapshot, prefer showing the computed current assignments
+                // defined as total - completed so clients see the authoritative workload.
+                if (workload.Performance != null)
+                {
+                    workload.CurrentAssignments = workload.Performance.TotalAssignments - workload.Performance.CompletedAssignments;
+                }
 
                 workloadInfo.Add(workload);
             }
@@ -896,7 +951,10 @@ CapBot";
                 IsSuccess = true,
                 StatusCode = StatusCodes.Status200OK,
                 Message = "Lấy thông tin workload thành công",
-                Data = workloadInfo.OrderBy(w => w.CurrentAssignments).ToList()
+                Data = workloadInfo
+                    .OrderByDescending(w => w.CurrentAssignments)
+                    .ThenByDescending(w => w.IsAvailable)
+                    .ToList()
             };
         }
         catch (Exception ex)
