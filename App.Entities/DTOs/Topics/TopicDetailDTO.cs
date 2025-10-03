@@ -86,17 +86,44 @@ public class TopicDetailDTO
         CurrentVersion = latestVersion != null ? new TopicVersionDetailDTO(latestVersion, null) : null;
 
 
-        LatestSubmittedAt = topic.Submissions
-            .Where(s => s.IsActive && s.DeletedAt == null)
-            .OrderByDescending(s => s.SubmittedAt ?? s.CreatedAt)
-            .Select(s => s.SubmittedAt)
-            .FirstOrDefault();
+        // Prefer submissions that belong to the current TopicVersion (if any), so DTO reflects
+        // the state of the current version. If there is no current version or no submissions for it,
+        // fall back to the overall latest submission for the topic.
+        var activeSubs = topic.Submissions?.Where(s => s.IsActive && s.DeletedAt == null).ToList() ?? new List<Submission>();
 
-        LatestSubmissionStatus = topic.Submissions
-            .Where(s => s.IsActive && s.DeletedAt == null)
-            .OrderByDescending(s => s.SubmittedAt ?? s.CreatedAt)
-            .Select(s => (SubmissionStatus?)s.Status)
-            .FirstOrDefault();
+        DateTime? latestSubmittedAt = null;
+        SubmissionStatus? latestStatus = null;
+
+        if (CurrentVersion != null)
+        {
+            var subsForCurrentVersion = activeSubs
+                .Where(s => s.TopicVersionId.HasValue && s.TopicVersionId == CurrentVersion.Id)
+                .OrderByDescending(s => s.SubmittedAt ?? s.CreatedAt)
+                .ToList();
+
+            if (subsForCurrentVersion.Any())
+            {
+                latestSubmittedAt = subsForCurrentVersion.Select(s => s.SubmittedAt).FirstOrDefault();
+                latestStatus = subsForCurrentVersion.Select(s => (SubmissionStatus?)s.Status).FirstOrDefault();
+            }
+        }
+
+        if (latestSubmittedAt == null && latestStatus == null)
+        {
+            // fallback to any latest submission across versions
+            latestSubmittedAt = activeSubs
+                .OrderByDescending(s => s.SubmittedAt ?? s.CreatedAt)
+                .Select(s => s.SubmittedAt)
+                .FirstOrDefault();
+
+            latestStatus = activeSubs
+                .OrderByDescending(s => s.SubmittedAt ?? s.CreatedAt)
+                .Select(s => (SubmissionStatus?)s.Status)
+                .FirstOrDefault();
+        }
+
+        LatestSubmittedAt = latestSubmittedAt;
+        LatestSubmissionStatus = latestStatus;
 
         HasSubmitted = LatestSubmittedAt.HasValue;
 
